@@ -1,0 +1,419 @@
+//@version=6
+indicator("BTC Multi-Market Wave AVWAP PRO", shorttitle="BTC Wave AVWAP PRO", overlay=true, max_lines_count=20, max_labels_count=20, max_polylines_count=10)
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// INPUT GROUPS
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+string GROUP_WAVE = "① Wave Selection"
+string GROUP_SPOT = "② Spot Market"
+string GROUP_FUT = "③ Futures / Perpetual"
+string GROUP_CME = "④ CME Futures"
+string GROUP_CALC = "⑤ Calculation"
+string GROUP_VIEW = "⑥ Display"
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ① INTERACTIVE POINTS
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// Point 1
+float point1Price = input.price(100000.0, "Point 1", inline="P1", group=GROUP_WAVE, confirm=true)
+int point1Time = input.time(timestamp("01 Jan 2025 00:00 +0000"), "", inline="P1", group=GROUP_WAVE, confirm=true)
+
+// Point 2
+float point2Price = input.price(100000.0, "Point 2", inline="P2", group=GROUP_WAVE, confirm=true)
+int point2Time = input.time(timestamp("01 Jan 2026 00:00 +0000"), "", inline="P2", group=GROUP_WAVE, confirm=true)
+
+bool showWaveLine = input.bool(true, "Show Connecting Line", group=GROUP_WAVE)
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// WAVE NORMALIZATION
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+int waveStart = math.min(point1Time, point2Time)
+int waveEnd = math.max(point1Time, point2Time)
+
+bool validWave = waveEnd > waveStart
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ② SPOT
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+string spotExchange = input.string("Binance", "Primary Spot Exchange", options=["Binance", "Coinbase", "Kraken", "OKX", "Bybit", "Bitstamp"], group=GROUP_SPOT)
+
+bool showIndividualSpot = input.bool(false, "Show Individual Spot AVWAPs", group=GROUP_SPOT)
+
+string spotSymbol = spotExchange == "Binance" ? "BINANCE:BTCUSDT" :
+     spotExchange == "Coinbase" ? "COINBASE:BTCUSD" :
+     spotExchange == "Kraken" ? "KRAKEN:XBTUSD" :
+     spotExchange == "OKX" ? "OKX:BTCUSDT" :
+     spotExchange == "Bybit" ? "BYBIT:BTCUSDT" :
+     "BITSTAMP:BTCUSD"
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ③ FUTURES
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+string futuresExchange = input.string("Binance", "Primary Futures Exchange", options=["Binance", "OKX", "Bybit", "Kraken"], group=GROUP_FUT)
+
+bool showFutures = input.bool(true, "Show Futures AVWAP", group=GROUP_FUT)
+
+string futuresSymbol = futuresExchange == "Binance" ? "BINANCE:BTCUSDT.P" :
+     futuresExchange == "OKX" ? "OKX:BTCUSDT.P" :
+     futuresExchange == "Bybit" ? "BYBIT:BTCUSDT.P" :
+     "KRAKEN:XBTUSD.P"
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ④ CME
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+bool showCME = input.bool(true, "Show CME AVWAP", group=GROUP_CME)
+
+string cmeSymbol = "CME:BTC1!"
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ⑤ CALCULATION
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+string priceMode = input.string("HLC3", "Price Source", options=["HLC3", "Close", "HL2", "OHLC4"], group=GROUP_CALC)
+
+float sourcePrice = priceMode == "Close" ? close :
+     priceMode == "HL2" ? hl2 :
+     priceMode == "OHLC4" ? ohlc4 :
+     hlc3
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// MARKET DATA
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// Primary Spot
+float spotPrice = request.security(spotSymbol, timeframe.period, sourcePrice, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=true)
+float spotVolume = request.security(spotSymbol, timeframe.period, volume, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=true)
+
+// Futures
+float futuresPrice = request.security(futuresSymbol, timeframe.period, sourcePrice, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=true)
+float futuresVolume = request.security(futuresSymbol, timeframe.period, volume, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=true)
+
+// CME
+float cmePrice = request.security(cmeSymbol, timeframe.period, sourcePrice, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=true)
+float cmeVolume = request.security(cmeSymbol, timeframe.period, volume, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=true)
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// INDIVIDUAL SPOT DATA
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+float binancePrice = request.security("BINANCE:BTCUSDT", timeframe.period, sourcePrice, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=true)
+float binanceVolume = request.security("BINANCE:BTCUSDT", timeframe.period, volume, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=true)
+
+float coinbasePrice = request.security("COINBASE:BTCUSD", timeframe.period, sourcePrice, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=true)
+float coinbaseVolume = request.security("COINBASE:BTCUSD", timeframe.period, volume, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=true)
+
+float krakenPrice = request.security("KRAKEN:XBTUSD", timeframe.period, sourcePrice, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=true)
+float krakenVolume = request.security("KRAKEN:XBTUSD", timeframe.period, volume, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=true)
+
+float okxPrice = request.security("OKX:BTCUSDT", timeframe.period, sourcePrice, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=true)
+float okxVolume = request.security("OKX:BTCUSDT", timeframe.period, volume, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=true)
+
+float bybitPrice = request.security("BYBIT:BTCUSDT", timeframe.period, sourcePrice, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=true)
+float bybitVolume = request.security("BYBIT:BTCUSDT", timeframe.period, volume, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=true)
+
+float bitstampPrice = request.security("BITSTAMP:BTCUSD", timeframe.period, sourcePrice, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=true)
+float bitstampVolume = request.security("BITSTAMP:BTCUSD", timeframe.period, volume, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=true)
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// WAVE CONDITION
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+bool insideWave = time >= waveStart and time <= waveEnd
+bool afterWave = time > waveEnd
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PRIMARY SPOT AVWAP
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+var float spotPV = 0.0
+var float spotV = 0.0
+var float finalSpotAVWAP = na
+
+if insideWave
+    if not na(spotPrice) and not na(spotVolume)
+        spotPV += spotPrice * spotVolume
+        spotV += spotVolume
+
+if afterWave and na(finalSpotAVWAP)
+    if spotV > 0
+        finalSpotAVWAP := spotPV / spotV
+
+float spotAVWAP = not na(finalSpotAVWAP) ? finalSpotAVWAP : spotV > 0 ? spotPV / spotV : na
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// FUTURES AVWAP
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+var float futuresPV = 0.0
+var float futuresV = 0.0
+var float finalFuturesAVWAP = na
+
+if insideWave
+    if not na(futuresPrice) and not na(futuresVolume)
+        futuresPV += futuresPrice * futuresVolume
+        futuresV += futuresVolume
+
+if afterWave and na(finalFuturesAVWAP)
+    if futuresV > 0
+        finalFuturesAVWAP := futuresPV / futuresV
+
+float futuresAVWAP = not na(finalFuturesAVWAP) ? finalFuturesAVWAP : futuresV > 0 ? futuresPV / futuresV : na
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CME AVWAP
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+var float cmePV = 0.0
+var float cmeV = 0.0
+var float finalCMEAVWAP = na
+
+if insideWave
+    if not na(cmePrice) and not na(cmeVolume)
+        cmePV += cmePrice * cmeVolume
+        cmeV += cmeVolume
+
+if afterWave and na(finalCMEAVWAP)
+    if cmeV > 0
+        finalCMEAVWAP := cmePV / cmeV
+
+float cmeAVWAP = not na(finalCMEAVWAP) ? finalCMEAVWAP : cmeV > 0 ? cmePV / cmeV : na
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// INDIVIDUAL SPOT AVWAPS
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// Binance
+var float binancePV = 0.0
+var float binanceV = 0.0
+var float finalBinance = na
+
+if insideWave
+    if not na(binancePrice) and not na(binanceVolume)
+        binancePV += binancePrice * binanceVolume
+        binanceV += binanceVolume
+
+if afterWave and na(finalBinance)
+    if binanceV > 0
+        finalBinance := binancePV / binanceV
+
+float binanceAVWAP = not na(finalBinance) ? finalBinance : binanceV > 0 ? binancePV / binanceV : na
+
+// Coinbase
+var float coinbasePV = 0.0
+var float coinbaseV = 0.0
+var float finalCoinbase = na
+
+if insideWave
+    if not na(coinbasePrice) and not na(coinbaseVolume)
+        coinbasePV += coinbasePrice * coinbaseVolume
+        coinbaseV += coinbaseVolume
+
+if afterWave and na(finalCoinbase)
+    if coinbaseV > 0
+        finalCoinbase := coinbasePV / coinbaseV
+
+float coinbaseAVWAP = not na(finalCoinbase) ? finalCoinbase : coinbaseV > 0 ? coinbasePV / coinbaseV : na
+
+// Kraken
+var float krakenPV = 0.0
+var float krakenV = 0.0
+var float finalKraken = na
+
+if insideWave
+    if not na(krakenPrice) and not na(krakenVolume)
+        krakenPV += krakenPrice * krakenVolume
+        krakenV += krakenVolume
+
+if afterWave and na(finalKraken)
+    if krakenV > 0
+        finalKraken := krakenPV / krakenV
+
+float krakenAVWAP = not na(finalKraken) ? finalKraken : krakenV > 0 ? krakenPV / krakenV : na
+
+// OKX
+var float okxPV = 0.0
+var float okxV = 0.0
+var float finalOKX = na
+
+if insideWave
+    if not na(okxPrice) and not na(okxVolume)
+        okxPV += okxPrice * okxVolume
+        okxV += okxVolume
+
+if afterWave and na(finalOKX)
+    if okxV > 0
+        finalOKX := okxPV / okxV
+
+float okxAVWAP = not na(finalOKX) ? finalOKX : okxV > 0 ? okxPV / okxV : na
+
+// Bybit
+var float bybitPV = 0.0
+var float bybitV = 0.0
+var float finalBybit = na
+
+if insideWave
+    if not na(bybitPrice) and not na(bybitVolume)
+        bybitPV += bybitPrice * bybitVolume
+        bybitV += bybitVolume
+
+if afterWave and na(finalBybit)
+    if bybitV > 0
+        finalBybit := bybitPV / bybitV
+
+float bybitAVWAP = not na(finalBybit) ? finalBybit : bybitV > 0 ? bybitPV / bybitV : na
+
+// Bitstamp
+var float bitstampPV = 0.0
+var float bitstampV = 0.0
+var float finalBitstamp = na
+
+if insideWave
+    if not na(bitstampPrice) and not na(bitstampVolume)
+        bitstampPV += bitstampPrice * bitstampVolume
+        bitstampV += bitstampVolume
+
+if afterWave and na(finalBitstamp)
+    if bitstampV > 0
+        finalBitstamp := bitstampPV / bitstampV
+
+float bitstampAVWAP = not na(finalBitstamp) ? finalBitstamp : bitstampV > 0 ? bitstampPV / bitstampV : na
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// WAVE STATISTICS
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+var float waveHigh = na
+var float waveLow = na
+var float waveVolume = 0.0
+var int waveBars = 0
+
+if insideWave
+    waveHigh := na(waveHigh) ? high : math.max(waveHigh, high)
+    waveLow := na(waveLow) ? low : math.min(waveLow, low)
+
+    if not na(volume)
+        waveVolume += volume
+
+    waveBars += 1
+
+float waveRange = not na(waveHigh) and not na(waveLow) ? waveHigh - waveLow : na
+
+float waveRangePct = not na(waveLow) and waveLow != 0 ? waveRange / waveLow * 100.0 : na
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// DISTANCE
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+float currentPrice = close
+
+float spotDistance = not na(spotAVWAP) and spotAVWAP != 0 ? (currentPrice - spotAVWAP) / spotAVWAP * 100.0 : na
+
+float futuresDistance = not na(futuresAVWAP) and futuresAVWAP != 0 ? (currentPrice - futuresAVWAP) / futuresAVWAP * 100.0 : na
+
+float cmeDistance = not na(cmeAVWAP) and cmeAVWAP != 0 ? (currentPrice - cmeAVWAP) / cmeAVWAP * 100.0 : na
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// INTERACTIVE WAVE LINE
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+var polyline waveLine = na
+
+if barstate.islast
+    if not na(waveLine)
+        polyline.delete(waveLine)
+
+    if showWaveLine and validWave
+        array<chart.point> wavePoints = array.new<chart.point>()
+
+        wavePoints.push(chart.point.from_time(point1Time, point1Price))
+        wavePoints.push(chart.point.from_time(point2Time, point2Price))
+
+        waveLine := polyline.new(wavePoints, false, false, xloc.bar_time, color.yellow, na, line.style_solid, 2)
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PLOTS
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+plot(spotAVWAP, title="Primary Spot AVWAP", color=color.aqua, linewidth=3)
+
+plot(showFutures ? futuresAVWAP : na, title="Futures AVWAP", color=color.orange, linewidth=3)
+
+plot(showCME ? cmeAVWAP : na, title="CME AVWAP", color=color.fuchsia, linewidth=3)
+
+plot(showIndividualSpot ? binanceAVWAP : na, title="Binance Spot AVWAP", color=color.blue, linewidth=1)
+
+plot(showIndividualSpot ? coinbaseAVWAP : na, title="Coinbase Spot AVWAP", color=color.green, linewidth=1)
+
+plot(showIndividualSpot ? krakenAVWAP : na, title="Kraken Spot AVWAP", color=color.red, linewidth=1)
+
+plot(showIndividualSpot ? okxAVWAP : na, title="OKX Spot AVWAP", color=color.orange, linewidth=1)
+
+plot(showIndividualSpot ? bybitAVWAP : na, title="Bybit Spot AVWAP", color=color.purple, linewidth=1)
+
+plot(showIndividualSpot ? bitstampAVWAP : na, title="Bitstamp Spot AVWAP", color=color.gray, linewidth=1)
+
+plot(waveHigh, title="Wave High", color=color.new(color.green, 40), linewidth=1, style=plot.style_linebr)
+
+plot(waveLow, title="Wave Low", color=color.new(color.red, 40), linewidth=1, style=plot.style_linebr)
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// INFORMATION TABLE
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+var table infoTable = table.new(position.top_right, 4, 14, border_width=1)
+
+if barstate.islast
+    table.clear(infoTable, 0, 0, 3, 13)
+
+    table.cell(infoTable, 0, 0, "BTC WAVE AVWAP", text_color=color.white, bgcolor=color.blue)
+    table.cell(infoTable, 1, 0, "VALUE", text_color=color.white, bgcolor=color.blue)
+    table.cell(infoTable, 2, 0, "DIST.", text_color=color.white, bgcolor=color.blue)
+    table.cell(infoTable, 3, 0, "STATUS", text_color=color.white, bgcolor=color.blue)
+
+    table.cell(infoTable, 0, 1, "Spot " + spotExchange)
+    table.cell(infoTable, 1, 1, na(spotAVWAP) ? "N/A" : str.tostring(spotAVWAP, "#,##0.00"))
+    table.cell(infoTable, 2, 1, na(spotDistance) ? "N/A" : str.tostring(spotDistance, "#.##") + "%")
+    table.cell(infoTable, 3, 1, na(finalSpotAVWAP) ? "LIVE" : "FROZEN")
+
+    table.cell(infoTable, 0, 2, "Futures " + futuresExchange)
+    table.cell(infoTable, 1, 2, na(futuresAVWAP) ? "N/A" : str.tostring(futuresAVWAP, "#,##0.00"))
+    table.cell(infoTable, 2, 2, na(futuresDistance) ? "N/A" : str.tostring(futuresDistance, "#.##") + "%")
+    table.cell(infoTable, 3, 2, na(finalFuturesAVWAP) ? "LIVE" : "FROZEN")
+
+    table.cell(infoTable, 0, 3, "CME")
+    table.cell(infoTable, 1, 3, na(cmeAVWAP) ? "N/A" : str.tostring(cmeAVWAP, "#,##0.00"))
+    table.cell(infoTable, 2, 3, na(cmeDistance) ? "N/A" : str.tostring(cmeDistance, "#.##") + "%")
+    table.cell(infoTable, 3, 3, na(finalCMEAVWAP) ? "LIVE" : "FROZEN")
+
+    table.cell(infoTable, 0, 5, "Wave High")
+    table.cell(infoTable, 1, 5, na(waveHigh) ? "N/A" : str.tostring(waveHigh, "#,##0.00"))
+
+    table.cell(infoTable, 0, 6, "Wave Low")
+    table.cell(infoTable, 1, 6, na(waveLow) ? "N/A" : str.tostring(waveLow, "#,##0.00"))
+
+    table.cell(infoTable, 0, 7, "Range")
+    table.cell(infoTable, 1, 7, na(waveRange) ? "N/A" : str.tostring(waveRange, "#,##0.00"))
+    table.cell(infoTable, 2, 7, na(waveRangePct) ? "N/A" : str.tostring(waveRangePct, "#.##") + "%")
+
+    table.cell(infoTable, 0, 8, "Candles")
+    table.cell(infoTable, 1, 8, str.tostring(waveBars))
+
+    table.cell(infoTable, 0, 9, "Chart Volume")
+    table.cell(infoTable, 1, 9, str.tostring(waveVolume, "#,##0"))
+
+    table.cell(infoTable, 0, 11, "Point 1")
+    table.cell(infoTable, 1, 11, str.tostring(point1Price, "#,##0.00"))
+
+    table.cell(infoTable, 0, 12, "Point 2")
+    table.cell(infoTable, 1, 12, str.tostring(point2Price, "#,##0.00"))
+
+    string waveStatus = not validWave ? "INVALID" : time < waveStart ? "WAITING" : time <= waveEnd ? "CALCULATING" : "COMPLETED"
+
+    table.cell(infoTable, 0, 13, "Wave Status")
+    table.cell(infoTable, 1, 13, waveStatus)
