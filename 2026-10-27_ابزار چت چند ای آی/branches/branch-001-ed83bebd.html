@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ابزار چت چند ای آی - branch 1</title>
+<style>
+:root{--bg:#ffffff;--ink:#0d0d0d;--muted:#5d5d5d;--line:#e5e5e5;--chip:#f0f0f0;--chip-ink:#4a4a4a;--bubble:#e3ebf8;--bubble-ink:#0d0d0d;--link:#1f5fbf;--card:#f7f7f8;--pop:#ffffff;
+--font:ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#000000;--ink:#ececec;--muted:#afafaf;--line:#303030;--chip:#2f2f2f;--chip-ink:#cdcdcd;--bubble:#1c3b73;--bubble-ink:#ffffff;--link:#8ab4f8;--card:#171717;--pop:#2a2a2a}}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 var(--font);-webkit-font-smoothing:antialiased}
+.page{max-width:768px;margin:0 auto;padding:32px 20px 80px}
+header.conv{margin-bottom:40px}
+header.conv h1{font-size:18px;font-weight:600;line-height:1.4;margin:0}
+header.conv p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.turn{margin-bottom:40px}
+.turn-label{margin-bottom:10px;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.turn.assistant{border-left:3px solid var(--accent);padding-left:20px}
+.turn.user{display:flex;justify-content:flex-end}
+.turn.user .turn-label{align-self:flex-start;margin:10px 14px 0 0}
+.bubble{background:var(--bubble);color:var(--bubble-ink);padding:10px 20px;border-radius:24px;max-width:70%;line-height:1.6}
+.bubble .plain{white-space:pre-wrap;overflow-wrap:anywhere}
+.bubble figure{margin:6px 0}
+.bubble img{max-width:100%;border-radius:16px}
+.thought{color:var(--muted);font-size:15px;margin-bottom:12px}.thinking{border-left:3px solid var(--accent);padding-left:16px;opacity:.9}
+.body{overflow-wrap:break-word}
+.body p{margin:0 0 16px}
+.body strong{font-weight:600}
+.body h1{font-size:26px}.body h2{font-size:22px}.body h3{font-size:20px}.body h4{font-size:17px}
+.body h1,.body h2,.body h3,.body h4{font-weight:600;line-height:1.35;margin:28px 0 10px}
+.body a{color:var(--link);text-decoration:none}
+.body ul,.body ol{margin:0 0 16px;padding-left:26px}
+.body li{margin:4px 0}
+.body hr{border:0;border-top:1px solid var(--line);margin:28px 0}
+.body pre{background:var(--card);border-radius:12px;padding:14px 16px;overflow-x:auto;font-size:14px;line-height:1.55}
+.body code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.875em}
+.body :not(pre)>code{background:var(--chip);padding:2px 5px;border-radius:5px}
+.body blockquote{margin:0 0 16px;padding-left:16px;border-left:3px solid var(--line);color:var(--muted)}
+.table-wrap{overflow-x:auto;margin:4px 0 20px}
+table{border-collapse:collapse;width:100%;font-size:15px;line-height:1.7}
+th,td{padding:10px 20px 10px 0;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th:last-child,td:last-child{padding-right:0}
+th{font-weight:600}
+tbody tr:last-child td{border-bottom:0}
+th[align=right],td[align=right]{text-align:right;white-space:nowrap}
+th[align=center],td[align=center]{text-align:center}
+.cite{position:relative;display:inline-block;vertical-align:1px}
+.cite>a{display:inline-flex;align-items:center;gap:4px;font-size:12px;line-height:1;background:var(--chip);color:var(--chip-ink);padding:5px 9px;border-radius:999px;white-space:nowrap;max-width:190px;overflow:hidden;text-overflow:ellipsis}
+.cite>a:hover{filter:brightness(1.15)}
+.cite .more{opacity:.7}
+.cite .pop{display:none;position:absolute;left:0;top:100%;z-index:5;min-width:260px;max-width:360px;background:var(--pop);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.cite:hover .pop,.cite:focus-within .pop{display:block}
+.pop a{display:block;padding:6px 8px;border-radius:8px;font-size:13px;line-height:1.35;color:var(--ink)}
+.pop a:hover{background:var(--chip)}
+.pop small{display:block;color:var(--muted);font-size:11.5px}
+.gallery{display:flex;gap:4px;overflow-x:auto;margin:4px 0 20px;scrollbar-width:thin}
+.gallery a{flex:0 0 calc((100% - 8px) / 3)}
+.gallery img{display:block;width:100%;height:222px;border-radius:12px;object-fit:cover;object-position:top}
+.carousel{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;margin:8px 0 24px;padding-bottom:6px;scrollbar-width:thin}
+.product{flex:0 0 300px;scroll-snap-align:start;display:flex;flex-direction:column;color:inherit;text-decoration:none}
+.body a.product{color:inherit}
+.product img,.product .noimg{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:16px;background:var(--card);display:block;margin-bottom:10px}
+.product strong{font-size:16px;font-weight:500;line-height:1.4}
+.product .meta{color:var(--muted);font-size:15px;line-height:1.5}
+figure.asset{margin:0 0 16px}
+figure.asset img{max-width:min(100%,600px);border-radius:24px;display:block}
+.attachment{font-size:14px;color:var(--muted)}
+.filecite{font-size:12px;background:var(--chip);color:var(--chip-ink);padding:3px 7px;border-radius:999px;text-decoration:none}
+.index{list-style:none;padding:0;margin:0}
+.index li{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--line)}
+.index a{color:var(--link);text-decoration:none}
+.index span{color:var(--muted);font-size:14px;white-space:nowrap}
+footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+footer code{overflow-wrap:anywhere}
+@media (max-width:560px){.bubble{max-width:90%}.gallery a{flex-basis:45%}.gallery img{height:160px}.product{flex-basis:240px}}
+</style>
+</head>
+<body>
+<main class="page">
+<header class="conv"><h1>ابزار چت چند ای آی - branch 1</h1></header>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">ابزاری برای چت با چند ای آی میخوام</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>اگر منظورت ابزاری است که بتوانی چند هوش مصنوعی مثل ChatGPT، Claude، Gemini و DeepSeek را در یک محیط کنار هم داشته باشی و با آن‌ها گفت‌وگو کنی، چند گزینهٔ خوب وجود دارد. اما یک تفاوت مهم هست: <strong>بعضی ابزارها فقط امکان تعویض مدل را می‌دهند؛ بعضی دیگر اجازه می‌دهند چند AI هم‌زمان جواب بدهند یا حتی در یک گفت‌وگو با هم بحث کنند.</strong> &lt;Cite refs={[&quot;turn608474search0&quot;,&quot;turn608474search1&quot;]}/&gt;</p>
+<h2>گزینه‌های پیشنهادی</h2>
+&lt;box gap={3}&gt;
+  &lt;row align=start gap={3}&gt;
+    &lt;AsyncImage query=&quot;ChatHub AI chatbot aggregator side by side interface screenshot&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;124px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **۱. &lt;Entity category=&quot;software&quot; value=&quot;ChatHub&quot; disambig=&quot;multi-model AI chat aggregator&quot;/&gt;**
+
+<pre><code>  &lt;badge color=&quot;success&quot;&gt;پیشنهاد برای شروع&lt;/badge&gt;
+
+  برای زمانی که می‌خواهی یک سؤال را به چند AI بدهی و پاسخ‌هایشان را هم‌زمان مقایسه کنی. برای مقایسهٔ مستقیم جواب‌ها مناسب است.
+
+  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;وب‌سایت: &lt;Link url=&quot;https://chathub.gg/&quot; title=&quot;ChatHub&quot;/&gt;&lt;/text&gt;
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;row align=start gap={3}&gt;
+    &lt;AsyncImage query=&quot;Poe AI multiple models chatbot group chat interface screenshot&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;124px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **۲. &lt;Entity category=&quot;software&quot; value=&quot;Poe&quot; disambig=&quot;multi-model AI chatbot platform&quot;/&gt;**
+
+<pre><code>  مجموعه‌ای از مدل‌ها و بات‌های مختلف در یک محیط، با امکان گفت‌وگوی گروهی. مناسب است اگر می‌خواهی با چند بات کار کنی و لزوماً نیازی به مقایسهٔ دقیق پاسخ‌های یکسان نداری.
+
+  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;وب‌سایت: &lt;Link url=&quot;https://poe.com/&quot; title=&quot;Poe&quot;/&gt;&lt;/text&gt;
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;row align=start gap={3}&gt;
+    &lt;AsyncImage query=&quot;OpenRouter chat playground multiple AI models side by side interface&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;124px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **۳. &lt;Entity category=&quot;software&quot; value=&quot;OpenRouter&quot; disambig=&quot;multi-model AI API and chat platform&quot;/&gt;**
+
+<pre><code>  برای دسترسی به مدل‌های متعدد و مقایسهٔ پاسخ‌ها مناسب است. هزینه معمولاً به مدل و میزان استفاده بستگی دارد؛ برای استفادهٔ جدی‌تر، باید سازوکار اعتبار و هزینه را بررسی کنی.
+
+  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;وب‌سایت: &lt;Link url=&quot;https://openrouter.ai/&quot; title=&quot;OpenRouter&quot;/&gt;&lt;/text&gt;
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;row align=start gap={3}&gt;
+    &lt;AsyncImage query=&quot;TypingMind multi AI models parallel chat interface screenshot&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;124px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **۴. &lt;Entity category=&quot;software&quot; value=&quot;TypingMind&quot; disambig=&quot;multi-provider AI chat client&quot;/&gt;**
+
+<pre><code>  برای کسی که می‌خواهد محیط گفت‌وگوی خودش را بسازد و چند سرویس هوش مصنوعی را متصل کند. انعطاف بیشتری دارد، ولی معمولاً به کلیدهای API و پرداخت جداگانهٔ مصرف مدل‌ها نیاز دارد.
+
+  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;وب‌سایت: &lt;Link url=&quot;https://www.typingmind.com/&quot; title=&quot;TypingMind&quot;/&gt;&lt;/text&gt;
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+&lt;/box&gt;
+
+<p>&lt;text color=&quot;secondary&quot; size=&quot;xs&quot;&gt;این‌ها گزینه‌های اولیه‌اند؛ امکانات پلن رایگان، مدل‌های در دسترس و قیمت‌ها ممکن است تغییر کنند. &lt;Cite refs={[&quot;turn608474search0&quot;,&quot;turn608474search1&quot;]}/&gt;&lt;/text&gt;</p>
+<h2>اما یک سؤال تعیین‌کننده 😂</h2>
+<p>تو دقیقاً کدام نوع ابزار را می‌خواهی؟</p>
+<p>{@body const [mode,setMode] = DIL.useState(&quot;debate&quot;)}
+{@body const [budget,setBudget] = DIL.useState(&quot;free&quot;)}
+{@body const [setup,setSetup] = DIL.useState(&quot;ready&quot;)}
+&lt;box border radius=&quot;xl&quot; padding={4} gap={4}&gt;
+  &lt;text weight=&quot;medium&quot;&gt;۱. رفتار AIها در محیط چطور باشد؟&lt;/text&gt;
+  &lt;radio-group value={mode} onChange={setMode} direction=&quot;col&quot;&gt;
+    &lt;radio value=&quot;parallel&quot;&gt;هم‌زمان جواب بدهند؛ من پاسخ‌ها را کنار هم ببینم.&lt;/radio&gt;
+    &lt;radio value=&quot;debate&quot;&gt;در یک گفت‌وگو با هم بحث کنند، همدیگر را نقد کنند و به چالش بکشند.&lt;/radio&gt;
+    &lt;radio value=&quot;shared&quot;&gt;یک گفت‌وگوی مشترک داشته باشند و با دیدن پیام‌های یکدیگر ادامه دهند.&lt;/radio&gt;
+    &lt;radio value=&quot;switch&quot;&gt;فقط بتوانم بین مدل‌های مختلف جابه‌جا شوم.&lt;/radio&gt;
+  &lt;/radio-group&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;text weight=&quot;medium&quot;&gt;۲. بودجه‌ات چقدر است؟&lt;/text&gt;
+  &lt;radio-group value={budget} onChange={setBudget} direction=&quot;col&quot;&gt;
+    &lt;radio value=&quot;free&quot;&gt;فقط رایگان&lt;/radio&gt;
+    &lt;radio value=&quot;cheap&quot;&gt;ترجیحاً ارزان، ولی پولی هم قابل‌قبول است.&lt;/radio&gt;
+    &lt;radio value=&quot;flexible&quot;&gt;اگر ابزار واقعاً خوب باشد، هزینه مهم‌ترین معیار نیست.&lt;/radio&gt;
+  &lt;/radio-group&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;text weight=&quot;medium&quot;&gt;۳. چقدر با راه‌اندازی فنی راحتی؟&lt;/text&gt;
+  &lt;radio-group value={setup} onChange={setSetup} direction=&quot;col&quot;&gt;
+    &lt;radio value=&quot;ready&quot;&gt;یک وب‌سایت آماده می‌خواهم؛ بدون کدنویسی.&lt;/radio&gt;
+    &lt;radio value=&quot;technical&quot;&gt;راه‌اندازی فنی و اتصال API هم برایم قابل‌قبول است.&lt;/radio&gt;
+  &lt;/radio-group&gt;
+  &lt;button block onClick={ =&gt; GenUI.issueNewTurn(&quot;برایم ابزار چت چند هوش مصنوعی پیشنهاد بده. نوع تعامل: &quot;+({&quot;parallel&quot;:&quot;پاسخ هم‌زمان و مقایسه کنار هم&quot;,&quot;debate&quot;:&quot;بحث و نقد متقابل AIها&quot;,&quot;shared&quot;:&quot;گفت‌وگوی مشترک با مشاهده پیام‌های یکدیگر&quot;,&quot;switch&quot;:&quot;تعویض مدل در یک محیط&quot;}[mode])+&quot;؛ بودجه: &quot;+({&quot;free&quot;:&quot;فقط رایگان&quot;,&quot;cheap&quot;:&quot;ترجیحاً ارزان&quot;,&quot;flexible&quot;:&quot;انعطاف‌پذیر&quot;}[budget])+&quot;؛ راه‌اندازی: &quot;+({&quot;ready&quot;:&quot;آماده و بدون کدنویسی&quot;,&quot;technical&quot;:&quot;API و راه‌اندازی فنی قابل‌قبول&quot;}[setup])+&quot;. گزینه‌های واقعی را با لینک و محدودیت‌هایشان مقایسه کن.&quot;)}&gt;پیدا کردن بهترین گزینه برای من&lt;/button&gt;
+&lt;/box&gt;</p>
+<p>به‌خصوص اگر منظورت این است که چند AI واقعاً با یکدیگر بحث کنند، نه اینکه صرفاً چند پاسخ جداگانه بدهند، انتخاب ابزار متفاوت خواهد بود.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">برایم ابزار چت چند هوش مصنوعی پیشنهاد بده. نوع تعامل: بحث و نقد متقابل AIها؛ بودجه: فقط رایگان؛ راه‌اندازی: API و راه‌اندازی فنی قابل‌قبول. گزینه‌های واقعی را با لینک و محدودیت‌هایشان مقایسه کن.</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>با توجه به سه شرطت، من دنبال ابزار «چت چندمدلی» معمولی نیستم؛ دنبال یک <strong>اتاق بحث چندهوش‌مصنوعی</strong> هستم که هر AI نظر مستقل بدهد، استدلال بقیه را ببیند، مخالفت کند و در چند دور بحث به نتیجه برسد.</p>
+<p>یک نکتهٔ مهم دربارهٔ شرط رایگان: رایگان بودن نرم‌افزار با رایگان بودن مدل‌ها فرق دارد. اگر ابزار API پولی بخواهد، حتی اگر خودش متن‌باز و رایگان باشد، لزوماً برای تو رایگان تمام نمی‌شود. گزینه‌های زیر را با این تفاوت در نظر می‌گیرم.</p>
+<h2>بهترین گزینه‌ها برای نیاز تو</h2>
+&lt;box gap={3}&gt;
+  &lt;row align=start gap={3}&gt;
+    &lt;AsyncImage query=&quot;Agent Discussion Arena open source multi AI debate local browser application screenshot&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;132px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      &lt;title size=&quot;lg&quot;&gt;۱. &lt;Entity category=&quot;software&quot; value=&quot;Agent Discussion Arena&quot; disambig=&quot;open-source multi-agent debate application&quot;/&gt;&lt;/title&gt;
+      &lt;badge color=&quot;success&quot;&gt;بهترین نقطهٔ شروع&lt;/badge&gt;
+
+<pre><code>  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;متن‌باز · اجرا روی کامپیوتر خودت · Python&lt;/text&gt;
+
+  چند عامل با دیدگاه‌های متفاوت بحث می‌کنند و یک داور، استدلال‌ها را ارزیابی و نتیجه‌گیری می‌کند. از مدل‌های ابری و مدل‌های محلی از طریق Ollama یا LM Studio پشتیبانی می‌کند. &lt;Cite refs={[&quot;turn583588search4&quot;]}/&gt;
+
+  **هزینهٔ واقعی:** نرم‌افزار رایگان است؛ با مدل محلی می‌توانی بدون هزینهٔ API شروع کنی، البته سخت‌افزار و برق رایگان نیستند.
+
+  &lt;text&gt;&lt;Link url=&quot;https://github.com/paolodalprato/agent-discussion-arena&quot; title=&quot;کد و راهنمای نصب در GitHub&quot;/&gt;&lt;/text&gt;
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;row align=start gap={3}&gt;
+    &lt;AsyncImage query=&quot;ThinkTank sandoracs multi party AI debate web hub terminal application screenshot&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;132px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      &lt;title size=&quot;lg&quot;&gt;۲. &lt;Entity category=&quot;software&quot; value=&quot;ThinkTank&quot; disambig=&quot;local multi-agent discussion and memory system&quot;/&gt;&lt;/title&gt;
+
+<pre><code>  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;متن‌باز · گفت‌وگوی گروهی · حافظهٔ چندلایه&lt;/text&gt;
+
+  برای بحثی که می‌خواهی در آن هر عامل شخصیت و نقش خودش را داشته باشد، جالب است. عوامل و انسان دور یک میز مجازی گفت‌وگو می‌کنند؛ تاریخچه و حافظه نیز در معماری آن در نظر گرفته شده است. امکان استفاده از Ollama یا یک ارائه‌دهندهٔ مدل را دارد. &lt;Cite refs={[&quot;turn583588search10&quot;]}/&gt;
+
+  **هزینهٔ واقعی:** با مدل محلی می‌توانی هزینهٔ API را حذف کنی. برای راه‌اندازی، کمی کار فنی لازم است.
+
+  &lt;text&gt;&lt;Link url=&quot;https://github.com/sandoracs/thinktank&quot; title=&quot;کد و راهنمای نصب در GitHub&quot;/&gt;&lt;/text&gt;
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;row align=start gap={3}&gt;
+    &lt;AsyncImage query=&quot;RoundTable entropyvortex multi AI debate engine web application screenshot&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;132px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      &lt;title size=&quot;lg&quot;&gt;۳. &lt;Entity category=&quot;software&quot; value=&quot;RoundTable&quot; disambig=&quot;open-source multi-model debate engine&quot;/&gt;&lt;/title&gt;
+
+<pre><code>  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;بحث چندمرحله‌ای · نقش‌های سفارشی · ارزیابی نهایی&lt;/text&gt;
+
+  مدل‌ها ابتدا مستقل تحلیل می‌کنند، سپس استدلال‌های یکدیگر را نقد می‌کنند و در نهایت یک جمع‌بندی و ارزیابی از اختلاف‌ها ارائه می‌شود. می‌توان برای هر جایگاه، شخصیت یا نقش متفاوت تعریف کرد. &lt;Cite refs={[&quot;turn583588search13&quot;]}/&gt;
+
+  **هزینهٔ واقعی:** برنامه رایگان است، اما استفاده از API مدل‌های تجاری ممکن است پولی باشد؛ باید آن را با مدل محلی یا سرویس دارای سهمیهٔ رایگان تنظیم کنی.
+
+  &lt;text&gt;&lt;Link url=&quot;https://github.com/entropyvortex/roundtable&quot; title=&quot;کد پروژه در GitHub&quot;/&gt;&lt;/text&gt;
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;row align=start gap={3}&gt;
+    &lt;AsyncImage query=&quot;Microsoft AutoGen multi agent debate pattern software architecture diagram&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;132px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      &lt;title size=&quot;lg&quot;&gt;۴. &lt;Entity category=&quot;software&quot; value=&quot;Microsoft AutoGen&quot; disambig=&quot;open-source multi-agent development framework&quot;/&gt;&lt;/title&gt;
+
+<pre><code>  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;چارچوب برنامه‌نویسی · کنترل کامل بر جریان بحث&lt;/text&gt;
+
+  اگر بخواهی خودت پروتکل بحث را بسازی، این گزینه انعطاف بیشتری دارد: عامل‌ها چند دور پاسخ می‌دهند، پاسخ‌های یکدیگر را می‌خوانند و نظرشان را بازنگری می‌کنند؛ عامل دیگری هم می‌تواند نتیجه‌ها را ترکیب کند. &lt;Cite refs={[&quot;turn583588search5&quot;]}/&gt;
+
+  **هزینهٔ واقعی:** چارچوب متن‌باز است، ولی هزینهٔ مدل به روش اجرا بستگی دارد. برای ساخت یک محیط کاملاً سفارشی مناسب‌تر است تا استفادهٔ فوری.
+
+  &lt;text&gt;&lt;Link url=&quot;https://microsoft.github.io/autogen/&quot; title=&quot;مستندات رسمی AutoGen&quot;/&gt;&lt;/text&gt;
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+&lt;/box&gt;
+
+<h2>دو گزینهٔ دیگر که ارزش بررسی دارند</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ابزار</th>
+<th>مزیت اصلی</th>
+<th>محدودیت برای استفادهٔ رایگان</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&lt;Entity category=&quot;software&quot; value=&quot;AISCouncil&quot; disambig=&quot;multi-model AI debate web platform&quot;/&gt; — &lt;Link url=&quot;https://www.aiscouncil.com/&quot; title=&quot;وب‌سایت&quot;/&gt;</td>
+<td>آماده در مرورگر، با حالت Debate و چند شیوهٔ ترکیب پاسخ‌ها</td>
+<td>سطح رایگان به مدل‌های رایگان در دسترس وابسته است؛ برای مدل‌های دیگر ممکن است کلید API لازم باشد. &lt;Cite refs={[&quot;turn583588search0&quot;]}/&gt;</td>
+</tr>
+<tr>
+<td>&lt;Entity category=&quot;software&quot; value=&quot;Agora&quot; disambig=&quot;open-source AI roundtable discussion tool&quot;/&gt; — &lt;Link url=&quot;https://github.com/lagameon/agora&quot; title=&quot;GitHub&quot;/&gt;</td>
+<td>میزگرد چندعاملی، نقش‌های مختلف و جمع‌بندی نهایی</td>
+<td>راه‌اندازی فنی و دسترسی به مدل لازم است؛ APIهای پولی هزینه دارند. &lt;Cite refs={[&quot;turn583588search11&quot;]}/&gt;</td>
+</tr>
+</tbody></table></div>
+<h2>انتخاب من برای تو</h2>
+<p>با شرط «فقط رایگان»، این ترتیب را پیشنهاد می‌کنم:</p>
+<ul>
+<li><strong>برای شروع سریع و بحث ساختاریافته:</strong> Agent Discussion Arena با یک مدل محلی.</li>
+<li><strong>برای گفت‌وگوی گروهی و نگه‌داشتن زمینهٔ بحث:</strong> ThinkTank.</li>
+<li><strong>برای ساخت پروتکل بحث دقیق و قابل‌کنترل:</strong> AutoGen.</li>
+<li><strong>برای امتحان‌کردن ایده بدون نصب:</strong> AISCouncil؛ ابتدا محدودیت پلن رایگان را بررسی کن.</li>
+</ul>
+<p>روی کامپیوتری که ۳۲ گیگابایت RAM دارد، اجرای مدل‌های محلی کم‌حجم می‌تواند نقطهٔ شروع مناسبی باشد؛ ولی سرعت و کیفیت به اندازه و نوع مدل بستگی دارد. برای بحث چندعاملی هم لازم نیست از ابتدا چهار مدل سنگین اجرا کنی: حتی دو مدل متفاوت با نقش‌های متضاد و یک داور می‌توانند برای آزمایش اولیه کافی باشند.</p>
+<p>یک هشدار مهم: <strong>بحث چند AI لزوماً به معنی نقد واقعی نیست.</strong> ممکن است مدل‌ها به یکدیگر تعارف کنند، از پاسخ اول پیروی کنند یا با اعتمادبه‌نفس به توافق اشتباه برسند. ابزاری را ترجیح بده که متن کامل هر دور، مخالفت‌ها و دلیل تغییر نظر را نشان دهد.</p>
+<p>اگر بخواهم فقط یک گزینه را برای شروع انتخاب کنم، <strong>Agent Discussion Arena</strong> را بررسی می‌کنم؛ چون هم بحث چندمرحله‌ای دارد، هم مدل محلی را پشتیبانی می‌کند و هم لازم نیست از همان ابتدا برای API هزینه کنی.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain"># Selected text:
+
+## Selection 1
+در یک گفت‌وگو با هم بحث کنند، همدیگر را نقد کنند و به چالش بکشند.
+
+یک گفت‌وگوی مشترک داشته باشند و با دیدن پیام‌های یکدیگر ادامه دهند.
+
+## My request:
+بیشتر اون 2مورد باشه</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>پس تمرکز را می‌گذاریم روی <strong>یک اتاق گفت‌وگوی مشترک که خودت هم عضو آن هستی و AIها همدیگر را می‌بینند، به حرف‌های هم واکنش نشان می‌دهند و می‌توانند مخالفت کنند</strong>؛ نه چند پنجرهٔ مستقل که فقط پاسخ‌هایشان را کنار هم می‌گذارند.</p>
+<p>با جست‌وجوی دقیق‌تر، دو گزینه از بقیه به خواسته‌ات نزدیک‌ترند:</p>
+<h2>۱. Agent Discussion Arena — برای میزگرد و نقد چندمرحله‌ای</h2>
+&lt;row align=start gap={3}&gt;
+  &lt;AsyncImage query=&quot;paolodalprato agent discussion arena multi perspective debate local web interface&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;124px&quot;/&gt;
+  &lt;box flex=&quot;1&quot; gap={1}&gt;
+    &lt;badge color=&quot;success&quot;&gt;بهترین تطابق برای بحث&lt;/badge&gt;
+
+<pre><code>&lt;text&gt;&lt;Link url=&quot;https://github.com/paolodalprato/agent-discussion-arena&quot; title=&quot;صفحهٔ پروژه در GitHub&quot;/&gt;&lt;/text&gt;
+
+- هر عامل از زاویه و نقش مشخصی وارد بحث می‌شود.
+- عوامل پاسخ‌های قبلی را می‌خوانند و استدلال‌های همدیگر را نقد می‌کنند.
+- گرداننده در پایان قوت و ضعف استدلال‌ها را ارزیابی می‌کند.
+- با Ollama و مدل‌های محلی نیز قابل استفاده است؛ بنابراین می‌توان بدون API پولی شروع کرد. &lt;Cite refs={[&quot;turn144047search7&quot;]}/&gt;
+</code></pre>
+  &lt;/box&gt;
+&lt;/row&gt;
+
+<p>محدودیت مهم: این پروژه بیشتر یک <strong>میزگرد ساختاریافته با چند دور بحث</strong> است، نه لزوماً یک گروه چت آزاد که هر عامل در هر لحظه خودش تصمیم بگیرد حرف بزند. همچنین طبق مستندات نسخهٔ فعلی، ذخیره و بازیابی جلسه هنوز محدود است. &lt;Cite refs={[&quot;turn144047search7&quot;]}/&gt;</p>
+<h2>۲. AutoGen + نمونهٔ AI Roundtable — برای گفت‌وگوی مشترک واقعی</h2>
+&lt;row align=start gap={3}&gt;
+  &lt;AsyncImage query=&quot;Microsoft AutoGen AI roundtable advocate skeptic moderator shared group chat Streamlit interface&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;124px&quot;/&gt;
+  &lt;box flex=&quot;1&quot; gap={1}&gt;
+    &lt;text&gt;&lt;Link url=&quot;https://github.com/vyavahare-kishor/ai-roundtable&quot; title=&quot;نمونهٔ آمادهٔ AI Roundtable&quot;/&gt;&lt;/text&gt;
+
+<pre><code>- سه نقش نمونه: مدافع، منتقد و گرداننده.
+- هر عامل تاریخچهٔ مشترک بحث را می‌بیند و به حرف‌های دیگران پاسخ می‌دهد.
+- رابط مرورگری و نمایش زندهٔ جریان بحث دارد.
+- برای اجرا به Python و تنظیم سرویس مدل نیاز دارد. نمونهٔ فعلی از Groq استفاده می‌کند و به کلید API آن نیاز دارد؛ بنابراین برای شرط «فقط رایگان» باید آن را به مدل محلی سازگار تغییر بدهی. &lt;Cite refs={[&quot;turn144047search1&quot;,&quot;turn144047search8&quot;]}/&gt;
+</code></pre>
+  &lt;/box&gt;
+&lt;/row&gt;
+
+<h2>۳. Council — شاید بهترین انتخاب عملی برای شروع</h2>
+&lt;row align=start gap={3}&gt;
+  &lt;AsyncImage query=&quot;Council AI Conversation Hub auto debate consensus group chat interface xEscapeVelocity&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;124px&quot;/&gt;
+  &lt;box flex=&quot;1&quot; gap={1}&gt;
+    &lt;badge color=&quot;success&quot;&gt;پیشنهاد جدید و مهم&lt;/badge&gt;
+
+<pre><code>&lt;text&gt;&lt;Link url=&quot;https://xescapevelocity.github.io/AI-Conversation-Hub/&quot; title=&quot;وب‌سایت و دریافت نسخهٔ ویندوز&quot;/&gt;&lt;/text&gt;
+
+این ابزار دقیقاً قابلیت **Auto-Debate** و گفت‌وگوی گروهی دارد؛ می‌تواند مدل‌های متصل‌شده را وارد بحث چندمرحله‌ای کند. از Ollama و LM Studio نیز پشتیبانی می‌کند و تاریخچه و تنظیمات را محلی نگه می‌دارد. &lt;Cite refs={[&quot;turn835682view0&quot;]}/&gt;
+
+مزیتش برای تو این است که یک برنامهٔ آماده برای ویندوز دارد و لازم نیست از ابتدا یک سامانهٔ چندعاملی برنامه‌نویسی کنی.
+
+محدودیت: پروژه نسبتاً جدید است؛ پیش از تکیه‌کردن به آن، کیفیت اجرا و امکاناتش را در یک آزمایش کوتاه بسنج.
+</code></pre>
+  &lt;/box&gt;
+&lt;/row&gt;
+
+<h2>مقایسهٔ نهایی</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>معیار</th>
+<th>Agent Discussion Arena</th>
+<th>AI Roundtable</th>
+<th>Council</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>واکنش به پیام دیگران</td>
+<td>بله</td>
+<td>بله</td>
+<td>بله</td>
+</tr>
+<tr>
+<td>بحث چندمرحله‌ای</td>
+<td>بله</td>
+<td>بله</td>
+<td>بله</td>
+</tr>
+<tr>
+<td>مدل محلی بدون هزینهٔ API</td>
+<td>بله</td>
+<td>با تغییر پیکربندی</td>
+<td>بله</td>
+</tr>
+<tr>
+<td>رابط آماده</td>
+<td>مرورگر محلی</td>
+<td>Streamlit</td>
+<td>برنامهٔ دسکتاپ</td>
+</tr>
+<tr>
+<td>انعطاف در طراحی نقش‌ها</td>
+<td>زیاد</td>
+<td>متوسط تا زیاد</td>
+<td>وابسته به امکانات برنامه</td>
+</tr>
+</tbody></table></div>
+<p>مستندات پروژه‌ها: &lt;Link url=&quot;https://github.com/paolodalprato/agent-discussion-arena&quot; title=&quot;Arena&quot;/&gt;، &lt;Link url=&quot;https://github.com/vyavahare-kishor/ai-roundtable&quot; title=&quot;AI Roundtable&quot;/&gt; و &lt;Link url=&quot;https://github.com/xEscapeVelocity/AI-Conversation-Hub&quot; title=&quot;Council در GitHub&quot;/&gt;. &lt;Cite refs={[&quot;turn835682view2&quot;,&quot;turn144047search1&quot;,&quot;turn835682view0&quot;]}/&gt;</p>
+<h3>یک نکته دربارهٔ سخت‌افزارت</h3>
+<p>با توجه به اینکه کامپیوترت ۳۲ گیگابایت RAM دارد، می‌توانی مدل‌های محلی را آزمایش کنی؛ اما برای اجرای چند مدل هم‌زمان بهتر است ابتدا هر عامل را جداگانه و سپس به‌صورت نوبتی اجرا کنی. مدل‌های بزرگ‌تر ممکن است به حافظه و زمان بیشتری نیاز داشته باشند.</p>
+<p><strong>انتخاب اولیهٔ من برای تو Council است</strong>، اگر می‌خواهی سریع وارد یک اتاق گفت‌وگوی چندعاملی شوی. اگر کنترل دقیق‌تر روی قواعد بحث و نقش‌ها برایت مهم‌تر است، Agent Discussion Arena انتخاب مناسب‌تری است.</p>
+<p>در هر دو حالت، هدف این است که بتوانی خودت هم وسط گفت‌وگو پیام بدهی، مسیر بحث را عوض کنی و از AIها بخواهی استدلال یکدیگر را نقد کنند؛ نه اینکه صرفاً در پایان یک جواب ترکیبی تحویل بگیری.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain"># Selected text:
+
+## Selection 1
+انتخاب اولیهٔ من برای تو Council است، اگر می‌خواهی سریع وارد یک اتاق گفت‌وگوی چندعاملی شوی.
+
+## My request:
+پس نظر اولیه ات این ؟</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>بله، ولی با یک اصلاح مهم. 😄</p>
+<p><strong>نظر اولیه‌ام Council است، اما هنوز انتخاب قطعی‌ام نیست.</strong></p>
+<p>چرا Council را جلو گذاشتم؟</p>
+<ul>
+<li>تو دنبال یک گفت‌وگوی مشترک هستی، نه صرفاً مقایسهٔ چند پاسخ.</li>
+<li>می‌خواهی AIها حرف یکدیگر را ببینند، مخالفت کنند و بحث را ادامه دهند.</li>
+<li>نمی‌خواهی از صفر برنامه‌نویسی کنی؛ ولی با راه‌اندازی فنی مشکلی نداری.</li>
+<li>می‌خواهی هزینهٔ استفاده تا جای ممکن صفر باشد؛ بنابراین پشتیبانی از مدل‌های محلی مهم است.</li>
+</ul>
+<p>اما یک ضعف در پیشنهاد قبلی‌ام وجود دارد: <strong>قابلیت بحث گروهی به‌تنهایی ثابت نمی‌کند که Council بهترین گزینه است.</strong> هنوز باید کیفیت نقد متقابل، امکان دخالت مستقیم تو در بحث، کنترل نوبت‌ها و سهولت اجرای مدل‌های محلی را بررسی کنیم.</p>
+<p>اگر بخواهم دقیق‌تر بگویم، فعلاً Council را به‌عنوان <strong>گزینهٔ اول برای آزمایش</strong> انتخاب می‌کنم، نه برندهٔ قطعی.</p>
+<p>یک تفاوت هم برایم مهم است: تو می‌خواهی AIها صرفاً نقش‌های از پیش تعیین‌شده‌ای مثل «موافق، مخالف و داور» بازی کنند، یا می‌خواهی آزادانه بحث کنند، خودشان اختلاف‌های مهم را پیدا کنند و در صورت لزوم حتی با چارچوب اولیهٔ بحث مخالفت کنند؟</p>
+<p>این دو طراحی می‌توانند به نتایج بسیار متفاوتی برسند.</p>
+</div></section>
+<footer>Exported with ChatGPT Markdown Export.</footer>
+</main>
+</body>
+</html>

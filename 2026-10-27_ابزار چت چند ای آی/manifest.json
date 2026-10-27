@@ -1,0 +1,65 @@
+{
+  "schema_version": 4,
+  "exported_at": "2026-10-27T23:11:33.781Z",
+  "conversation_count": 1,
+  "embedded_markdown": false,
+  "capabilities": {
+    "bearer_token": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-10-27T23:11:28.536Z"
+    },
+    "conversation_api": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-10-27T23:11:33.781Z"
+    },
+    "sandbox_download": {
+      "status": "available",
+      "detail": "/backend-api/conversation/<id>/interpreter/download",
+      "checked_at": "2026-10-27T23:11:33.748Z"
+    }
+  },
+  "files": [
+    {
+      "path": "2026-10-27_sans-titre.md",
+      "size": 90541,
+      "sha256": "78f0de9746428207b7d9cc0f61923d45a809a068e3014231120cb852cc5b8a90"
+    },
+    {
+      "path": "2026-10-27_sans-titre.html",
+      "size": 108016,
+      "sha256": "2b2ab8d8b3c59a7227f5617467535a4145257f5d9c3daf5506ddfc95922dc5dd"
+    },
+    {
+      "path": "branches/branch-001-ed83bebd.md",
+      "size": 25659,
+      "sha256": "fad80337038ee5263a672059fd82c9b209295db22de403916a7f6fdbe414d52b"
+    },
+    {
+      "path": "branches/branch-001-ed83bebd.html",
+      "size": 36447,
+      "sha256": "3e8663b83860fb564cabe4b3dd98d6f5cd3fc154baea84d5a3c906d14a263e00"
+    },
+    {
+      "path": "files/001-دریافت فایل Python.bin",
+      "size": 8621,
+      "sha256": "1b6677c37ece3a9f047d18aa059b4fe57c674bf439d0040e63c8c9a316dbdae8"
+    },
+    {
+      "path": "2026-10-27_sans-titre.json",
+      "size": 1155289,
+      "sha256": "f4ff20e17344aaeb5503fc2af225cd7cb2faecca81c5a589d6af5a6db15ff3af"
+    },
+    {
+      "path": "2026-10-27_sans-titre.metadata.json",
+      "size": 1095,
+      "sha256": "4cde84b60713eb28a1c32730b5bf6830f91c68b58b2ffd5328534e9ccec1b8e5"
+    },
+    {
+      "path": "_capabilities.json",
+      "size": 406,
+      "sha256": "7ceb3db3aa33c29616fd1a9af5585fc479a19a9c42e3192fbc77e3512e60da00"
+    }
+  ]
+}

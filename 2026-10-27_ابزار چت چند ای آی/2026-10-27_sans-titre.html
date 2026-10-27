@@ -1,0 +1,1347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ابزار چت چند ای آی</title>
+<style>
+:root{--bg:#ffffff;--ink:#0d0d0d;--muted:#5d5d5d;--line:#e5e5e5;--chip:#f0f0f0;--chip-ink:#4a4a4a;--bubble:#e3ebf8;--bubble-ink:#0d0d0d;--link:#1f5fbf;--card:#f7f7f8;--pop:#ffffff;
+--font:ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#000000;--ink:#ececec;--muted:#afafaf;--line:#303030;--chip:#2f2f2f;--chip-ink:#cdcdcd;--bubble:#1c3b73;--bubble-ink:#ffffff;--link:#8ab4f8;--card:#171717;--pop:#2a2a2a}}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 var(--font);-webkit-font-smoothing:antialiased}
+.page{max-width:768px;margin:0 auto;padding:32px 20px 80px}
+header.conv{margin-bottom:40px}
+header.conv h1{font-size:18px;font-weight:600;line-height:1.4;margin:0}
+header.conv p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.turn{margin-bottom:40px}
+.turn-label{margin-bottom:10px;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.turn.assistant{border-left:3px solid var(--accent);padding-left:20px}
+.turn.user{display:flex;justify-content:flex-end}
+.turn.user .turn-label{align-self:flex-start;margin:10px 14px 0 0}
+.bubble{background:var(--bubble);color:var(--bubble-ink);padding:10px 20px;border-radius:24px;max-width:70%;line-height:1.6}
+.bubble .plain{white-space:pre-wrap;overflow-wrap:anywhere}
+.bubble figure{margin:6px 0}
+.bubble img{max-width:100%;border-radius:16px}
+.thought{color:var(--muted);font-size:15px;margin-bottom:12px}.thinking{border-left:3px solid var(--accent);padding-left:16px;opacity:.9}
+.body{overflow-wrap:break-word}
+.body p{margin:0 0 16px}
+.body strong{font-weight:600}
+.body h1{font-size:26px}.body h2{font-size:22px}.body h3{font-size:20px}.body h4{font-size:17px}
+.body h1,.body h2,.body h3,.body h4{font-weight:600;line-height:1.35;margin:28px 0 10px}
+.body a{color:var(--link);text-decoration:none}
+.body ul,.body ol{margin:0 0 16px;padding-left:26px}
+.body li{margin:4px 0}
+.body hr{border:0;border-top:1px solid var(--line);margin:28px 0}
+.body pre{background:var(--card);border-radius:12px;padding:14px 16px;overflow-x:auto;font-size:14px;line-height:1.55}
+.body code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.875em}
+.body :not(pre)>code{background:var(--chip);padding:2px 5px;border-radius:5px}
+.body blockquote{margin:0 0 16px;padding-left:16px;border-left:3px solid var(--line);color:var(--muted)}
+.table-wrap{overflow-x:auto;margin:4px 0 20px}
+table{border-collapse:collapse;width:100%;font-size:15px;line-height:1.7}
+th,td{padding:10px 20px 10px 0;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th:last-child,td:last-child{padding-right:0}
+th{font-weight:600}
+tbody tr:last-child td{border-bottom:0}
+th[align=right],td[align=right]{text-align:right;white-space:nowrap}
+th[align=center],td[align=center]{text-align:center}
+.cite{position:relative;display:inline-block;vertical-align:1px}
+.cite>a{display:inline-flex;align-items:center;gap:4px;font-size:12px;line-height:1;background:var(--chip);color:var(--chip-ink);padding:5px 9px;border-radius:999px;white-space:nowrap;max-width:190px;overflow:hidden;text-overflow:ellipsis}
+.cite>a:hover{filter:brightness(1.15)}
+.cite .more{opacity:.7}
+.cite .pop{display:none;position:absolute;left:0;top:100%;z-index:5;min-width:260px;max-width:360px;background:var(--pop);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.cite:hover .pop,.cite:focus-within .pop{display:block}
+.pop a{display:block;padding:6px 8px;border-radius:8px;font-size:13px;line-height:1.35;color:var(--ink)}
+.pop a:hover{background:var(--chip)}
+.pop small{display:block;color:var(--muted);font-size:11.5px}
+.gallery{display:flex;gap:4px;overflow-x:auto;margin:4px 0 20px;scrollbar-width:thin}
+.gallery a{flex:0 0 calc((100% - 8px) / 3)}
+.gallery img{display:block;width:100%;height:222px;border-radius:12px;object-fit:cover;object-position:top}
+.carousel{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;margin:8px 0 24px;padding-bottom:6px;scrollbar-width:thin}
+.product{flex:0 0 300px;scroll-snap-align:start;display:flex;flex-direction:column;color:inherit;text-decoration:none}
+.body a.product{color:inherit}
+.product img,.product .noimg{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:16px;background:var(--card);display:block;margin-bottom:10px}
+.product strong{font-size:16px;font-weight:500;line-height:1.4}
+.product .meta{color:var(--muted);font-size:15px;line-height:1.5}
+figure.asset{margin:0 0 16px}
+figure.asset img{max-width:min(100%,600px);border-radius:24px;display:block}
+.attachment{font-size:14px;color:var(--muted)}
+.filecite{font-size:12px;background:var(--chip);color:var(--chip-ink);padding:3px 7px;border-radius:999px;text-decoration:none}
+.index{list-style:none;padding:0;margin:0}
+.index li{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--line)}
+.index a{color:var(--link);text-decoration:none}
+.index span{color:var(--muted);font-size:14px;white-space:nowrap}
+footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+footer code{overflow-wrap:anywhere}
+@media (max-width:560px){.bubble{max-width:90%}.gallery a{flex-basis:45%}.gallery img{height:160px}.product{flex-basis:240px}}
+</style>
+</head>
+<body>
+<main class="page">
+<header class="conv"><h1>ابزار چت چند ای آی</h1></header>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">ابزاری برای چت با چند ای آی میخوام</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>اگر منظورت ابزاری است که بتوانی چند هوش مصنوعی مثل ChatGPT، Claude، Gemini و DeepSeek را در یک محیط کنار هم داشته باشی و با آن‌ها گفت‌وگو کنی، چند گزینهٔ خوب وجود دارد. اما یک تفاوت مهم هست: <strong>بعضی ابزارها فقط امکان تعویض مدل را می‌دهند؛ بعضی دیگر اجازه می‌دهند چند AI هم‌زمان جواب بدهند یا حتی در یک گفت‌وگو با هم بحث کنند.</strong> &lt;Cite refs={[&quot;turn608474search0&quot;,&quot;turn608474search1&quot;]}/&gt;</p>
+<h2>گزینه‌های پیشنهادی</h2>
+&lt;box gap={3}&gt;
+  &lt;row align=start gap={3}&gt;
+    &lt;AsyncImage query=&quot;ChatHub AI chatbot aggregator side by side interface screenshot&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;124px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **۱. &lt;Entity category=&quot;software&quot; value=&quot;ChatHub&quot; disambig=&quot;multi-model AI chat aggregator&quot;/&gt;**
+
+<pre><code>  &lt;badge color=&quot;success&quot;&gt;پیشنهاد برای شروع&lt;/badge&gt;
+
+  برای زمانی که می‌خواهی یک سؤال را به چند AI بدهی و پاسخ‌هایشان را هم‌زمان مقایسه کنی. برای مقایسهٔ مستقیم جواب‌ها مناسب است.
+
+  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;وب‌سایت: &lt;Link url=&quot;https://chathub.gg/&quot; title=&quot;ChatHub&quot;/&gt;&lt;/text&gt;
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;row align=start gap={3}&gt;
+    &lt;AsyncImage query=&quot;Poe AI multiple models chatbot group chat interface screenshot&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;124px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **۲. &lt;Entity category=&quot;software&quot; value=&quot;Poe&quot; disambig=&quot;multi-model AI chatbot platform&quot;/&gt;**
+
+<pre><code>  مجموعه‌ای از مدل‌ها و بات‌های مختلف در یک محیط، با امکان گفت‌وگوی گروهی. مناسب است اگر می‌خواهی با چند بات کار کنی و لزوماً نیازی به مقایسهٔ دقیق پاسخ‌های یکسان نداری.
+
+  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;وب‌سایت: &lt;Link url=&quot;https://poe.com/&quot; title=&quot;Poe&quot;/&gt;&lt;/text&gt;
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;row align=start gap={3}&gt;
+    &lt;AsyncImage query=&quot;OpenRouter chat playground multiple AI models side by side interface&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;124px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **۳. &lt;Entity category=&quot;software&quot; value=&quot;OpenRouter&quot; disambig=&quot;multi-model AI API and chat platform&quot;/&gt;**
+
+<pre><code>  برای دسترسی به مدل‌های متعدد و مقایسهٔ پاسخ‌ها مناسب است. هزینه معمولاً به مدل و میزان استفاده بستگی دارد؛ برای استفادهٔ جدی‌تر، باید سازوکار اعتبار و هزینه را بررسی کنی.
+
+  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;وب‌سایت: &lt;Link url=&quot;https://openrouter.ai/&quot; title=&quot;OpenRouter&quot;/&gt;&lt;/text&gt;
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;row align=start gap={3}&gt;
+    &lt;AsyncImage query=&quot;TypingMind multi AI models parallel chat interface screenshot&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;124px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **۴. &lt;Entity category=&quot;software&quot; value=&quot;TypingMind&quot; disambig=&quot;multi-provider AI chat client&quot;/&gt;**
+
+<pre><code>  برای کسی که می‌خواهد محیط گفت‌وگوی خودش را بسازد و چند سرویس هوش مصنوعی را متصل کند. انعطاف بیشتری دارد، ولی معمولاً به کلیدهای API و پرداخت جداگانهٔ مصرف مدل‌ها نیاز دارد.
+
+  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;وب‌سایت: &lt;Link url=&quot;https://www.typingmind.com/&quot; title=&quot;TypingMind&quot;/&gt;&lt;/text&gt;
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+&lt;/box&gt;
+
+<p>&lt;text color=&quot;secondary&quot; size=&quot;xs&quot;&gt;این‌ها گزینه‌های اولیه‌اند؛ امکانات پلن رایگان، مدل‌های در دسترس و قیمت‌ها ممکن است تغییر کنند. &lt;Cite refs={[&quot;turn608474search0&quot;,&quot;turn608474search1&quot;]}/&gt;&lt;/text&gt;</p>
+<h2>اما یک سؤال تعیین‌کننده 😂</h2>
+<p>تو دقیقاً کدام نوع ابزار را می‌خواهی؟</p>
+<p>{@body const [mode,setMode] = DIL.useState(&quot;debate&quot;)}
+{@body const [budget,setBudget] = DIL.useState(&quot;free&quot;)}
+{@body const [setup,setSetup] = DIL.useState(&quot;ready&quot;)}
+&lt;box border radius=&quot;xl&quot; padding={4} gap={4}&gt;
+  &lt;text weight=&quot;medium&quot;&gt;۱. رفتار AIها در محیط چطور باشد؟&lt;/text&gt;
+  &lt;radio-group value={mode} onChange={setMode} direction=&quot;col&quot;&gt;
+    &lt;radio value=&quot;parallel&quot;&gt;هم‌زمان جواب بدهند؛ من پاسخ‌ها را کنار هم ببینم.&lt;/radio&gt;
+    &lt;radio value=&quot;debate&quot;&gt;در یک گفت‌وگو با هم بحث کنند، همدیگر را نقد کنند و به چالش بکشند.&lt;/radio&gt;
+    &lt;radio value=&quot;shared&quot;&gt;یک گفت‌وگوی مشترک داشته باشند و با دیدن پیام‌های یکدیگر ادامه دهند.&lt;/radio&gt;
+    &lt;radio value=&quot;switch&quot;&gt;فقط بتوانم بین مدل‌های مختلف جابه‌جا شوم.&lt;/radio&gt;
+  &lt;/radio-group&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;text weight=&quot;medium&quot;&gt;۲. بودجه‌ات چقدر است؟&lt;/text&gt;
+  &lt;radio-group value={budget} onChange={setBudget} direction=&quot;col&quot;&gt;
+    &lt;radio value=&quot;free&quot;&gt;فقط رایگان&lt;/radio&gt;
+    &lt;radio value=&quot;cheap&quot;&gt;ترجیحاً ارزان، ولی پولی هم قابل‌قبول است.&lt;/radio&gt;
+    &lt;radio value=&quot;flexible&quot;&gt;اگر ابزار واقعاً خوب باشد، هزینه مهم‌ترین معیار نیست.&lt;/radio&gt;
+  &lt;/radio-group&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;text weight=&quot;medium&quot;&gt;۳. چقدر با راه‌اندازی فنی راحتی؟&lt;/text&gt;
+  &lt;radio-group value={setup} onChange={setSetup} direction=&quot;col&quot;&gt;
+    &lt;radio value=&quot;ready&quot;&gt;یک وب‌سایت آماده می‌خواهم؛ بدون کدنویسی.&lt;/radio&gt;
+    &lt;radio value=&quot;technical&quot;&gt;راه‌اندازی فنی و اتصال API هم برایم قابل‌قبول است.&lt;/radio&gt;
+  &lt;/radio-group&gt;
+  &lt;button block onClick={ =&gt; GenUI.issueNewTurn(&quot;برایم ابزار چت چند هوش مصنوعی پیشنهاد بده. نوع تعامل: &quot;+({&quot;parallel&quot;:&quot;پاسخ هم‌زمان و مقایسه کنار هم&quot;,&quot;debate&quot;:&quot;بحث و نقد متقابل AIها&quot;,&quot;shared&quot;:&quot;گفت‌وگوی مشترک با مشاهده پیام‌های یکدیگر&quot;,&quot;switch&quot;:&quot;تعویض مدل در یک محیط&quot;}[mode])+&quot;؛ بودجه: &quot;+({&quot;free&quot;:&quot;فقط رایگان&quot;,&quot;cheap&quot;:&quot;ترجیحاً ارزان&quot;,&quot;flexible&quot;:&quot;انعطاف‌پذیر&quot;}[budget])+&quot;؛ راه‌اندازی: &quot;+({&quot;ready&quot;:&quot;آماده و بدون کدنویسی&quot;,&quot;technical&quot;:&quot;API و راه‌اندازی فنی قابل‌قبول&quot;}[setup])+&quot;. گزینه‌های واقعی را با لینک و محدودیت‌هایشان مقایسه کن.&quot;)}&gt;پیدا کردن بهترین گزینه برای من&lt;/button&gt;
+&lt;/box&gt;</p>
+<p>به‌خصوص اگر منظورت این است که چند AI واقعاً با یکدیگر بحث کنند، نه اینکه صرفاً چند پاسخ جداگانه بدهند، انتخاب ابزار متفاوت خواهد بود.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">برایم ابزار چت چند هوش مصنوعی پیشنهاد بده. نوع تعامل: بحث و نقد متقابل AIها؛ بودجه: فقط رایگان؛ راه‌اندازی: API و راه‌اندازی فنی قابل‌قبول. گزینه‌های واقعی را با لینک و محدودیت‌هایشان مقایسه کن.</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>با توجه به سه شرطت، من دنبال ابزار «چت چندمدلی» معمولی نیستم؛ دنبال یک <strong>اتاق بحث چندهوش‌مصنوعی</strong> هستم که هر AI نظر مستقل بدهد، استدلال بقیه را ببیند، مخالفت کند و در چند دور بحث به نتیجه برسد.</p>
+<p>یک نکتهٔ مهم دربارهٔ شرط رایگان: رایگان بودن نرم‌افزار با رایگان بودن مدل‌ها فرق دارد. اگر ابزار API پولی بخواهد، حتی اگر خودش متن‌باز و رایگان باشد، لزوماً برای تو رایگان تمام نمی‌شود. گزینه‌های زیر را با این تفاوت در نظر می‌گیرم.</p>
+<h2>بهترین گزینه‌ها برای نیاز تو</h2>
+&lt;box gap={3}&gt;
+  &lt;row align=start gap={3}&gt;
+    &lt;AsyncImage query=&quot;Agent Discussion Arena open source multi AI debate local browser application screenshot&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;132px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      &lt;title size=&quot;lg&quot;&gt;۱. &lt;Entity category=&quot;software&quot; value=&quot;Agent Discussion Arena&quot; disambig=&quot;open-source multi-agent debate application&quot;/&gt;&lt;/title&gt;
+      &lt;badge color=&quot;success&quot;&gt;بهترین نقطهٔ شروع&lt;/badge&gt;
+
+<pre><code>  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;متن‌باز · اجرا روی کامپیوتر خودت · Python&lt;/text&gt;
+
+  چند عامل با دیدگاه‌های متفاوت بحث می‌کنند و یک داور، استدلال‌ها را ارزیابی و نتیجه‌گیری می‌کند. از مدل‌های ابری و مدل‌های محلی از طریق Ollama یا LM Studio پشتیبانی می‌کند. &lt;Cite refs={[&quot;turn583588search4&quot;]}/&gt;
+
+  **هزینهٔ واقعی:** نرم‌افزار رایگان است؛ با مدل محلی می‌توانی بدون هزینهٔ API شروع کنی، البته سخت‌افزار و برق رایگان نیستند.
+
+  &lt;text&gt;&lt;Link url=&quot;https://github.com/paolodalprato/agent-discussion-arena&quot; title=&quot;کد و راهنمای نصب در GitHub&quot;/&gt;&lt;/text&gt;
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;row align=start gap={3}&gt;
+    &lt;AsyncImage query=&quot;ThinkTank sandoracs multi party AI debate web hub terminal application screenshot&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;132px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      &lt;title size=&quot;lg&quot;&gt;۲. &lt;Entity category=&quot;software&quot; value=&quot;ThinkTank&quot; disambig=&quot;local multi-agent discussion and memory system&quot;/&gt;&lt;/title&gt;
+
+<pre><code>  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;متن‌باز · گفت‌وگوی گروهی · حافظهٔ چندلایه&lt;/text&gt;
+
+  برای بحثی که می‌خواهی در آن هر عامل شخصیت و نقش خودش را داشته باشد، جالب است. عوامل و انسان دور یک میز مجازی گفت‌وگو می‌کنند؛ تاریخچه و حافظه نیز در معماری آن در نظر گرفته شده است. امکان استفاده از Ollama یا یک ارائه‌دهندهٔ مدل را دارد. &lt;Cite refs={[&quot;turn583588search10&quot;]}/&gt;
+
+  **هزینهٔ واقعی:** با مدل محلی می‌توانی هزینهٔ API را حذف کنی. برای راه‌اندازی، کمی کار فنی لازم است.
+
+  &lt;text&gt;&lt;Link url=&quot;https://github.com/sandoracs/thinktank&quot; title=&quot;کد و راهنمای نصب در GitHub&quot;/&gt;&lt;/text&gt;
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;row align=start gap={3}&gt;
+    &lt;AsyncImage query=&quot;RoundTable entropyvortex multi AI debate engine web application screenshot&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;132px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      &lt;title size=&quot;lg&quot;&gt;۳. &lt;Entity category=&quot;software&quot; value=&quot;RoundTable&quot; disambig=&quot;open-source multi-model debate engine&quot;/&gt;&lt;/title&gt;
+
+<pre><code>  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;بحث چندمرحله‌ای · نقش‌های سفارشی · ارزیابی نهایی&lt;/text&gt;
+
+  مدل‌ها ابتدا مستقل تحلیل می‌کنند، سپس استدلال‌های یکدیگر را نقد می‌کنند و در نهایت یک جمع‌بندی و ارزیابی از اختلاف‌ها ارائه می‌شود. می‌توان برای هر جایگاه، شخصیت یا نقش متفاوت تعریف کرد. &lt;Cite refs={[&quot;turn583588search13&quot;]}/&gt;
+
+  **هزینهٔ واقعی:** برنامه رایگان است، اما استفاده از API مدل‌های تجاری ممکن است پولی باشد؛ باید آن را با مدل محلی یا سرویس دارای سهمیهٔ رایگان تنظیم کنی.
+
+  &lt;text&gt;&lt;Link url=&quot;https://github.com/entropyvortex/roundtable&quot; title=&quot;کد پروژه در GitHub&quot;/&gt;&lt;/text&gt;
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;row align=start gap={3}&gt;
+    &lt;AsyncImage query=&quot;Microsoft AutoGen multi agent debate pattern software architecture diagram&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;132px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      &lt;title size=&quot;lg&quot;&gt;۴. &lt;Entity category=&quot;software&quot; value=&quot;Microsoft AutoGen&quot; disambig=&quot;open-source multi-agent development framework&quot;/&gt;&lt;/title&gt;
+
+<pre><code>  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;چارچوب برنامه‌نویسی · کنترل کامل بر جریان بحث&lt;/text&gt;
+
+  اگر بخواهی خودت پروتکل بحث را بسازی، این گزینه انعطاف بیشتری دارد: عامل‌ها چند دور پاسخ می‌دهند، پاسخ‌های یکدیگر را می‌خوانند و نظرشان را بازنگری می‌کنند؛ عامل دیگری هم می‌تواند نتیجه‌ها را ترکیب کند. &lt;Cite refs={[&quot;turn583588search5&quot;]}/&gt;
+
+  **هزینهٔ واقعی:** چارچوب متن‌باز است، ولی هزینهٔ مدل به روش اجرا بستگی دارد. برای ساخت یک محیط کاملاً سفارشی مناسب‌تر است تا استفادهٔ فوری.
+
+  &lt;text&gt;&lt;Link url=&quot;https://microsoft.github.io/autogen/&quot; title=&quot;مستندات رسمی AutoGen&quot;/&gt;&lt;/text&gt;
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+&lt;/box&gt;
+
+<h2>دو گزینهٔ دیگر که ارزش بررسی دارند</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ابزار</th>
+<th>مزیت اصلی</th>
+<th>محدودیت برای استفادهٔ رایگان</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&lt;Entity category=&quot;software&quot; value=&quot;AISCouncil&quot; disambig=&quot;multi-model AI debate web platform&quot;/&gt; — &lt;Link url=&quot;https://www.aiscouncil.com/&quot; title=&quot;وب‌سایت&quot;/&gt;</td>
+<td>آماده در مرورگر، با حالت Debate و چند شیوهٔ ترکیب پاسخ‌ها</td>
+<td>سطح رایگان به مدل‌های رایگان در دسترس وابسته است؛ برای مدل‌های دیگر ممکن است کلید API لازم باشد. &lt;Cite refs={[&quot;turn583588search0&quot;]}/&gt;</td>
+</tr>
+<tr>
+<td>&lt;Entity category=&quot;software&quot; value=&quot;Agora&quot; disambig=&quot;open-source AI roundtable discussion tool&quot;/&gt; — &lt;Link url=&quot;https://github.com/lagameon/agora&quot; title=&quot;GitHub&quot;/&gt;</td>
+<td>میزگرد چندعاملی، نقش‌های مختلف و جمع‌بندی نهایی</td>
+<td>راه‌اندازی فنی و دسترسی به مدل لازم است؛ APIهای پولی هزینه دارند. &lt;Cite refs={[&quot;turn583588search11&quot;]}/&gt;</td>
+</tr>
+</tbody></table></div>
+<h2>انتخاب من برای تو</h2>
+<p>با شرط «فقط رایگان»، این ترتیب را پیشنهاد می‌کنم:</p>
+<ul>
+<li><strong>برای شروع سریع و بحث ساختاریافته:</strong> Agent Discussion Arena با یک مدل محلی.</li>
+<li><strong>برای گفت‌وگوی گروهی و نگه‌داشتن زمینهٔ بحث:</strong> ThinkTank.</li>
+<li><strong>برای ساخت پروتکل بحث دقیق و قابل‌کنترل:</strong> AutoGen.</li>
+<li><strong>برای امتحان‌کردن ایده بدون نصب:</strong> AISCouncil؛ ابتدا محدودیت پلن رایگان را بررسی کن.</li>
+</ul>
+<p>روی کامپیوتری که ۳۲ گیگابایت RAM دارد، اجرای مدل‌های محلی کم‌حجم می‌تواند نقطهٔ شروع مناسبی باشد؛ ولی سرعت و کیفیت به اندازه و نوع مدل بستگی دارد. برای بحث چندعاملی هم لازم نیست از ابتدا چهار مدل سنگین اجرا کنی: حتی دو مدل متفاوت با نقش‌های متضاد و یک داور می‌توانند برای آزمایش اولیه کافی باشند.</p>
+<p>یک هشدار مهم: <strong>بحث چند AI لزوماً به معنی نقد واقعی نیست.</strong> ممکن است مدل‌ها به یکدیگر تعارف کنند، از پاسخ اول پیروی کنند یا با اعتمادبه‌نفس به توافق اشتباه برسند. ابزاری را ترجیح بده که متن کامل هر دور، مخالفت‌ها و دلیل تغییر نظر را نشان دهد.</p>
+<p>اگر بخواهم فقط یک گزینه را برای شروع انتخاب کنم، <strong>Agent Discussion Arena</strong> را بررسی می‌کنم؛ چون هم بحث چندمرحله‌ای دارد، هم مدل محلی را پشتیبانی می‌کند و هم لازم نیست از همان ابتدا برای API هزینه کنی.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain"># Selected text:
+
+## Selection 1
+در یک گفت‌وگو با هم بحث کنند، همدیگر را نقد کنند و به چالش بکشند.
+
+یک گفت‌وگوی مشترک داشته باشند و با دیدن پیام‌های یکدیگر ادامه دهند.
+
+## My request:
+بیشتر اون 2مورد باشه</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>پس تمرکز را می‌گذاریم روی <strong>یک اتاق گفت‌وگوی مشترک که خودت هم عضو آن هستی و AIها همدیگر را می‌بینند، به حرف‌های هم واکنش نشان می‌دهند و می‌توانند مخالفت کنند</strong>؛ نه چند پنجرهٔ مستقل که فقط پاسخ‌هایشان را کنار هم می‌گذارند.</p>
+<p>با جست‌وجوی دقیق‌تر، دو گزینه از بقیه به خواسته‌ات نزدیک‌ترند:</p>
+<h2>۱. Agent Discussion Arena — برای میزگرد و نقد چندمرحله‌ای</h2>
+&lt;row align=start gap={3}&gt;
+  &lt;AsyncImage query=&quot;paolodalprato agent discussion arena multi perspective debate local web interface&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;124px&quot;/&gt;
+  &lt;box flex=&quot;1&quot; gap={1}&gt;
+    &lt;badge color=&quot;success&quot;&gt;بهترین تطابق برای بحث&lt;/badge&gt;
+
+<pre><code>&lt;text&gt;&lt;Link url=&quot;https://github.com/paolodalprato/agent-discussion-arena&quot; title=&quot;صفحهٔ پروژه در GitHub&quot;/&gt;&lt;/text&gt;
+
+- هر عامل از زاویه و نقش مشخصی وارد بحث می‌شود.
+- عوامل پاسخ‌های قبلی را می‌خوانند و استدلال‌های همدیگر را نقد می‌کنند.
+- گرداننده در پایان قوت و ضعف استدلال‌ها را ارزیابی می‌کند.
+- با Ollama و مدل‌های محلی نیز قابل استفاده است؛ بنابراین می‌توان بدون API پولی شروع کرد. &lt;Cite refs={[&quot;turn144047search7&quot;]}/&gt;
+</code></pre>
+  &lt;/box&gt;
+&lt;/row&gt;
+
+<p>محدودیت مهم: این پروژه بیشتر یک <strong>میزگرد ساختاریافته با چند دور بحث</strong> است، نه لزوماً یک گروه چت آزاد که هر عامل در هر لحظه خودش تصمیم بگیرد حرف بزند. همچنین طبق مستندات نسخهٔ فعلی، ذخیره و بازیابی جلسه هنوز محدود است. &lt;Cite refs={[&quot;turn144047search7&quot;]}/&gt;</p>
+<h2>۲. AutoGen + نمونهٔ AI Roundtable — برای گفت‌وگوی مشترک واقعی</h2>
+&lt;row align=start gap={3}&gt;
+  &lt;AsyncImage query=&quot;Microsoft AutoGen AI roundtable advocate skeptic moderator shared group chat Streamlit interface&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;124px&quot;/&gt;
+  &lt;box flex=&quot;1&quot; gap={1}&gt;
+    &lt;text&gt;&lt;Link url=&quot;https://github.com/vyavahare-kishor/ai-roundtable&quot; title=&quot;نمونهٔ آمادهٔ AI Roundtable&quot;/&gt;&lt;/text&gt;
+
+<pre><code>- سه نقش نمونه: مدافع، منتقد و گرداننده.
+- هر عامل تاریخچهٔ مشترک بحث را می‌بیند و به حرف‌های دیگران پاسخ می‌دهد.
+- رابط مرورگری و نمایش زندهٔ جریان بحث دارد.
+- برای اجرا به Python و تنظیم سرویس مدل نیاز دارد. نمونهٔ فعلی از Groq استفاده می‌کند و به کلید API آن نیاز دارد؛ بنابراین برای شرط «فقط رایگان» باید آن را به مدل محلی سازگار تغییر بدهی. &lt;Cite refs={[&quot;turn144047search1&quot;,&quot;turn144047search8&quot;]}/&gt;
+</code></pre>
+  &lt;/box&gt;
+&lt;/row&gt;
+
+<h2>۳. Council — شاید بهترین انتخاب عملی برای شروع</h2>
+&lt;row align=start gap={3}&gt;
+  &lt;AsyncImage query=&quot;Council AI Conversation Hub auto debate consensus group chat interface xEscapeVelocity&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;124px&quot;/&gt;
+  &lt;box flex=&quot;1&quot; gap={1}&gt;
+    &lt;badge color=&quot;success&quot;&gt;پیشنهاد جدید و مهم&lt;/badge&gt;
+
+<pre><code>&lt;text&gt;&lt;Link url=&quot;https://xescapevelocity.github.io/AI-Conversation-Hub/&quot; title=&quot;وب‌سایت و دریافت نسخهٔ ویندوز&quot;/&gt;&lt;/text&gt;
+
+این ابزار دقیقاً قابلیت **Auto-Debate** و گفت‌وگوی گروهی دارد؛ می‌تواند مدل‌های متصل‌شده را وارد بحث چندمرحله‌ای کند. از Ollama و LM Studio نیز پشتیبانی می‌کند و تاریخچه و تنظیمات را محلی نگه می‌دارد. &lt;Cite refs={[&quot;turn835682view0&quot;]}/&gt;
+
+مزیتش برای تو این است که یک برنامهٔ آماده برای ویندوز دارد و لازم نیست از ابتدا یک سامانهٔ چندعاملی برنامه‌نویسی کنی.
+
+محدودیت: پروژه نسبتاً جدید است؛ پیش از تکیه‌کردن به آن، کیفیت اجرا و امکاناتش را در یک آزمایش کوتاه بسنج.
+</code></pre>
+  &lt;/box&gt;
+&lt;/row&gt;
+
+<h2>مقایسهٔ نهایی</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>معیار</th>
+<th>Agent Discussion Arena</th>
+<th>AI Roundtable</th>
+<th>Council</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>واکنش به پیام دیگران</td>
+<td>بله</td>
+<td>بله</td>
+<td>بله</td>
+</tr>
+<tr>
+<td>بحث چندمرحله‌ای</td>
+<td>بله</td>
+<td>بله</td>
+<td>بله</td>
+</tr>
+<tr>
+<td>مدل محلی بدون هزینهٔ API</td>
+<td>بله</td>
+<td>با تغییر پیکربندی</td>
+<td>بله</td>
+</tr>
+<tr>
+<td>رابط آماده</td>
+<td>مرورگر محلی</td>
+<td>Streamlit</td>
+<td>برنامهٔ دسکتاپ</td>
+</tr>
+<tr>
+<td>انعطاف در طراحی نقش‌ها</td>
+<td>زیاد</td>
+<td>متوسط تا زیاد</td>
+<td>وابسته به امکانات برنامه</td>
+</tr>
+</tbody></table></div>
+<p>مستندات پروژه‌ها: &lt;Link url=&quot;https://github.com/paolodalprato/agent-discussion-arena&quot; title=&quot;Arena&quot;/&gt;، &lt;Link url=&quot;https://github.com/vyavahare-kishor/ai-roundtable&quot; title=&quot;AI Roundtable&quot;/&gt; و &lt;Link url=&quot;https://github.com/xEscapeVelocity/AI-Conversation-Hub&quot; title=&quot;Council در GitHub&quot;/&gt;. &lt;Cite refs={[&quot;turn835682view2&quot;,&quot;turn144047search1&quot;,&quot;turn835682view0&quot;]}/&gt;</p>
+<h3>یک نکته دربارهٔ سخت‌افزارت</h3>
+<p>با توجه به اینکه کامپیوترت ۳۲ گیگابایت RAM دارد، می‌توانی مدل‌های محلی را آزمایش کنی؛ اما برای اجرای چند مدل هم‌زمان بهتر است ابتدا هر عامل را جداگانه و سپس به‌صورت نوبتی اجرا کنی. مدل‌های بزرگ‌تر ممکن است به حافظه و زمان بیشتری نیاز داشته باشند.</p>
+<p><strong>انتخاب اولیهٔ من برای تو Council است</strong>، اگر می‌خواهی سریع وارد یک اتاق گفت‌وگوی چندعاملی شوی. اگر کنترل دقیق‌تر روی قواعد بحث و نقش‌ها برایت مهم‌تر است، Agent Discussion Arena انتخاب مناسب‌تری است.</p>
+<p>در هر دو حالت، هدف این است که بتوانی خودت هم وسط گفت‌وگو پیام بدهی، مسیر بحث را عوض کنی و از AIها بخواهی استدلال یکدیگر را نقد کنند؛ نه اینکه صرفاً در پایان یک جواب ترکیبی تحویل بگیری.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain"># Selected text:
+
+## Selection 1
+انتخاب اولیهٔ من برای تو Council است، اگر می‌خواهی سریع وارد یک اتاق گفت‌وگوی چندعاملی شوی.
+
+## My request:
+پس نظر اولیه ات این ؟</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>آره، ولی با یک تبصرهٔ مهم. 😂</p>
+<p><strong>نظر اولیه‌ام Council است، اما هنوز انتخاب نهایی و تأییدشده نیست.</strong></p>
+<p>چرا Council را جلو گذاشتم؟</p>
+<ul>
+<li>می‌خواهی چند AI در یک گفت‌وگوی مشترک باشند و پیام‌های همدیگر را ببینند.</li>
+<li>می‌خواهی بتوانند بحث را ادامه بدهند، مخالفت کنند و همدیگر را به چالش بکشند.</li>
+<li>می‌خواهی بدون پرداخت هزینهٔ API شروع کنی.</li>
+<li>ترجیح می‌دهی به‌جای ساختن همه‌چیز از صفر، یک ابزار آماده داشته باشی.</li>
+</ul>
+<p>اما یک ضعف در ارزیابی قبلی من وجود دارد: <strong>اینکه یک ابزار قابلیت Auto-Debate دارد، ثابت نمی‌کند کیفیت بحثش خوب است یا تجربهٔ استفاده از آن واقعاً با خواستهٔ تو جور درمی‌آید.</strong> من هنوز آن را عملاً آزمایش نکرده‌ام.</p>
+<p>اگر بخواهم دقیق‌تر بگویم، انتخاب Council فعلاً یک فرضیه برای شروع بررسی است، نه نتیجهٔ یک مقایسهٔ عملی.</p>
+<p>و یک سؤال که می‌تواند انتخاب را عوض کند: می‌خواهی AIها <strong>هرکدام شخصیت و نظر مستقل خودشان را داشته باشند و حتی ممکن باشد به نتیجه‌های متفاوت برسند</strong>، یا هدفت بیشتر این است که با بحث‌کردن به یک نتیجهٔ مشترک برسند؟ این دو طراحی، تفاوت مهمی دارند.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">هردو گزینه ولی اولی مهمتره</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>پس معیار اصلی مشخص شد: <strong>استقلال فکری و اختلاف نظر واقعی بین AIها مهم‌تر از رسیدن به توافق است؛ توافق هم مطلوب است، اما نباید به زور تحمیل شود.</strong></p>
+<p>برای انتخاب ابزار، من سه قابلیت را ضروری می‌دانم:</p>
+<ol>
+<li><strong>استقلال نظر:</strong> هر AI ابتدا بدون دیدن پاسخ بقیه تحلیل خودش را ارائه کند تا اثر لنگراندازی کمتر شود.</li>
+<li><strong>نقد متقابل:</strong> بعد از آن، پاسخ‌های دیگران را ببیند، ایراد بگیرد، از نظر خودش دفاع کند یا با دلیل نظرش را تغییر دهد.</li>
+<li><strong>توافق اختیاری:</strong> در پایان، اختلاف‌های حل‌نشده حفظ شوند؛ جمع‌بندی داور نباید به‌اشتباه به‌عنوان توافق همه معرفی شود.</li>
+</ol>
+<p>این ترتیب مهم است: اگر همهٔ عامل‌ها از ابتدا پاسخ یکدیگر را ببینند، ممکن است به‌جای تفکر مستقل، صرفاً از اولین پاسخ قوی پیروی کنند.</p>
+<h2>یک گزینه را هم به فهرست اضافه می‌کنم</h2>
+&lt;row align=start gap={3}&gt;
+  &lt;AsyncImage query=&quot;Agents Arena multi AI agents independent first round deliberation debate interface&quot; aspectRatio=&quot;4:5&quot; maxWidth=&quot;112px&quot;/&gt;
+  &lt;box flex=&quot;1&quot; gap={1}&gt;
+    **&lt;Entity category=&quot;software&quot; value=&quot;Agents Arena&quot; disambig=&quot;multi-agent deliberation and persistent conversation platform&quot;/&gt;**
+
+<pre><code>&lt;text&gt;&lt;Link url=&quot;https://www.agentsarena.dev/docs&quot; title=&quot;مستندات رسمی&quot;/&gt;&lt;/text&gt;
+
+نکتهٔ جالبش این است که طبق مستندات، عامل‌ها در دور اول مستقل پاسخ می‌دهند؛ بعد پاسخ‌ها را می‌بینند و در دور بعد با توجه به دیدگاه‌های دیگران واکنش نشان می‌دهند. همچنین امکان ادامه‌دادن گفت‌وگو با همان عامل‌ها وجود دارد. &lt;Cite refs={[&quot;turn472120search5&quot;]}/&gt;
+
+این دقیقاً یکی از ویژگی‌هایی است که برای اولویت تو مهم است. بااین‌حال، هنوز باید بررسی کنیم آیا استفادهٔ رایگان و مدل‌های قابل‌اتصالش با محدودیت تو سازگارند یا نه.
+</code></pre>
+  &lt;/box&gt;
+&lt;/row&gt;
+
+<p><strong>جمع‌بندی من:</strong> فعلاً Council را کنار نمی‌گذارم، ولی دیگر بدون مقایسه آن را انتخاب اول قطعی نمی‌دانم. برای معیار استقلال اولیه و نقد متقابل، Agents Arena و Agent Discussion Arena هم باید بررسی شوند. تفاوت اصلی این است که می‌خواهیم اختلاف‌نظر را حفظ کنیم، نه اینکه صرفاً تعداد بیشتری AI به یک پاسخ نهایی برسند.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">دقیقن میخوام از نقطه نظرهای متفاوت به بحث بپردازن</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>با این توضیح، یک گزینهٔ دیگر پیدا کردم که از نظر طراحی بحث، حتی از انتخاب اولیه‌ام هم به خواسته‌ات نزدیک‌تر به نظر می‌رسد.</p>
+&lt;box border radius=&quot;xl&quot; padding={4} gap={2}&gt;
+  &lt;title size=&quot;lg&quot;&gt;گزینهٔ پیشنهادی جدید: RoundTable&lt;/title&gt;
+  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;پروژهٔ متن‌باز · اجرای محلی · بحث چندمرحله‌ای&lt;/text&gt;
+  &lt;text&gt;&lt;Link url=&quot;https://github.com/entropyvortex/roundtable&quot; title=&quot;مشاهدهٔ پروژه در GitHub&quot;/&gt;&lt;/text&gt;
+  این ابزار امکان می‌دهد هر AI شخصیت تحلیلی متفاوتی داشته باشد؛ مثلاً یکی فرضیات را زیر سؤال ببرد، دیگری از دیدگاه مخالف دفاع کند و سومی شواهد را ارزیابی کند. دور اول می‌تواند مستقل باشد و دورهای بعدی به نقد متقابل اختصاص پیدا کنند. همچنین اختلاف‌ها و تغییر موضع‌ها در خروجی ثبت می‌شوند. &lt;Cite refs={[&quot;turn128421search3&quot;]}/&gt;
+
+<p>  <strong>محدودیت:</strong> خود برنامه رایگان است، اما استفاده از مدل‌های ابری ممکن است هزینه داشته باشد. برای رایگان ماندن باید مسیر اجرای مدل محلی را بررسی کنیم.
+&lt;/box&gt;</p>
+<p>در حال حاضر، برای نیاز تو این دو را در صدر بررسی می‌گذارم:</p>
+<ul>
+<li><strong>RoundTable:</strong> اگر می‌خواهی اختلاف دیدگاه‌ها، نقد استدلال‌ها و تغییر موضع‌ها را به‌صورت ساختاریافته دنبال کنی.</li>
+<li><strong>Agent Discussion Arena:</strong> اگر یک میزگرد محلی با تعریف نقش‌ها و شروع سریع‌تر می‌خواهی. &lt;Cite refs={[&quot;turn128421search0&quot;]}/&gt;</li>
+</ul>
+<p>نکتهٔ مهم این است که قرار نیست AIها فقط نقش‌های نمایشی بازی کنند؛ باید بتوانند با شواهد و استدلال از موضع خود دفاع کنند، در صورت لزوم نظرشان را تغییر دهند و حتی در پایان همچنان مخالف بمانند.</p>
+<p><strong>قدم بعدی منطقی:</strong> بررسی سازگاری این دو ابزار با ویندوز و اجرای رایگان مدل‌های محلی، پیش از اینکه یکی را انتخاب و نصب کنیم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">خب با توجه به سیستم من کدوم مناسب تره؟</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>با مشخصاتی که قبلاً از کامپیوترت گفته بودی — <strong>Core i5-11400، رم ۳۲ گیگابایت، مادربرد ASUS TUF Z590 و پاور ۶۰۰ وات</strong> — انتخاب من فعلاً <strong>Agent Discussion Arena همراه با Ollama</strong> است؛ نه به این دلیل که لزوماً بهترین ابزار موجود است، بلکه چون با اولویت‌های تو و محدودیت هزینه سازگاری خوبی دارد.</p>
+<h2>چرا این ترکیب؟</h2>
+<ul>
+<li>برنامه روی ویندوز اجرا می‌شود و به Docker یا نصب وابستگی‌های پیچیده نیاز ندارد.</li>
+<li>می‌توانی ۲ تا ۴ عامل با دیدگاه‌های متفاوت تعریف کنی و آن‌ها را وارد چند دور نقد متقابل کنی.</li>
+<li>از مدل‌های محلی پشتیبانی می‌کند؛ بنابراین برای شروع به خرید API نیاز نداری.</li>
+<li>در پایان می‌توانی متن کامل بحث را به‌صورت Markdown ذخیره کنی. &lt;Cite refs={[&quot;turn706353search0&quot;]}/&gt;</li>
+</ul>
+<h2>محدودیت اصلی سیستم تو</h2>
+<p>هنوز یک قطعهٔ مهم را نمی‌دانم: <strong>کارت گرافیک فعلی‌ات دقیقاً چیست؟</strong> قبلاً کارت‌های RTX 5050، 5060 و 5060 Ti را بررسی می‌کردی، اما نمی‌خواهم فرض کنم یکی از آن‌ها را خریده‌ای.</p>
+<p>این موضوع روی کیفیت مدل‌های محلی که می‌توانی اجرا کنی، تأثیر زیادی دارد.</p>
+<p>تا روشن‌شدن آن، پیشنهاد شروع من این است:</p>
+<ol>
+<li>نصب <a href="https://ollama.com/download/windows">Ollama برای ویندوز</a>.</li>
+<li>اجرای یک مدل محلی با اندازهٔ مناسب.</li>
+<li>اتصال آن به <a href="https://github.com/paolodalprato/agent-discussion-arena">Agent Discussion Arena</a>.</li>
+<li>آزمایش سه نقش: یک تحلیلگر مستقل، یک منتقد جدی و یک ارزیاب شواهد؛ ابتدا با دو دور بحث.</li>
+</ol>
+<p>توجه کن که اجرای سه نقش با یک مدل واحد، سه هوش مصنوعی مستقل از نظر مدل ایجاد نمی‌کند؛ بلکه سه عامل با دستورها و دیدگاه‌های متفاوت می‌سازد. برای مقایسهٔ واقعی مدل‌ها می‌توانیم بعداً مدل‌های متفاوتی متصل کنیم.</p>
+<p><strong>الان فقط بگو کارت گرافیکت چیست و چند گیگابایت VRAM دارد؟</strong> اگر هنوز کارت جدید نخریده‌ای، همان را بگو تا مسیر مناسب را بر اساس سخت‌افزار فعلی‌ات انتخاب کنیم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">الان سیستم من متفاوت میخوای بهت بدم اطلاعاتش؟</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>آره، حتماً 😂 چون انتخاب مدل‌های محلی و تعداد AIهایی که می‌تونی اجرا کنی، به مشخصات جدید سیستمت بستگی داره.</p>
+<p>بهترین کار اینه که اطلاعات فعلی سیستم رو بدی؛ لازم نیست همه‌چیز رو دستی تایپ کنی.</p>
+<p><strong>در ویندوز:</strong></p>
+<ol>
+<li>کلیدهای <code>Ctrl + Shift + Esc</code> رو بزن تا Task Manager باز بشه.</li>
+<li>وارد بخش <strong>Performance</strong> شو.</li>
+<li>از این قسمت‌ها عکس بفرست:<ul>
+<li>CPU</li>
+<li>Memory</li>
+<li>GPU 0 و اگر هست GPU 1</li>
+</ul>
+</li>
+</ol>
+<p>اگر راحت‌تری، فقط مدل پردازنده، مقدار RAM، مدل کارت گرافیک و حافظهٔ گرافیکی (VRAM) رو بنویس.</p>
+<p>بعد با مشخصات واقعی سیستم خودت بررسی می‌کنیم:</p>
+<ul>
+<li>چه مدل‌هایی رو می‌تونی رایگان اجرا کنی؛</li>
+<li>چند عامل می‌تونن هم‌زمان یا نوبتی بحث کنن؛</li>
+<li>و بین <strong>Council، RoundTable و Agent Discussion Arena</strong> کدوم واقعاً مناسب‌تره.</li>
+</ul>
+<p>نمی‌خوام صرفاً بر اساس اسم ابزار انتخاب کنیم و بعد وسط اجرا بفهمیم سخت‌افزار یا محدودیت مدل‌ها دست‌وپامون رو بسته. 😄</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">Device Name	DESKTOP-N5EC1OD
+Processor	Intel(R) Core(TM) i5-9600K CPU @ 3.70GHz   3.70 GHz
+Installed RAM	32/0 GB (30/9 GB usable)
+Storage	932 GB SSD NVMe Samsung SSD 970, 1.82 TB WDC WD20EARS-00MVWB0, 2.73 TB WDC WD30EZRX-00DC0B0
+Graphics Card	Intel(R) UHD Graphics 630 (128 MB)
+Device ID	7635DD1F-9403-422B-9807-323C68805D6D
+Product ID	00331-10000-00001-AA218
+System Type	64-bit operating system, x64-based processor
+Pen and touch	No pen or touch input is available for this display</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>حالا تصویر سخت‌افزارت روشن‌تر شد. تفاوت مهم با مشخصاتی که قبلاً داشتم این است که پردازنده‌ات <strong>Core i5-9600K</strong> است و طبق اطلاعاتی که فرستادی، کارت گرافیک مجزایی نداری؛ فقط Intel UHD Graphics 630 با حافظهٔ گرافیکی گزارش‌شدهٔ ۱۲۸ مگابایت.</p>
+<h2>ارزیابی سیستم تو برای میزگرد چندهوش‌مصنوعی</h2>
+&lt;box border radius=&quot;xl&quot; padding={3} gap={3}&gt;
+  &lt;row align=&quot;center&quot; gap={3}&gt;
+    &lt;icon name=&quot;cpu&quot; size=&quot;2xl&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **پردازنده:** Intel Core i5-9600K
+      &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;برای اجرای مدل‌های کوچک روی CPU قابل استفاده است؛ مدل‌های بزرگ‌تر کندتر خواهند بود.&lt;/text&gt;
+    &lt;/box&gt;
+  &lt;/row&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;row align=&quot;center&quot; gap={3}&gt;
+    &lt;icon name=&quot;memory-stick&quot; size=&quot;2xl&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **رم:** ۳۲ گیگابایت
+      &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;برای آزمایش مدل‌های کم‌حجم و اجرای نوبتی چند عامل نقطهٔ شروع خوبی است.&lt;/text&gt;
+    &lt;/box&gt;
+  &lt;/row&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;row align=&quot;center&quot; gap={3}&gt;
+    &lt;icon name=&quot;monitor&quot; size=&quot;2xl&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **گرافیک:** Intel UHD Graphics 630
+      &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;نباید روی شتاب‌دهی مناسب برای مدل‌های زبانی بزرگ حساب کنیم؛ فعلاً CPU را مبنا می‌گیریم.&lt;/text&gt;
+    &lt;/box&gt;
+  &lt;/row&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;row align=&quot;center&quot; gap={3}&gt;
+    &lt;icon name=&quot;hard-drive&quot; size=&quot;2xl&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **ذخیره‌سازی:** SSD NVMe حدود ۱ ترابایت، به‌علاوهٔ دو هارد
+      &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;فضای ذخیره‌سازی مدل‌ها احتمالاً مسئلهٔ اصلی نیست؛ فضای خالی واقعی SSD را باید در نظر گرفت.&lt;/text&gt;
+    &lt;/box&gt;
+  &lt;/row&gt;
+&lt;/box&gt;
+
+<h2>نکتهٔ تعیین‌کننده: رایگان بودن در برابر کیفیت</h2>
+<p>دو مسیر داری:</p>
+<ul>
+<li><strong>کاملاً رایگان:</strong> مدل محلی با Ollama؛ ولی روی سیستم تو باید انتظار سرعت پایین‌تر و محدودیت کیفیت نسبت به مدل‌های ابری قوی را داشته باشیم.</li>
+<li><strong>مدل‌های ابری با سهمیهٔ رایگان:</strong> امکان استفاده از چند مدل متفاوت و قوی‌تر، اما سهمیه‌ها و محدودیت‌ها وابسته به سرویس‌اند.</li>
+</ul>
+<p>برای هدف تو، تفاوت واقعی مدل‌ها مهم است؛ سه عامل با یک مدل واحد و سه شخصیت متفاوت الزاماً به‌اندازهٔ سه مدل مستقل، تنوع فکری ایجاد نمی‌کنند.</p>
+<p>پیشنهاد من این است که ابتدا <strong>Agent Discussion Arena</strong> را با یک مدل محلی آزمایش کنیم. نصبش سبک است و طبق راهنمای پروژه به Python 3.10 یا جدیدتر نیاز دارد؛ سرویس مدل محلی را هم می‌توان از طریق Ollama متصل کرد. &lt;Cite refs={[&quot;turn562608view0&quot;,&quot;turn562608view1&quot;]}/&gt;</p>
+<p>لینک‌ها:</p>
+<ul>
+<li><a href="https://github.com/paolodalprato/agent-discussion-arena">Agent Discussion Arena</a></li>
+<li><a href="https://ollama.com/download/windows">دانلود Ollama برای ویندوز</a></li>
+</ul>
+<p>اما قبل از نصب، یک انتخاب مهم داریم: <strong>می‌خواهی کاملاً محلی و بدون هزینه جلو برویم، حتی اگر پاسخ‌ها کندتر و ضعیف‌تر باشند، یا حاضر هستی از سهمیه‌های رایگان مدل‌های ابری هم استفاده کنی تا تنوع و کیفیت بیشتری داشته باشی؟</strong></p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain"># Selected text:
+
+## Selection 1
+اما قبل از نصب، یک انتخاب مهم داریم: می‌خواهی کاملاً محلی و بدون هزینه جلو برویم، حتی اگر پاسخ‌ها کندتر و ضعیف‌تر باشند، یا حاضر هستی از سهمیه‌های رایگان مدل‌های ابری هم استفاده کنی تا تنوع و کیفیت بیشتری داشته باشی؟
+
+## My request:
+هیچ ایده ای ندارم عملکرد هرکدوم چطوریه</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>پس فعلاً لازم نیست بین این دو مسیر یکی را انتخاب کنی. بگذار تفاوتشان را با یک مثال روشن کنم و بعد پیشنهاد بدهم چطور بدون هزینه امتحانشان کنی.</p>
+<h2>۱. تفاوت در عمل چیست؟</h2>
+&lt;box border radius=&quot;xl&quot; padding={3} gap={3}&gt;
+  &lt;title size=&quot;md&quot;&gt;مسیر A — مدل‌های محلی&lt;/title&gt;
+  &lt;row align=&quot;start&quot; gap={3}&gt;
+    &lt;AsyncImage query=&quot;Ollama local large language model running on Windows terminal&quot; aspectRatio=&quot;4:3&quot; maxWidth=&quot;112px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **مدل روی کامپیوتر خودت اجرا می‌شود.**
+
+<pre><code>  - اینترنت برای خودِ تولید پاسخ لازم نیست.
+  - هزینهٔ API نداری.
+  - اطلاعات ورودی در همان محیط محلی پردازش می‌شود.
+  - اما سرعت و توان استدلال به مدل و سخت‌افزار محدود است.
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  روی سیستم تو با ۳۲ گیگابایت RAM، مدل‌های کم‌حجم قابل آزمایش‌اند؛ مدل‌های بزرگ‌تر ممکن است کند باشند. راهنمای Ollama برای مدل‌های ۷ میلیارد پارامتری حدود ۸ گیگابایت RAM را حداقل راهنمایی می‌کند، نه تضمین سرعت مناسب. &lt;Cite refs={[&quot;turn198466search8&quot;,&quot;turn198466search10&quot;]}/&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;title size=&quot;md&quot;&gt;مسیر B — مدل‌های ابری با سهمیهٔ رایگان&lt;/title&gt;
+  &lt;row align=&quot;start&quot; gap={3}&gt;
+    &lt;AsyncImage query=&quot;OpenRouter free AI models selection playground web interface&quot; aspectRatio=&quot;4:3&quot; maxWidth=&quot;112px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **پاسخ را سرورهای ارائه‌دهنده تولید می‌کنند.**
+
+<pre><code>  - می‌توانی مدل‌های متفاوتی را امتحان کنی.
+  - نیاز نیست کارت گرافیک قوی داشته باشی.
+  - معمولاً برای مدل‌های قوی‌تر و متنوع‌تر انتخاب‌های بیشتری داری.
+  - به اینترنت، حساب کاربری و رعایت محدودیت سهمیه وابسته‌ای.
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  برای نمونه، &lt;Entity category=&quot;software&quot; value=&quot;OpenRouter&quot; disambig=&quot;AI model API aggregator&quot;/&gt; مدل‌های رایگان و API ارائه می‌کند. در حال حاضر محدودیت رایج پلن رایگان آن ۵۰ درخواست در روز است؛ سقف دقیق و دسترسی مدل‌ها ممکن است تغییر کند. &lt;Cite refs={[&quot;turn198466search2&quot;,&quot;turn198466search5&quot;]}/&gt;
+
+<p>  &lt;text&gt;&lt;Link url=&quot;https://openrouter.ai/models?max_price=0&quot; title=&quot;مشاهدهٔ مدل‌های رایگان OpenRouter&quot;/&gt;&lt;/text&gt;
+&lt;/box&gt;</p>
+<h2>۲. برای میزگرد تو چه تفاوتی ایجاد می‌کند؟</h2>
+<p>فرض کن سه عامل باید دربارهٔ یک تصمیم بحث کنند.</p>
+&lt;box border radius=&quot;lg&quot; padding={3} gap={2}&gt;
+  &lt;row align=&quot;start&quot; gap={2}&gt;
+    &lt;box background=&quot;surface-secondary&quot; radius=&quot;lg&quot; padding={2}&gt;
+      &lt;icon name=&quot;brain&quot; size=&quot;xl&quot;/&gt;
+    &lt;/box&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **عامل اول — تحلیلگر**
+
+<pre><code>  مزایا، فرضیات و شواهد موافق را بررسی می‌کند.
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  &lt;row align=&quot;start&quot; gap={2}&gt;
+    &lt;box background=&quot;surface-secondary&quot; radius=&quot;lg&quot; padding={2}&gt;
+      &lt;icon name=&quot;shield-alert&quot; size=&quot;xl&quot;/&gt;
+    &lt;/box&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **عامل دوم — منتقد**
+
+<pre><code>  فرضیات را به چالش می‌کشد و دنبال تناقض‌ها و توضیح‌های جایگزین می‌گردد.
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  &lt;row align=&quot;start&quot; gap={2}&gt;
+    &lt;box background=&quot;surface-secondary&quot; radius=&quot;lg&quot; padding={2}&gt;
+      &lt;icon name=&quot;scale&quot; size=&quot;xl&quot;/&gt;
+    &lt;/box&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **عامل سوم — ارزیاب**
+
+<pre><code>  استدلال‌های هر دو را بررسی می‌کند، اما مجبور نیست آن‌ها را به توافق برساند.
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+&lt;/box&gt;
+
+<p>در مسیر محلی می‌توانی همین نقش‌ها را با یک مدل اجرا کنی؛ در مسیر ابری می‌توانی مدل‌های متفاوتی را به نقش‌ها اختصاص بدهی. مسیر دوم فرصت بیشتری برای تفاوت واقعی در سبک استدلال فراهم می‌کند، ولی تضمین نمی‌کند مدل‌ها واقعاً اختلاف نظر مفیدی داشته باشند.</p>
+<h2>۳. پیشنهاد من: اول آزمایش، بعد انتخاب</h2>
+<p>من پیشنهاد می‌کنم فعلاً هیچ برنامه‌ای را نصب نکنیم. ابتدا یک آزمایش کوتاه با مدل‌های رایگان ابری انجام بدهیم و ببینیم کیفیت و تنوع پاسخ‌ها برایت کافی است یا نه. بعد اگر محدودیت سهمیه آزاردهنده بود یا خواستی مستقل از سرویس‌های آنلاین کار کنی، مدل محلی را راه می‌اندازیم.</p>
+<p>برای شروع می‌توانی از <a href="https://openrouter.ai/models?max_price=0">OpenRouter</a> مدل‌های رایگان را بررسی کنی؛ استفاده از API نیازمند ساخت حساب و کلید API است.</p>
+<p><strong>نکته:</strong> رایگان‌بودن به معنی نامحدودبودن نیست. اگر بخواهی چند عامل در چند دور به هم پاسخ دهند، مصرف درخواست‌ها سریع بالا می‌رود.</p>
+<p>این مسیر به تو اجازه می‌دهد قبل از درگیرشدن با نصب و تنظیمات، خودِ کیفیت بحث چندعاملی را بسنجی.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">بدنیست امتحان کردنش</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>عالی 😂 پس بیاییم یک آزمایش کوچک و واقعی انجام بدهیم؛ فعلاً بدون نصب چیزی روی کامپیوترت.</p>
+<h2>قدم اول: دسترسی به مدل‌های رایگان</h2>
+&lt;box border radius=&quot;xl&quot; padding={3} gap={3}&gt;
+  &lt;row align=&quot;center&quot; gap={3}&gt;
+    &lt;AsyncImage query=&quot;OpenRouter AI models platform logo&quot; aspectRatio=&quot;1:1&quot; maxWidth=&quot;60px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **&lt;Entity category=&quot;software&quot; value=&quot;OpenRouter&quot; disambig=&quot;AI model API aggregator&quot;/&gt;**
+
+<pre><code>  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;دسترسی به چند مدل از یک سرویس&lt;/text&gt;
+  &lt;text&gt;&lt;Link url=&quot;https://openrouter.ai/models?max_price=0&quot; title=&quot;دیدن مدل‌های رایگان&quot;/&gt;&lt;/text&gt;
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  طبق صفحهٔ قیمت‌گذاری فعلی، پلن رایگان شامل مدل‌های رایگان و دسترسی به چت و API است؛ محدودیت عمومی آن برای مدل‌های رایگان ۵۰ درخواست در روز است، هرچند محدودیت ارائه‌دهندهٔ هر مدل هم ممکن است اعمال شود. &lt;Cite refs={[&quot;turn182468search0&quot;,&quot;turn182468search5&quot;]}/&gt;
+&lt;/box&gt;
+
+<h3>کاری که فعلاً انجام بده</h3>
+<ol>
+<li>لینک بالا را باز کن و یک حساب بساز.</li>
+<li>از میان مدل‌هایی که برچسب <strong>Free</strong> دارند، دو مدل متفاوت انتخاب کن.</li>
+<li>هر دو را با یک سؤال یکسان آزمایش کن؛ هنوز لازم نیست API بسازی یا کلیدی را جایی وارد کنی.</li>
+</ol>
+<p>برای آزمایش اول، این سؤال را به هر دو بده:</p>
+&lt;box border radius=&quot;lg&quot; padding={3} gap={2}&gt;
+  &lt;text preserveWhitespace&gt;یک شهر در برابر بحران کمبود منابع قرار گرفته است. سه راه وجود دارد:
+
+<p>۱. توزیع مساوی منابع بین همه
+۲. تخصیص بیشتر به بخش‌هایی که بیشترین بازده را دارند
+۳. حفظ ذخیرهٔ اضطراری و کاهش مصرف فعلی</p>
+<p>کدام راه را انتخاب می‌کنی؟ فرضیاتت را مشخص کن، از انتخابت دفاع کن و قوی‌ترین ایراد به نظر خودت را هم بیان کن. اگر اطلاعات کافی نیست، بگو چه اطلاعاتی لازم داری.&lt;/text&gt;
+  &lt;button block onClick={ =&gt; GenUI.copy(&quot;یک شهر در برابر بحران کمبود منابع قرار گرفته است. سه راه وجود دارد:\n\n۱. توزیع مساوی منابع بین همه\n۲. تخصیص بیشتر به بخش‌هایی که بیشترین بازده را دارند\n۳. حفظ ذخیرهٔ اضطراری و کاهش مصرف فعلی\n\nکدام راه را انتخاب می‌کنی؟ فرضیاتت را مشخص کن، از انتخابت دفاع کن و قوی‌ترین ایراد به نظر خودت را هم بیان کن. اگر اطلاعات کافی نیست، بگو چه اطلاعاتی لازم داری.&quot;)}&gt;کپی سؤال آزمایشی&lt;/button&gt;
+&lt;/box&gt;</p>
+<p>بعد پاسخ‌های هر دو را همین‌جا بفرست. با هم بررسی می‌کنیم که آیا واقعاً تفاوت استدلال دارند یا فقط جواب‌های متفاوتی با ظاهر متفاوت تولید کرده‌اند.</p>
+<p><strong>فعلاً سراغ نصب میزگرد نمی‌رویم.</strong> اول کیفیت مدل‌ها را می‌سنجیم؛ بعد اتصالشان به یک اتاق بحث مشترک را انجام می‌دهیم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">باشه بزار ببینم چکار میکنن</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>باشه 😂 برو ببین این دوتا فیلسوف رایگان چه می‌کنن! 🏹⚖️</p>
+<p>فقط وقتی جواب‌ها رو گرفتی، هر دو رو همین‌جا بفرست؛ حتی اگه یکی خیلی قانع‌کننده‌تر به نظر رسید.</p>
+<p>من از سه جهت بررسی‌شون می‌کنم:</p>
+<ul>
+<li><strong>استقلال فکری:</strong> واقعاً از دو زاویهٔ متفاوت به مسئله نگاه می‌کنن یا نه؟</li>
+<li><strong>کیفیت استدلال:</strong> دلیل میارن یا فقط جواب خوش‌آب‌ورنگ تحویل می‌دن؟</li>
+<li><strong>نقد خود:</strong> واقعاً ضعف نظر خودشون رو پیدا می‌کنن یا یه ایراد بی‌خطر و نمایشی می‌سازن؟</li>
+</ul>
+<p>فعلاً دنبال این نیستیم که کدوم جواب درست‌تره؛ می‌خوایم بفهمیم آیا این مدل‌ها ظرفیت تبدیل‌شدن به اعضای یک میزگرد مفید رو دارن یا نه. 😁</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">Favicon for thinkingmachines
+Thinking Machines: Inkling Small (free)
+207B tokens
+
+Inkling Small is an open-weight multimodal mixture-of-experts model from Thinking Machines Lab, with 12B active parameters out of 276B total. It is positioned as the smaller, more efficient member of the Inkling family and is suited for reasoning, coding, agentic workflows, retrieval-augmented generation, instruction following, and multilingual conversation.
+by thinkingmachinesJul 30, 20261.05M context$0/M input tokens$0/M output tokens
+Favicon for fish-audio
+Fish Audio: S2.1 Pro Free (free)
+18.8M tokens
+
+S2.1 Pro Free is the no-cost variant of Fish Audio S2.1 Pro, intended for testing, prototyping, and low-volume applications. It provides the same synthesis capabilities without production latency or availability guarantees.
+by fish-audioJul 29, 2026$0/M input tokens$0/M output tokens
+Favicon for poolside
+Poolside: Laguna S 2.1 (free)
+Going away October 31, 2026
+1T tokens
+
+Laguna S 2.1 is the latest coding agent model from Poolside. Laguna S 2.1 is a 118B total parameter model with 8B active parameters, scoring 70.2% on Terminal-Bench 2.1 and 40.4% on DeepSWE, making it one of the strongest coding models in its category. Open-weight under the OpenMDW-1.1 license.  Laguna S 2.1 is designed for software engineering and agentic coding use cases, and you are responsible for confirming that it is appropriate for your intended application. Laguna S 2.1 is subject to the OpenMDW-1.1 License, and should be used consistently with Poolside&#39;s Acceptable Use Policy. We advise against circumventing Laguna S 2.1 safety guardrails without implementing substantially equivalent mitigations appropriate for your use case.  Please report security vulnerabilities or safety concerns to security@poolside.ai.  If you are using Laguna S 2.1 for free, we may use your inputs and outputs to train and improve our models.
+by poolsideJul 21, 2026262K context$0/M input tokens$0/M output tokens
+Favicon for thinkingmachines
+Thinking Machines: Inkling (free)
+381B tokens
+
+Inkling is an open-weight multimodal mixture-of-experts model from Thinking Machines Lab, with 41B active parameters out of 975B total. It is designed for general-purpose reasoning, coding, agentic and tool-use systems, retrieval-augmented generation, instruction following, and multilingual conversational applications. Its native image and audio understanding supports multimodal analysis alongside text.
+by thinkingmachinesJul 17, 20261.05M context$0/M input tokens$0/M output tokens
+Favicon for nvidia
+NVIDIA: Nemotron 3 Embed 1B (free)
+931M tokens
+
+NVIDIA Nemotron 3 Embed 1B is an open text embedding model from NVIDIA, optimized for high-throughput, low-latency retrieval. It is suited for enterprise search, RAG, code retrieval, and agentic retrieval workflows, retaining more than 95% of the 8B model’s accuracy in a smaller deployment footprint.
+by nvidiaJul 16, 2026$0/M input tokens$0/M output tokens
+Favicon for poolside
+Poolside: Laguna XS 2.1 (free)
+Going away October 31, 2026
+94B tokens
+
+Laguna XS 2.1 is the latest coding agent model in the 33B-A3B category from Poolside and a step forward from their Laguna XS.2 model (released in April 2026). It combines tool calling and reasoning capabilities with a compact footprint, offering a 256K context window and up to 32K output tokens. Quantized to FP8 for fast, cost-efficient agentic coding workflows.  Laguna XS 2.1 is designed for software engineering and agentic coding use cases, and you are responsible for confirming that it is appropriate for your intended application. Laguna XS 2.1 is subject to the OpenMDW-1.1 License, and should be used consistently with Poolside&#39;s Acceptable Use Policy. We advise against circumventing Laguna XS 2.1 safety guardrails without implementing substantially equivalent mitigations appropriate for your use case.  Please report security vulnerabilities or safety concerns to security@poolside.ai.  If you are using Laguna XS 2.1 for free, we may use your inputs and outputs to train and improve our models.
+by poolsideJul 2, 2026262K context$0/M input tokens$0/M output tokens
+Favicon for cohere
+Cohere: North Mini Code (free)
+171B tokens
+
+North Mini Code is Cohere&#39;s first agentic coding model and the debut of its North family. A sparse mixture-of-experts model with 30B total parameters and 3B active, it is optimized for code generation, agentic software engineering, and terminal tasks, and is trained to generalize across agent harnesses such as OpenCode and SWE-Agent.  It offers a 256K-token context window with up to 64K tokens of output, supports interleaved reasoning and tool use via JSON schema, and is released open-weight under the Apache 2.0 license. Its small active-parameter footprint enables low-latency inference, including on local hardware.
+by cohereJun 17, 2026256K context$0/M input tokens$0/M output tokens
+Favicon for nvidia
+NVIDIA: Llama Nemotron Rerank VL 1B V2 (free)
+2.65B tokens
+
+Llama Nemotron Rerank VL 1B V2 is a 1.7B multimodal reranking model from NVIDIA. It evaluates the relevance of document images and text against user queries, designed for vision RAG pipelines handling charts, tables, infographics, and mixed-media documents. Functions as a cross-encoder that accepts text queries paired with image, text, or combined document inputs, delivering approximately 6-7% recall improvements over embedding-only baselines on visual document retrieval benchmarks.
+by nvidiaJun 9, 2026$0/M input tokens$0/M output tokens
+Favicon for nvidia
+NVIDIA: Nemotron 3.5 Content Safety (free)
+2.24B tokens
+
+NVIDIA Nemotron 3.5 Content Safety is a compact 4B-parameter multimodal guardrail model from NVIDIA, fine-tuned from Google Gemma-3-4B. It moderates both inputs to and responses from LLMs and VLMs, accepting text and image input and returning text output: a safe/unsafe classification for the user prompt and the response, safety category labels, and an optional reasoning trace. It covers 12 languages with a context window of up to 128K tokens.  It is suited for prompt and response moderation, content classification, safety pipelines, and enterprise AI guardrails with policy enforcement, and includes a togglable reasoning mode. It is part of the NVIDIA Nemotron family of open models for agentic AI.
+by nvidiaJun 4, 2026128K context$0/M input tokens$0/M output tokens
+Favicon for nvidia
+NVIDIA: Nemotron 3 Ultra (free)
+5.89T tokens
+Health (#44)
+
+NVIDIA Nemotron 3 Ultra is an open frontier-reasoning and orchestration model from NVIDIA, with 55B active parameters out of 550B total (MoE). Built on a hybrid Transformer-Mamba mixture-of-experts architecture, it supports text input and output with a context window of up to 1M tokens. It is suited for long-running agentic workflows, including agent orchestration, coding agents, deep research, and complex enterprise tasks.  It is particularly strong at multi-step reasoning and planning, with high-throughput inference designed for high-volume agent pipelines. It is part of the NVIDIA Nemotron family of open models for agentic AI.
+by nvidiaJun 4, 20261M context$0/M input tokens$0/M output tokens
+Favicon for nvidia
+NVIDIA: Nemotron 3 Nano Omni (free)
+43.1B tokens
+
+NVIDIA Nemotron™ 3 Nano Omni is a 30B-A3B open multimodal model designed to function as a perception and context sub-agent in enterprise agent systems. It accepts text, image, video, and audio inputs and produces text output, enabling agents to perceive and reason across modalities in a single inference loop.  Built on a hybrid MoE Transformer-Mamba architecture with Conv3D video layers and Efficient Video Sampling (EVS), it delivers approximately 2× higher throughput and 2.5× lower compute for video reasoning versus separate vision + speech pipelines. It supports up to 300K context length and a 16,384 reasoning budget, with extended thinking enabled via reasoning.enabled on OpenRouter.
+by nvidiaApr 28, 2026256K context$0/M input tokens$0/M output tokens
+Favicon for google
+Google: Gemma 4 26B A4B (free)
+1.13B tokens
+
+Gemma 4 26B A4B IT is an instruction-tuned Mixture-of-Experts (MoE) model from Google DeepMind. Despite 25.2B total parameters, only 3.8B activate per token during inference — delivering near-31B quality at a fraction of the compute cost. Supports multimodal input including text, images, and video (up to 60s at 1fps). Features a 256K token context window, native function calling, configurable thinking/reasoning mode, and structured output support. Released under Apache 2.0.
+by googleApr 3, 2026262K context$0/M input tokens$0/M output tokens
+Favicon for google
+Google: Gemma 4 31B (free)
+668M tokens
+
+Gemma 4 31B Instruct is Google DeepMind&#39;s 30.7B dense multimodal model supporting text and image input with text output. Features a 256K token context window, configurable thinking/reasoning mode, native function calling, and multilingual support across 140+ languages. Strong on coding, reasoning, and document understanding tasks. Apache 2.0 license.
+by googleApr 2, 2026262K context$0/M input tokens$0/M output tokens
+Favicon for nvidia
+NVIDIA: Llama Nemotron Embed VL 1B V2 (free)
+489M tokens
+
+The Llama Nemotron Embed VL 1B V2 embedding model is optimized for multimodal question-answering retrieval. The model can embed &#39;documents&#39; in the form of image, text, or image and text combined. Documents can be retrieved given a user query in text form. The model supports images containing text, tables, charts, and infographics.
+by nvidiaFeb 25, 2026$0/M input tokens$0/M output tokens</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>خوبه! 😂 این فهرست برای شروع خیلی به درد می‌خوره. از بین مدل‌هایی که فرستادی، برای آزمایش میزگرد من این دو را انتخاب می‌کنم:</p>
+&lt;box gap={3}&gt;
+  &lt;row align=start gap={3}&gt;
+    &lt;AsyncImage query=&quot;Thinking Machines Lab Inkling Small AI model logo&quot; aspectRatio=&quot;1:1&quot; maxWidth=&quot;76px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **۱. Inkling Small — عامل تحلیلگر**
+
+<pre><code>  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;۱۲ میلیارد پارامتر فعال · رایگان در OpenRouter&lt;/text&gt;
+
+  گزینهٔ اول برای آزمودن استدلال عمومی و تحلیل چندمرحله‌ای. اندازهٔ کل مدل بسیار بزرگ‌تر از تعداد پارامترهای فعال آن است، پس رایگان‌بودن API به معنی اجرای آسان آن روی کامپیوتر خودت نیست.
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  &lt;divider color=&quot;subtle&quot;/&gt;
+  &lt;row align=start gap={3}&gt;
+    &lt;AsyncImage query=&quot;Google Gemma 4 26B A4B model logo&quot; aspectRatio=&quot;1:1&quot; maxWidth=&quot;76px&quot;/&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **۲. Gemma 4 26B A4B — منتقد مستقل**
+
+<pre><code>  &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;حدود ۳٫۸ میلیارد پارامتر فعال · رایگان در OpenRouter&lt;/text&gt;
+
+  انتخاب مناسبی برای مقایسهٔ اولیه است، چون خانواده و معماری آن با مدل اول متفاوت است. البته تفاوت معماری به‌تنهایی استقلال فکری یا کیفیت بالاتر را تضمین نمی‌کند.
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+&lt;/box&gt;
+
+<h2>چطور آزمایش را انجام بدهیم؟</h2>
+<p>۱. در <a href="https://openrouter.ai/models?max_price=0">OpenRouter</a> صفحهٔ هر دو مدل را باز کن و مطمئن شو هنوز رایگان و در دسترس‌اند.</p>
+<p>۲. همان سؤال آزمایشی شهر و کمبود منابع را جداگانه برای هر دو بفرست. <strong>پاسخ مدل اول را به مدل دوم نشان نده</strong> تا ابتدا نظر مستقلشان را بسنجیم.</p>
+<p>۳. هر دو پاسخ را اینجا بفرست. من اختلاف استدلال‌ها، فرضیات و کیفیت نقد خودشان را بررسی می‌کنم.</p>
+<p>بعد از آن، دور دوم را اجرا می‌کنیم: هر مدل پاسخ مدل دیگر را می‌بیند و باید نقد کند. این مرحله به هدف اصلی تو نزدیک‌تر است.</p>
+<p><strong>فعلاً سراغ Inkling اصلی، Nemotron 3 Ultra یا مدل‌های بسیار بزرگ نرویم.</strong> برای اولین آزمایش نیازی به این پیچیدگی نداریم. و یک نکته: مدل Fish Audio که در فهرستت هست، مدل صوتی است و برای این آزمایش متنی انتخاب مناسبی نیست.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">The free Inkling Small endpoint is only available for use with agentic harnesses. Do not upload any confidential information or personal data (e.g., voices and images of people&#39;s faces). Your usage of this free endpoint, including prompts and outputs, is logged and used to improve Thinking Machines Lab&#39;s models, products, and services. The logged session data will be disassociated from your account and other persistent identifiers before being used for these purposes.
+
+By using this free endpoint, you agree to the TML Free Research API Terms of Service. For more information about Thinking Machines Lab&#39;s data processing practices, see this Privacy Notice.
+Dismiss
+Favicon for thinkingmachines
+Thinking Machines: Inkling Small (free)
+
+thinkingmachines/inkling-small:free
+Model weights
+Compare
+API
+Try this model
+
+Inkling Small is an open-weight multimodal mixture-of-experts model from Thinking Machines Lab, with 12B active parameters out of 276B total. It is positioned as the smaller, more efficient member of the Inkling family and is suited for reasoning, coding, agentic workflows, retrieval-augmented generation, instruction following, and multilingual conversation.
+Show less
+Modalities
+Price
+Free
+Context
+1.0M
+Released
+Jul 30, 2026
+Favicon for thinkingmachines
+Thinking Machines: Inkling Small (free)
+Compare
+API
+Try this model
+Providers
+Performance
+Uptime
+Benchmarks
+Apps
+Activity
+FAQ
+Explore
+Providers
+
+This model is hosted by one provider. OpenRouter forwards every request to it directly — no routing decisions to make.
+Free
+Reasoning effort
+Latency / throughput
+P50
+P75
+P90
+P95
+P99
+Provider
+	
+Input /M
+	
+Output /M
+	
+Latency
+	
+Throughput
+	
+Uptime
+Favicon for Thinking Machines
+Thinking Machines
+	Free	Free	1.36s	98 tps	
+100.00%
+Performance
+
+Throughput is how fast the model writes (tokens per second — higher is better). Latency is total round-trip time (lower is better). TTFT is time-to-first-token — how long before you see anything appear (lower is better).
+Throughput
+98tok/s
+
+P50, best across providers
+Latency
+1.36s
+
+P50, best provider
+All locations
+Reasoning effort
+All
+1 week
+Throughput
+P50
+Avg98 tok/s
+P75
+Avg61 tok/s
+P90
+Avg38 tok/s
+P95
+Avg28 tok/s
+P99
+Avg14 tok/s
+Latency
+P50
+Avg1.38 s
+P75
+Avg2.09 s
+P90
+Avg3.21 s
+P95
+Avg4.45 s
+P99
+Avg10.26 s
+E2E latency
+P50
+Avg3.68 s
+P75
+Avg5.61 s
+P90
+Avg8.85 s
+P95
+Avg12.22 s
+P99
+Avg26.17 s
+AutoExacto benchmarks
+GPQA DiamondTAU-Benchauto-routing86.7%62.0%DeepInfra86.9%58.5%
+Tool call error rate
+Thinking Machines
+Avg5.94 %
+Cache hit rate
+Thinking Machines
+Avg87.74 %
+Uptime
+
+Uptime is the percentage of the past 3 days that at least one provider was responding to requests. Availability is the percentage of time that inference was successfully served. OpenRouter continuously monitors and uses the next-best provider when one returns an error.
+Uptime (3d)The model was reachable. Request routed to a provider.
+100.00%
+Availability (3d)The model returned inference from any provider. Errors and empty responses count against it.
+99.35%
+Availability over the last 3 days
+Oct 25, 1 AM - Oct 28, 1 AM
+Availability 99.35%
+SunMonTueNow
+Availability over the last 24 hours
+Oct 27, 2:00 AM6:00 AM10:00 AM2:00 PM6:00 PM10:00 PM2:00 AM90%93%96%100%
+OpenRouter Availability
+99.40%
+
+When an error occurs in an upstream provider, we can recover by routing to another healthy provider, if your request filters allow it. You can access per-provider uptime data programmatically through the Endpoints API. Learn more about our load balancing and provider routing options.
+Benchmarks
+
+Scores on standardized evaluations and this model’s own outputs on shared benchmark prompts. Higher percentages are better — and each rank shows where this model lands among the models evaluated on that source.
+Benchmark score summary for Thinking Machines: Inkling Small (free) (Artificial Analysis and Vals AI)Source	Benchmark	Score
+Artificial Analysis	Inkling Small Intelligence Index	25.7
+Artificial Analysis	Inkling Small Coding Index	52.9
+Artificial Analysis	Inkling Small Agentic Index	23.5
+Artificial Analysis	Inkling Small GPQA Diamond	89.5%
+Artificial Analysis	Inkling Small HLE	33.3%
+Artificial Analysis	Inkling Small AA-LCR	75.7%
+Artificial Analysis	Inkling Small τ-Bench Banking	18.8%
+Artificial Analysis	Inkling Small GDPval-AA	31.6%
+Artificial Analysis	Inkling Small CritPt	8.3%
+Artificial Analysis	Inkling Small SciCode	49.7%
+Artificial Analysis	Inkling Small Terminal-Bench 4.0	1.0%
+Artificial Analysis	Inkling Small Terminal-Bench 2.1	55.1%
+Artificial Analysis	Inkling Small AA-Omniscience Accuracy	33.2%
+Artificial Analysis	Inkling Small AA-Omniscience Non-Hallucination Rate	37.0%
+Vals AI	Inkling Small Code Migration v1.1	10.4%
+Vals AI	Inkling Small CorpFin v2	69.6%
+Vals AI	Inkling Small CyberBench v1.1	64.1%
+Vals AI	Inkling Small EMB v1.1	40.8%
+Vals AI	Inkling Small Finance Agent v2.1	44.8%
+Vals AI	Inkling Small Vals Finance Index	36.3%
+Vals AI	Inkling Small GPQA Diamond	83.6%
+Vals AI	Inkling Small HLAB-Vals-1.1	2.9%
+Vals AI	Inkling Small IOI	9.3%
+Vals AI	Inkling Small LiveCodeBench	85.9%
+Vals AI	Inkling Small LegalBench	83.0%
+Vals AI	Inkling Small Vals Legal Index	57.8%
+Vals AI	Inkling Small Legal Research Bench	25.5%
+Vals AI	Inkling Small MedCode	37.9%
+Vals AI	Inkling Small MedScribe	84.1%
+Vals AI	Inkling Small MMLU Pro	85.6%
+Vals AI	Inkling Small MortgageTax	62.3%
+Vals AI	Inkling Small ProgramBench	0.5%
+Vals AI	Inkling Small ProofBench v1.1	6.0%
+Vals AI	Inkling Small SAGE	32.7%
+Vals AI	Inkling Small SkillsBench	33.6%
+Vals AI	Inkling Small SWE-bench	82.2%
+Vals AI	Inkling Small Tax Agent Bench	15.4%
+Vals AI	Inkling Small TaxEval v2	75.5%
+Vals AI	Inkling Small Terminal-Bench 4.0	0.0%
+Vals AI	Inkling Small Vals Index	27.6%
+Vals AI	Inkling Small Vals Multimodal Index	50.1%
+Vals AI	Inkling Small Vibe Code Bench v1.1	19.1%
+Artificial Analysis
+Vals AI
+
+25.7
+
+Artificial AnalysisIntelligence Index
+Better than 79% of models compared
+
+52.9
+
+Artificial AnalysisCoding Index
+Better than 64% of models compared
+
+23.5
+
+Artificial AnalysisAgentic Index
+Better than 61% of models compared
+Ranked #75 of 353
+
+    1. Claude Opus 5.5 57.6
+        Max 57.6
+        Xhigh 56.0
+        High 53.6
+        Medium 51.2
+        Low 42.3
+    2. Claude Sonnet 5.5 56.0
+        Max 56.0
+        Xhigh 51.9
+        High 46.8
+        Medium 40.8
+        Low 35.9
+    3. Kimi K3.1 Pro 55.1
+    4. Claude Fable 5.1 53.4
+        Max 53.4
+        Xhigh 53.2
+        High 51.2
+        Medium 48.9
+        Low 46.8
+    5. Qwen3.8 Max 53.4
+    6. GPT-6 Astra 52.7
+        Max 52.7
+        Xhigh 52.4
+        High 50.9
+        Medium 49.6
+        Low 45.8
+    7. Gemini 4 Argon (High) 52.6
+    8. GPT-6.1 Sol 51.8
+        Max 51.8
+        Xhigh 51.0
+        High 50.2
+        Medium 47.8
+        Low 42.1
+    74. Grok 4.20 0309 25.7
+        v2, Reasoning 25.7
+        Reasoning 25.2
+        Non-reasoning 14.6
+        v2, Non-reasoning 14.2
+    75. Inkling Small 25.7
+    76. Hy3 25.3
+        Hy3 25.3
+        preview, Reasoning 22.7
+        preview, Non-reasoning 17.0
+
+Favicon for anthropic
+#1Claude Opus 5.5
+Favicon for anthropic
+#2Claude Sonnet5.5
+Favicon for moonshotai
+#3Kimi K3.1 Pro
+Favicon for anthropic
+#4Claude Fable 5.1
+Favicon for qwen
+#5Qwen3.8 Max
+Favicon for openai
+#6GPT-6 Astra
+Favicon for google
+#7Gemini 4 Argon(High)
+Favicon for openai
+#8GPT-6.1 Sol
+Favicon for x-ai
+#74Grok 4.20 0309
+Favicon for thinkingmachines
+#75Inkling Small
+Favicon for tencent
+#76Hy30153045605856555353535352262625
+See full rankings →
+Reasoning
+
+GPQA Diamond
+
+Graduate-level scientific reasoning
+
+#47 of 323 models
+
+89.5%
+
+HLE
+
+Humanity&#39;s Last Exam
+
+#72 of 339 models
+
+33.3%
+
+AA-LCR
+
+Long context reasoning evaluation
+
+#81 of 286 models
+
+75.7%
+
+τ-Bench Banking
+
+Agentic tool use in a banking domain
+
+#53 of 130 models
+
+18.8%
+
+GDPval-AA
+
+Economically valuable tasks
+
+#56 of 160 models
+
+31.6%
+
+CritPt
+
+Research-level physics reasoning
+
+#66 of 283 models
+
+8.3%
+Coding
+
+SciCode
+
+Python programming for scientific computing
+
+#52 of 131 models
+
+49.7%
+
+Terminal-Bench 4.0
+
+Agentic coding &amp; terminal use
+
+#55 of 126 models
+
+1.0%
+
+Terminal-Bench 2.1
+
+Agentic coding &amp; terminal use
+
+#58 of 138 models
+
+55.1%
+Knowledge
+
+AA-Omniscience Accuracy
+
+Proportion of correctly answered questions
+
+#69 of 281 models
+
+33.2%
+
+AA-Omniscience Non-Hallucination Rate
+
+Rate of avoiding hallucination among non-correct responses
+
+#100 of 281 models
+
+37.0%</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>خب، این صفحه چند نکتهٔ مهم دارد که انتخاب ما را کمی تغییر می‌دهد. 😄</p>
+<p><strong>اول از همه، Inkling Small رایگان است، اما رایگان بودنش به معنی استفادهٔ بدون محدودیت یا محرمانه نیست.</strong> طبق هشدار خود OpenRouter، ورودی‌ها و خروجی‌های استفاده از این endpoint ثبت می‌شوند و برای بهبود مدل‌های Thinking Machines Lab استفاده خواهند شد. پس اطلاعات شخصی یا محرمانه واردش نکن.</p>
+<h2>ارزیابی من از Inkling Small برای آزمایش ما</h2>
+&lt;box gap={3}&gt;
+  &lt;row align=&quot;start&quot; gap={3}&gt;
+    &lt;box background=&quot;surface-secondary&quot; radius=&quot;lg&quot; padding={3}&gt;
+      &lt;icon name=&quot;brain&quot; size=&quot;xl&quot; /&gt;
+    &lt;/box&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **استدلال**
+
+<pre><code>  امتیاز GPQA Diamond آن ۸۹٫۵٪ است؛ نشانه‌ای امیدوارکننده در یک آزمون دشوار علمی. اما این نتیجه به‌تنهایی نشان نمی‌دهد که مدل در بحث‌های چنددیدگاهی چقدر خوب عمل می‌کند.
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  &lt;divider color=&quot;subtle&quot; /&gt;
+  &lt;row align=&quot;start&quot; gap={3}&gt;
+    &lt;box background=&quot;surface-secondary&quot; radius=&quot;lg&quot; padding={3}&gt;
+      &lt;icon name=&quot;messages-square&quot; size=&quot;xl&quot; /&gt;
+    &lt;/box&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **بحث و نقد متقابل**
+
+<pre><code>  هنوز شواهد کافی نداریم که این مدل واقعاً دیدگاه مستقلی تولید می‌کند، ایرادهای اساسی دیگران را پیدا می‌کند یا فقط با لحنی متفاوت همان حرف‌ها را تکرار می‌کند. این دقیقاً همان چیزی است که باید آزمایش کنیم.
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+  &lt;divider color=&quot;subtle&quot; /&gt;
+  &lt;row align=&quot;start&quot; gap={3}&gt;
+    &lt;box background=&quot;surface-secondary&quot; radius=&quot;lg&quot; padding={3}&gt;
+      &lt;icon name=&quot;gauge&quot; size=&quot;xl&quot; /&gt;
+    &lt;/box&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      **سرعت**
+
+<pre><code>  سرعت گزارش‌شدهٔ ۹۸ توکن در ثانیه و تأخیر اولیهٔ حدود ۱٫۴ ثانیه مناسب به نظر می‌رسد؛ البته این اعداد تضمین نمی‌کنند که همهٔ درخواست‌ها با همین سرعت پاسخ بگیرند.
+&lt;/box&gt;
+</code></pre>
+  &lt;/row&gt;
+&lt;/box&gt;
+
+<h2>اما یک مانع مهم وجود دارد</h2>
+<p>هشدار بالای صفحه می‌گوید:</p>
+<blockquote>
+<p>The free Inkling Small endpoint is only available for use with agentic harnesses.</p>
+</blockquote>
+<p>یعنی این endpoint رایگان فقط برای استفاده از طریق یک <strong>چارچوب اجرایی عامل‌محور (Agentic Harness)</strong> در دسترس است. بنابراین ممکن است دکمهٔ <strong>Try this model</strong> برای گفت‌وگوی ساده کار نکند یا محدودیت داشته باشد. اگر چنین شد، لزوماً مشکل از تنظیمات تو نیست.</p>
+<h2>قدم بعدی پیشنهادی من</h2>
+<p>فعلاً لازم نیست وارد ساخت سامانهٔ چندعاملی شویم. اول ببینیم این مدل واقعاً از چه راهی قابل استفاده است.</p>
+<ol>
+<li>روی <strong>Try this model</strong> بزن.</li>
+<li>اگر امکان ارسال پیام داد، همان مسئلهٔ شهر و کمبود منابع را که قبلاً تعیین کردیم، بدون تغییر برایش بفرست.</li>
+<li>اگر خطا داد یا از تو خواست از یک harness استفاده کنی، متن خطا را بفرست تا مسیر مناسب را انتخاب کنیم.</li>
+</ol>
+<p>یک نکتهٔ روش‌شناختی: حتی اگر Inkling Small پاسخ خوبی بدهد، برای هدف تو به یک مدل دوم با دیدگاه و ترجیحات متفاوت نیاز داریم. <strong>دو مدل قوی الزاماً دو دیدگاه مستقل تولید نمی‌کنند.</strong> معیار اصلی ما اختلاف واقعی در فرضیات، استدلال‌ها و تشخیص نقاط کور خواهد بود، نه صرفاً متفاوت بودن متن پاسخ‌ها.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">Generation failed
+
+thinkingmachines/inkling-small:free is only available on agentic harnesses. Try plugging it into a coding agent or productivity app listed on [https://openrouter.ai/apps](https://openrouter.ai/apps)</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>خب، پس مانع دقیقاً مشخص شد: <strong>Inkling Small را نمی‌توان از چت سادهٔ OpenRouter آزمایش کرد؛ باید آن را به یک ابزار عامل‌محور وصل کنیم.</strong> این خطا از پرامپت تو نیست.</p>
+<p>دو مسیر داریم:</p>
+<ul>
+<li><strong>مسیر سریع‌تر:</strong> فعلاً این مدل را کنار بگذاریم و مدل رایگان دیگری را که در چت مستقیم OpenRouter پاسخ می‌دهد انتخاب کنیم.</li>
+<li><strong>مسیر فنی‌تر:</strong> یک harness راه‌اندازی کنیم تا چند مدل را در یک گفت‌وگوی مشترک قرار دهیم و پیام‌های یکدیگر را ببینند، نقد کنند و در صورت نیاز مخالفتشان را حفظ کنند.</li>
+</ul>
+<p>با توجه به اینکه برای تو تفاوت واقعی دیدگاه‌ها مهم‌تر از صرفاً داشتن چند مدل است، مسیر دوم در نهایت مناسب‌تر است؛ چون می‌توانیم ترتیب بحث را هم طراحی کنیم: <strong>تحلیل مستقل اولیه ← نقد متقابل ← پاسخ به نقدها ← گزارش اختلاف‌های حل‌نشده</strong>.</p>
+<h2>پیشنهاد عملی فعلی</h2>
+<p>به‌جای اینکه فعلاً وقت صرف اتصال Inkling Small کنیم، اول این مدل را امتحان کن:</p>
+&lt;row align=&quot;start&quot; gap={3}&gt;
+  &lt;AsyncImage query=&quot;Google Gemma AI model logo&quot; aspectRatio=&quot;1:1&quot; maxWidth=&quot;76px&quot; /&gt;
+  &lt;box flex=&quot;1&quot; gap={1}&gt;
+    **&lt;Entity value=&quot;Google Gemma 4 26B A4B&quot; category=&quot;software&quot; disambig=&quot;Google DeepMind open-weight language model&quot; /&gt;**
+
+<pre><code>&lt;badge color=&quot;success&quot;&gt;رایگان در فهرست فعلی&lt;/badge&gt;
+
+طبق صفحهٔ OpenRouter، این مدل از طریق رابط مستقیم API قابل استفاده است و ابزار فراخوانی هم پشتیبانی می‌کند؛ محدودیت سهمیهٔ رایگان همچنان وجود دارد. &lt;Cite refs={[&quot;turn784822search2&quot;]}/&gt;
+
+[باز کردن Gemma 4 در OpenRouter](https://openrouter.ai/google/gemma-4-26b-a4b-it:free)
+</code></pre>
+  &lt;/box&gt;
+&lt;/row&gt;
+
+<p>اگر از چت مستقیم پاسخ گرفتیم، آزمایش اول را انجام می‌دهیم. بعد یک مدل دوم انتخاب می‌کنیم و پاسخ‌های اولیه را مستقل می‌گیریم.</p>
+<p>اما اگر هدف نهایی‌ات همان میزگرد چندعاملی واقعی است، پیشنهاد من این است که پس از این تست کوچک، یک چارچوب متن‌باز روی کامپیوترت بسازیم یا راه‌اندازی کنیم که از APIهای رایگان استفاده کند. این‌طوری به‌جای وابستگی به یک رابط چت، کنترل می‌کنیم کدام عامل چه زمانی پاسخ دیگران را ببیند و چطور آن‌ها را نقد کند.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">Generation failed
+
+(Google AI Studio) Rate limit exceeded. Please try again shortly. Consider adding your own API key to accumulate your own rate limits.</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>😂 خب، دومین مانع هم روشن شد: این بار مدل قابل استفاده است، اما سهمیهٔ رایگان Google AI Studio پر شده. این لزوماً به معنی تمام شدن سهمیهٔ شخصی تو نیست؛ ممکن است محدودیت سراسری یا محدودیت همان مدل باشد.</p>
+<p>به نظرم بهتر است فعلاً مدل‌به‌مدل بین صفحات چت جابه‌جا نشویم. این دقیقاً همان جایی است که یک میزگرد چندعاملی با APIهای قابل‌تعویض ارزش پیدا می‌کند.</p>
+<p><strong>دو مسیر عملی داریم:</strong></p>
+<ol>
+<li><strong>بدون برنامه‌نویسی:</strong> مدل رایگان دیگری در OpenRouter امتحان کنیم؛ ممکن است باز هم به محدودیت سهمیه یا دسترسی برخورد کنیم.</li>
+<li><strong>راه‌حل پایدارتر:</strong> یک میزگرد کوچک روی ویندوزت بسازیم که از چند مدل رایگان پشتیبانی کند، پاسخ‌های اولیه را مستقل بگیرد و سپس پاسخ‌ها را برای نقد متقابل به عوامل بدهد. اگر یک مدل محدود شد، بتوانیم آن را عوض کنیم.</li>
+</ol>
+<p>با توجه به اینکه با Python و PowerShell کار کرده‌ای، مسیر دوم برایت شدنی است؛ ولی باید صادق باشم: <strong>رایگان بودن APIها تضمین نمی‌کند که همیشه در دسترس باشند یا سهمیهٔ کافی داشته باشند.</strong></p>
+<p>من مسیر دوم را ترجیح می‌دهم. اول یک نسخهٔ ساده با دو عامل و سه مرحلهٔ بحث می‌سازیم، بدون اجبار به توافق نهایی. بعد کیفیت اختلاف دیدگاه‌ها را آزمایش می‌کنیم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain"># Selected text:
+
+## Selection 1
+من مسیر دوم را ترجیح می‌دهم. اول یک نسخهٔ ساده با دو عامل و سه مرحلهٔ بحث می‌سازیم، بدون اجبار به توافق نهایی. بعد کیفیت اختلاف دیدگاه‌ها را آزمایش می‌کنیم.
+
+## My request:
+خب چاره ای نیست ببینیم چی میشه</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>پس شروع کنیم. نسخهٔ اولیه را ساختم؛ فعلاً بدون رابط گرافیکی و بدون نصب کتابخانه‌های اضافی، تا اگر خطایی پیش آمد راحت‌تر بفهمیم از کجاست.</p>
+&lt;box border radius=&quot;xl&quot; padding={4} gap={3}&gt;
+  &lt;row align=&quot;center&quot; gap={3}&gt;
+    &lt;box background=&quot;surface-secondary&quot; radius=&quot;lg&quot; size=&quot;48px&quot; align=&quot;center&quot; justify=&quot;center&quot;&gt;
+      &lt;icon name=&quot;code-2&quot; size=&quot;2xl&quot; /&gt;
+    &lt;/box&gt;
+    &lt;box flex=&quot;1&quot; gap={1}&gt;
+      &lt;title size=&quot;lg&quot;&gt;Two-Agent Debate&lt;/title&gt;
+      &lt;text color=&quot;secondary&quot; size=&quot;sm&quot;&gt;نسخهٔ آزمایشی اول · Python · ویندوز&lt;/text&gt;
+    &lt;/box&gt;
+  &lt;/row&gt;
+  &lt;text&gt;این برنامه دو مدل را در سه مرحله وارد بحث می‌کند:&lt;/text&gt;
+  &lt;list marker=&quot;number&quot; gap={2}&gt;
+    &lt;list-item&gt;**تحلیل مستقل:** هر مدل مسئله را جداگانه بررسی می‌کند و پاسخ دیگری را نمی‌بیند.&lt;/list-item&gt;
+    &lt;list-item&gt;**نقد متقابل:** هر مدل پاسخ اولیهٔ دیگری را می‌خواند و نقد می‌کند.&lt;/list-item&gt;
+    &lt;list-item&gt;**پاسخ نهایی:** هر مدل به نقدها جواب می‌دهد و اختلاف‌های حل‌نشده را مشخص می‌کند.&lt;/list-item&gt;
+  &lt;/list&gt;
+  [دریافت فایل Python](files/001-دریافت فایل Python.bin)
+&lt;/box&gt;
+
+<h2>قدم اول: اتصال به OpenRouter</h2>
+<p>۱. وارد <a href="https://openrouter.ai/">OpenRouter</a> شو و در صورت نیاز حساب بساز.</p>
+<p>۲. از بخش <a href="https://openrouter.ai/settings/keys">API Keys</a> یک کلید API بساز. <strong>کلید را برای من نفرست و در فایل برنامه هم قرار نده.</strong> برنامه هنگام اجرا می‌تواند آن را به‌صورت مخفی از تو بگیرد.</p>
+<p>۳. فایل بالا را در یک پوشه، مثلاً <code>C:\Users\Zardakh\two-agent-debate</code> قرار بده.</p>
+<p>۴. PowerShell را در همان پوشه باز کن و اجرا کن:</p>
+<pre><code class="language-powershell">python .\two_agent_debate.py
+</code></pre>
+<p>اگر فرمان <code>python</code> کار نکرد، این را امتحان کن:</p>
+<pre><code class="language-powershell">py .\two_agent_debate.py
+</code></pre>
+<p>برنامه دو شناسهٔ مدل پیشنهادی دارد؛ می‌توانی با زدن Enter همان‌ها را بپذیری یا شناسه‌های دیگری وارد کنی. فهرست مدل‌های رایگان مرتب تغییر می‌کند و محدودیت سهمیه هم وجود دارد؛ بنابراین هنوز تضمینی نیست هر دو مدل در اولین اجرا پاسخ بدهند. &lt;Cite refs={[&quot;turn471519search0&quot;,&quot;turn471519search2&quot;]}/&gt;</p>
+<p>وقتی برنامه موضوع بحث را خواست، می‌توانی پرامپت آزمایشی شهر و کمبود منابع را وارد کنی و در خطی جداگانه بنویسی <code>END</code>.</p>
+<p><strong>نکته:</strong> خروجی‌ها در پوشهٔ <code>debate_results</code> ذخیره می‌شوند. چون سیاست ثبت و استفاده از داده‌ها بین ارائه‌دهندگان متفاوت است، فعلاً موضوعات آزمایشی و غیرمحرمانه وارد کن.</p>
+<p>فعلاً همین مرحله را انجام بده. اگر برنامه خطا داد، متن کامل خطا را بفرست؛ اگر اجرا شد، پاسخ‌های دو عامل را بررسی می‌کنیم و می‌بینیم آیا واقعاً اختلاف دیدگاه دارند یا فقط دو پاسخ شبیه به هم تولید می‌کنند.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">TWO-AGENT DEBATE — prototype
+==================================================================
+Uses OpenRouter API. Free endpoints can be rate-limited or unavailable.
+Do not enter confidential or personal information in the topic.
+
+OpenRouter API key (input hidden):</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>عالی، برنامه درست اجرا شده و الان منتظر کلید API است. 👍</p>
+<p>در این مرحله:</p>
+<ol>
+<li>کلیدی را که از <a href="https://openrouter.ai/settings/keys">OpenRouter API Keys</a> ساخته‌ای، در PowerShell وارد کن و Enter بزن. هنگام تایپ، نمایش داده نمی‌شود؛ این طبیعی است.</li>
+<li>بعد برنامه نام دو مدل را می‌پرسد. فعلاً می‌توانی با زدن Enter، مدل‌های پیش‌فرض را امتحان کنی.</li>
+<li>اگر خطای مدل ناموجود یا محدودیت سهمیه دیدی، متن خطا را بفرست تا اصلاحش کنیم.</li>
+</ol>
+<p><strong>دو نکته:</strong></p>
+<ul>
+<li>کلید API را اینجا در چت نفرست.</li>
+<li>فعلاً به حساب اعتبار پولی اضافه نکن؛ هدف ما آزمایش مسیر رایگان است.</li>
+</ul>
+<p>وقتی به مرحلهٔ انتخاب مدل رسیدی، اگر خواستی قبل از ادامه خروجی همان بخش را بفرست تا با هم بررسی کنیم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">چرا هیچی تایپ نمیکنه؟</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>طبیعیه 😂 رمزت رو مخفی کرده، نه اینکه برنامه هنگ کرده باشه!</p>
+<p>در PowerShell وقتی برنامه از <code>getpass</code> استفاده می‌کنه، <strong>هنگام تایپ کلید API هیچ چیزی نمایش داده نمی‌شه؛ نه حروف، نه ستاره و نه نقطه.</strong></p>
+<p>الان این کار رو انجام بده:</p>
+<ol>
+<li>کلید API رو تایپ یا Paste کن؛ حتی اگر صفحه کاملاً خالیه.</li>
+<li>کلید رو اینجا نفرست.</li>
+<li>کلید رو که وارد کردی، <code>Enter</code> بزن.</li>
+</ol>
+<p>اگر درست پیش بره، به مرحلهٔ انتخاب مدل می‌رسی.</p>
+<p>اگر Paste هم کار نکرد، بهم بگو؛ یک راه جایگزین داریم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">==================================================================
+ TWO-AGENT DEBATE — prototype
+==================================================================
+Uses OpenRouter API. Free endpoints can be rate-limited or unavailable.
+Do not enter confidential or personal information in the topic.
+
+OpenRouter API key (input hidden):
+Model A [google/gemma-4-31b-it:free]:</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>عالی 😂 کلید رو پذیرفته و از مرحلهٔ اول رد شدیم؛ حالا برنامه منتظر انتخاب مدل A است.</p>
+<p>فعلاً <strong>Enter بزن</strong> تا مدل پیش‌فرض را امتحان کنیم:</p>
+<p><code>google/gemma-4-31b-it:free</code></p>
+<p>بعد از آن، برنامه شناسهٔ مدل B را می‌پرسد. آنجا هم فعلاً Enter بزن تا مدل دوم پیش‌فرض انتخاب شود.</p>
+<p>اگر یکی از مدل‌ها خطای سهمیه یا شناسهٔ نامعتبر داد، متن کامل خطا را بفرست. هنوز لازم نیست چیزی را تغییر بدهیم.</p>
+</div></section>
+<footer>Exported with ChatGPT Markdown Export.</footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "schema_version": 2,
+  "conversation_id": "6ae11ef3-7380-83eb-b36f-b13950aa097e",
+  "title": "ابزار چت چند ای آی",
+  "created_at": 1793138419.925,
+  "updated_at": 1793142570.501588,
+  "exported_at": "2026-10-27T23:11:33.781Z",
+  "message_count": 40,
+  "branch": "current",
+  "branch_count": 2,
+  "project_id": null,
+  "project_title": null,
+  "archived": false,
+  "shared": false,
+  "share_id": null,
+  "workspace_id": "b1263d73-b449-435b-8fa8-6c023818f291",
+  "export_formats": {
+    "markdown": true,
+    "html": true,
+    "embedded_markdown": false,
+    "raw_json": true,
+    "thinking_summaries": false
+  },
+  "capability_snapshot": {
+    "bearer_token": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-10-27T23:11:28.536Z"
+    },
+    "conversation_api": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-10-26T23:08:29.245Z"
+    },
+    "sandbox_download": {
+      "status": "available",
+      "detail": "/backend-api/conversation/<id>/interpreter/download",
+      "checked_at": "2026-10-27T23:11:33.748Z"
+    }
+  }
+}
