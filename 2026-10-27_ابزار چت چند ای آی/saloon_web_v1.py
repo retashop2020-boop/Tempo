@@ -111,8 +111,10 @@ def call_model(api_key: str, member: Member, transcript: list[dict[str, Any]]) -
         },
         method="POST",
     )
+    http_status = None
     try:
         with urllib.request.urlopen(req, timeout=120) as response:
+            http_status = response.status
             data = json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="replace")[:1000]
@@ -130,9 +132,20 @@ def call_model(api_key: str, member: Member, transcript: list[dict[str, Any]]) -
         value = "\n".join(str(part.get("text", "")) for part in value if isinstance(part, dict))
     answer = str(value or "").strip()
     finish_reason = choice.get("finish_reason", "unknown")
-    if not answer:
-        raise RuntimeError("پاسخ خالی بود (finish_reason=" + str(finish_reason) + ").")
     truncated = finish_reason == "length"
+
+    # Diagnostic logging for empty/truncated responses. Never log request headers or API key.
+    if not answer or truncated:
+        print("\\n[diagnostic] OpenRouter response for member: " + member.name)
+        print("[diagnostic] HTTP status: " + str(http_status))
+        print("[diagnostic] requested model: " + member.model)
+        print("[diagnostic] returned model: " + str(data.get("model", "unknown")))
+        print("[diagnostic] usage: " + json.dumps(data.get("usage"), ensure_ascii=False))
+        print("[diagnostic] finish_reason: " + str(finish_reason))
+        print("[diagnostic] raw choice (max 4000 chars): " + json.dumps(choice, ensure_ascii=False)[:4000])
+
+    if not answer:
+        raise RuntimeError("پاسخ خالی بود (finish_reason=" + str(finish_reason) + "). جزئیات تشخیصی در پنجرهٔ PowerShell ثبت شد.")
     return answer, truncated
 
 
