@@ -96,7 +96,7 @@ def call_model(api_key: str, member: Member, transcript: list[dict[str, Any]]) -
     })
     payload = {
         "model": member.model,
-        "messages": [{"role": "system", "content": member.role}, *messages],
+        "messages": [{"role": "system", "content": member.role + "\n\nزبان پیش‌فرض گفتگو فارسی است. به فارسی روان و طبیعی پاسخ بده، مگر اینکه کاربر صریحاً زبان دیگری بخواهد. متن‌های انگلیسی، نام مدل‌ها و کدها را در صورت نیاز به شکل اصلی نگه دار."}, *messages],
         "temperature": member.temperature,
         "max_tokens": member.max_tokens,
     }
