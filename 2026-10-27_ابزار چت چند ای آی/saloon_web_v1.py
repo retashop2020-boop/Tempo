@@ -136,7 +136,7 @@ def call_model(api_key: str, member: Member, transcript: list[dict[str, Any]]) -
 
     # Diagnostic logging for empty/truncated responses. Never log request headers or API key.
     if not answer or truncated:
-        print("\\n[diagnostic] OpenRouter response for member: " + member.name)
+        print("\n[diagnostic] OpenRouter response for member: " + member.name)
         print("[diagnostic] HTTP status: " + str(http_status))
         print("[diagnostic] requested model: " + member.model)
         print("[diagnostic] returned model: " + str(data.get("model", "unknown")))
