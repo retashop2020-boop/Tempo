@@ -1,0 +1,31 @@
+{
+  "schema_version": 2,
+  "conversation_id": "6ae130f5-c4e8-83ed-a82f-f06ce7ebb949",
+  "title": "ادامه ابزار چت AI",
+  "created_at": 1793143030.295119,
+  "updated_at": 1793313643.999281,
+  "exported_at": "2026-10-31T07:50:18.046Z",
+  "message_count": 578,
+  "branch": "current",
+  "branch_count": 1,
+  "project_id": null,
+  "project_title": null,
+  "archived": false,
+  "shared": false,
+  "share_id": null,
+  "workspace_id": "b1263d73-b449-435b-8fa8-6c023818f291",
+  "export_formats": {
+    "markdown": true,
+    "html": true,
+    "embedded_markdown": false,
+    "raw_json": true,
+    "thinking_summaries": false
+  },
+  "capability_snapshot": {
+    "bearer_token": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-10-31T07:49:05.758Z"
+    }
+  }
+}

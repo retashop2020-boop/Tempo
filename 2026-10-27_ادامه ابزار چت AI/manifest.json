@@ -1,0 +1,45 @@
+{
+  "schema_version": 4,
+  "exported_at": "2026-10-31T07:50:18.046Z",
+  "conversation_count": 1,
+  "embedded_markdown": false,
+  "capabilities": {
+    "bearer_token": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-10-31T07:49:05.758Z"
+    },
+    "conversation_api": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-10-31T07:50:18.046Z"
+    }
+  },
+  "files": [
+    {
+      "path": "2026-10-27_ai.md",
+      "size": 1001658,
+      "sha256": "1527f6e79e71efe6b313459cc8e3c5d1fa8189efd367a29c3df8455d818492f5"
+    },
+    {
+      "path": "2026-10-27_ai.html",
+      "size": 1137665,
+      "sha256": "f3c405a2345effdccfc96047a9100c72a448bbfa676c129db92453c42ba59f41"
+    },
+    {
+      "path": "2026-10-27_ai.json",
+      "size": 6210666,
+      "sha256": "cf946a83756ba0031444e024c8cb4d4bfd2406543df9f3c40d4c0e70f68d3b95"
+    },
+    {
+      "path": "2026-10-27_ai.metadata.json",
+      "size": 787,
+      "sha256": "2b0d1147b5d21d7c7b9ec3f3300091c2d03d0c10f90d8e28ea74a27ae5e46370"
+    },
+    {
+      "path": "_capabilities.json",
+      "size": 236,
+      "sha256": "7fa58d6378f1a3b53465f1d366446d4c1d68f54d6132d7c693beae5678a37ba9"
+    }
+  ]
+}
