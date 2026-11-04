@@ -1,0 +1,31 @@
+{
+  "schema_version": 2,
+  "conversation_id": "6ae5bd7f-7524-83ed-843b-516afc9c7a1d",
+  "title": "احوالپرسی",
+  "created_at": 1793441152.049473,
+  "updated_at": 1793828209.786342,
+  "exported_at": "2026-11-04T21:37:08.628Z",
+  "message_count": 2030,
+  "branch": "current",
+  "branch_count": 4,
+  "project_id": null,
+  "project_title": null,
+  "archived": false,
+  "shared": false,
+  "share_id": null,
+  "workspace_id": "b1263d73-b449-435b-8fa8-6c023818f291",
+  "export_formats": {
+    "markdown": true,
+    "html": true,
+    "embedded_markdown": false,
+    "raw_json": true,
+    "thinking_summaries": false
+  },
+  "capability_snapshot": {
+    "bearer_token": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-11-04T21:36:48.379Z"
+    }
+  }
+}

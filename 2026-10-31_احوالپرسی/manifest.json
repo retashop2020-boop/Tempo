@@ -1,0 +1,75 @@
+{
+  "schema_version": 4,
+  "exported_at": "2026-11-04T21:37:08.628Z",
+  "conversation_count": 1,
+  "embedded_markdown": false,
+  "capabilities": {
+    "bearer_token": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-11-04T21:36:48.379Z"
+    },
+    "conversation_api": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-11-04T21:37:08.628Z"
+    }
+  },
+  "files": [
+    {
+      "path": "2026-10-31_sans-titre.md",
+      "size": 3082854,
+      "sha256": "a0407cbd97880cab8e9cd2725b5a8aaf41e2b49b9ed337ab34dfc860ece4aa10"
+    },
+    {
+      "path": "2026-10-31_sans-titre.html",
+      "size": 3590124,
+      "sha256": "eef82db9e1ec948cc1aa0d8ef92c47c4e9e5bcefc3a041f440f828683dd3a57b"
+    },
+    {
+      "path": "branches/branch-001-9697c39f.md",
+      "size": 231158,
+      "sha256": "df20636b1e4620aa34e7bfb75c917d866b9182b803ed7528270fe91e909696d7"
+    },
+    {
+      "path": "branches/branch-001-9697c39f.html",
+      "size": 290953,
+      "sha256": "0f988de531cf1b9067ac901967cc5a57e76fffa79d6593a977bb475ab433530d"
+    },
+    {
+      "path": "branches/branch-002-c0d72c6a.md",
+      "size": 550949,
+      "sha256": "5c5159b4beef8f368834f2bfac68866b89cb4e0f81e5e008d7f60f32bf41a827"
+    },
+    {
+      "path": "branches/branch-002-c0d72c6a.html",
+      "size": 666598,
+      "sha256": "1690151200ddf191a81d680e600c11bfc10518ff5b2db42cbeec43414475687a"
+    },
+    {
+      "path": "branches/branch-003-408e5387.md",
+      "size": 2402887,
+      "sha256": "9c3a14eee629f1f93b896c9491f752a99f5ede38bc50a4ed097dcc926b5636a0"
+    },
+    {
+      "path": "branches/branch-003-408e5387.html",
+      "size": 2726877,
+      "sha256": "b3425e4e583e89e34551907bebb9590a978c69dd8ab832d3c74bff7784dfc2f4"
+    },
+    {
+      "path": "2026-10-31_sans-titre.json",
+      "size": 17765462,
+      "sha256": "ae23a1b88a14096449b47c41ff844f4f13eea522eb010de7834c41f193a60ea7"
+    },
+    {
+      "path": "2026-10-31_sans-titre.metadata.json",
+      "size": 777,
+      "sha256": "8882caf3339bbea189ba5ba3cc19a4aa2c8d0c5e8d04c7d01045352ca1962ad3"
+    },
+    {
+      "path": "_capabilities.json",
+      "size": 236,
+      "sha256": "96744f14749b270797d83822a0e2a00f3427d6ebcf3e4af1ae5cd7a0cc577f73"
+    }
+  ]
+}
