@@ -1,0 +1,85 @@
+{
+  "schema_version": 4,
+  "exported_at": "2026-11-07T19:47:08.484Z",
+  "conversation_count": 1,
+  "embedded_markdown": false,
+  "capabilities": {
+    "bearer_token": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-11-07T19:46:49.539Z"
+    },
+    "conversation_api": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-11-07T19:47:08.484Z"
+    }
+  },
+  "files": [
+    {
+      "path": "2026-11-05_sans-titre.md",
+      "size": 1303135,
+      "sha256": "29903a6ae13cf6a67e52392db884cc890b4e673af65041f51f093b75a52af893"
+    },
+    {
+      "path": "2026-11-05_sans-titre.html",
+      "size": 1534397,
+      "sha256": "dfda0a890dab1a2ed8453ab2f1d10fec550b9664c9f554cd71ed3d1e418a62e3"
+    },
+    {
+      "path": "branches/branch-001-fbdb0028.md",
+      "size": 752821,
+      "sha256": "33393da91751256df8d9d576b5f757b82c772ffd628385eff4c52ea7c253b81e"
+    },
+    {
+      "path": "branches/branch-001-fbdb0028.html",
+      "size": 875636,
+      "sha256": "d36b8dae12f3176d6f7fac66042adb41f05ba9bb067e420d26fd0787f0d7a430"
+    },
+    {
+      "path": "branches/branch-002-99b4e42d.md",
+      "size": 761894,
+      "sha256": "50a1dab23875fb1776420a064fc3078215288fb366df4bf07ab7f47d7898b124"
+    },
+    {
+      "path": "branches/branch-002-99b4e42d.html",
+      "size": 888204,
+      "sha256": "d1c2beb2358bf8507905f0e4483680f1cdfd9a4a331212bfe62e0e84c9cfbaa5"
+    },
+    {
+      "path": "branches/branch-003-c6b036e8.md",
+      "size": 827139,
+      "sha256": "38b8b233872e0fa9d01dad8c24a3132f7b4b5a939e7cd9b5b4a3685fca548f21"
+    },
+    {
+      "path": "branches/branch-003-c6b036e8.html",
+      "size": 973740,
+      "sha256": "921eb266167069a85e1c8c3854d69f1e3cf688c2398079400b141827d57efe8d"
+    },
+    {
+      "path": "branches/branch-004-d2e54881.md",
+      "size": 1257232,
+      "sha256": "cfdd82e7feeb38d308bc6528826f498e88f3d00a25dd66373f386c63b1efa9f1"
+    },
+    {
+      "path": "branches/branch-004-d2e54881.html",
+      "size": 1473126,
+      "sha256": "de5df0ab62cf95e4b2c09bc5312dc44b88a88a2111df5c04efdde705cc94ae99"
+    },
+    {
+      "path": "2026-11-05_sans-titre.json",
+      "size": 11082455,
+      "sha256": "7a84c0042a1daf39ab18065b522dc1c99eb67b93223b720e0c9eb12d9aa70e12"
+    },
+    {
+      "path": "2026-11-05_sans-titre.metadata.json",
+      "size": 786,
+      "sha256": "2f22c584ef112ba407412d384fac9031e6385cf831403c682a56285c5c6a8a3d"
+    },
+    {
+      "path": "_capabilities.json",
+      "size": 236,
+      "sha256": "40fd33044d29fe0eb24a5e33d66f3a528f3c81ff7992dcb5f7e6f5a30d214404"
+    }
+  ]
+}
