@@ -1,0 +1,36 @@
+{
+  "schema_version": 2,
+  "conversation_id": "6aef8b85-6190-83ee-a85f-614216fd9e2b",
+  "title": "آزمایش مدل محلی",
+  "created_at": 1794083717.827707,
+  "updated_at": 1794103762.719812,
+  "exported_at": "2026-11-08T02:07:39.802Z",
+  "message_count": 294,
+  "branch": "current",
+  "branch_count": 1,
+  "project_id": null,
+  "project_title": null,
+  "archived": false,
+  "shared": false,
+  "share_id": null,
+  "workspace_id": "b1263d73-b449-435b-8fa8-6c023818f291",
+  "export_formats": {
+    "markdown": true,
+    "html": true,
+    "embedded_markdown": false,
+    "raw_json": true,
+    "thinking_summaries": false
+  },
+  "capability_snapshot": {
+    "bearer_token": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-11-07T19:46:49.539Z"
+    },
+    "conversation_api": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-11-07T19:47:08.484Z"
+    }
+  }
+}
