@@ -1,0 +1,876 @@
+PS C:\Users\Zardakh> Select-String -Path C:\Users\Zardakh\tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md -Pattern 'Flux|Klein|Qwen|GGUF' -Context 2,3
+
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:1:# ComfyUI-GGUF-Loader
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:2:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:3:GGUF Quantization support for native ComfyUI models —
+the CCTech Suite fork of [city96/ComfyUI-GGUF](https://github.com/city96/ComfyUI-GGUF).
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:4:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:5:These custom nodes provide support for model files
+stored in the GGUF format popularized by [llama.cpp](https://github.com/ggerganov/llama.cpp).
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:6:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:7:While quantization wasn't feasible for regular UNET
+models (conv2d), transformer/DiT models such as flux seem less affected by quantization. This allows running it in
+much lower bits per weight variable bitrate quants on low-end GPUs. For further VRAM savings, a node to load a
+quantized version of the T5 text encoder is also included.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:8:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:9:![Comfy_Flux1_dev_Q4_0_GGUF_1024](https://github.com/user
+-attachments/assets/70d16d97-c522-4ef4-9435-633f128644c8)
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:10:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:11:Note: The "Force/Set CLIP Device" is **NOT** part of
+this node pack. Do not install it if you only have one GPU. Do not set it to cuda:0 then complain about OOM errors if
+you do not undestand what it is for. There is no need to copy the workflow above, just use your own workflow and
+replace the stock "Load Diffusion Model" with the "Unet Loader (GGUF)" node.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:12:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:13:## What this fork adds
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:14:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:15:- **Open upstream PRs backported**, including newer
+architectures (LTX-2, Z-Image, Ideogram-4, Qwen3-VL / MiniMax-H3 text encoders). See [PR_BACKPORT.md](PR_BACKPORT.md).
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:16:- **MiniMax-H3 fix**: high-precision buffers such as
+`adaln_t_table` are kept in float32 through both conversion and loading. Stored as F16 they crash the sampler on the
+first step with `expected dtype struct c10::Half for 'weight' but got dtype float`.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:17:- **Convenience pipelines**: Scenema Audio and MiniMax
+Music 3 loaders/generators built on ComfyUI's native models.
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:18:- **Local speech generation**: Qwen3-TTS and OmniVoice
+loaders/generators, including OmniVoice short-form cloning and sentence-aware long-form synthesis.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:19:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:20:## Installation
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:21:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:23:> Make sure your ComfyUI is on a recent-enough version
+to support custom ops when loading the UNET-only.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:24:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:25:To install the custom node normally, git clone this
+repository into your custom nodes folder (`ComfyUI/custom_nodes`) and install the only dependency for inference (`pip
+install --upgrade gguf`)
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:26:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:27:```
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:28:git clone
+https://github.com/ChrisColeTech/ComfyUI-GGUF-Loader
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:29:```
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:30:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:31:To install the custom node on a standalone ComfyUI
+release, open a CMD inside the "ComfyUI_windows_portable" folder (where your `run_nvidia_gpu.bat` file is) and use
+the following commands:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:32:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:33:```
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:34:git clone
+https://github.com/ChrisColeTech/ComfyUI-GGUF-Loader ComfyUI/custom_nodes/ComfyUI-GGUF-Loader
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:35:.\python_embeded\python.exe -s -m pip install -r
+.\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\requirements.txt
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:36:```
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:37:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:38:On MacOS sequoia, torch 2.4.1 seems to be required, as
+2.6.X nightly versions cause a "M1 buffer is not large enough" error. See [this upstream
+issue](https://github.com/city96/ComfyUI-GGUF/issues/107) for more information/workarounds.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:39:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:40:## Usage
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:41:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:42:Simply use the GGUF UNET loader found under the `🤖
+CCTech/GGUF` category. Place the `.gguf` model files in your `ComfyUI/models/unet` (or `diffusion_models`) folder.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:43:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:44:LoRA loading is experimental but it should work with
+just the built-in LoRA loader node(s).
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:45:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:46:Pre-quantized models:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:47:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:48:- [flux1-dev
+GGUF](https://huggingface.co/city96/FLUX.1-dev-gguf)
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:49:- [flux1-schnell
+GGUF](https://huggingface.co/city96/FLUX.1-schnell-gguf)
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:50:- [stable-diffusion-3.5-large
+GGUF](https://huggingface.co/city96/stable-diffusion-3.5-large-gguf)
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:51:- [stable-diffusion-3.5-large-turbo
+GGUF](https://huggingface.co/city96/stable-diffusion-3.5-large-turbo-gguf)
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:52:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:53:Initial support for quantizing T5 has also been added
+recently, these can be used using the various `*CLIPLoader (gguf)` nodes which can be used inplace of the regular
+ones. For the CLIP model, use whatever model you were using before for CLIP. The loader can handle both types of
+files - `gguf` and regular `safetensors`/`bin`.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:54:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:55:- [t5_v1.1-xxl
+GGUF](https://huggingface.co/city96/t5-v1_1-xxl-encoder-gguf)
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:56:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:57:See the instructions in the
+[tools](https://github.com/ChrisColeTech/ComfyUI-GGUF-Loader/tree/main/tools) folder for how to create your own
+quants.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:58:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:59:## Nodes
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:60:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:61:The GGUF loaders live under `🤖 CCTech/GGUF`; Scenema
+Audio under `🤖 CCTech/Scenema`; MiniMax Music 3 under `🤖 CCTech/MiniMax Music`; LTX-2.3 A/V under `🤖
+CCTech/LTX-2.3`; LTX-2.5 A/V under `🤖 CCTech/LTX-2.5`; local LLM/VLM prompting under `🤖 CCTech/LM Studio`;
+Qwen3-TTS under `🤖 CCTech/Qwen TTS`; OmniVoice under `🤖 CCTech/OmniVoice`; TripoSG image-to-3D under `🤖
+CCTech/TripoSG`; UniRig auto-rigging under `🤖 CCTech/UniRig`; TRELLIS.2 / Pixal3D per-stage loaders under `🤖
+CCTech/TRELLIS.2`.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:62:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:63:| Node | Purpose |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:64:|---|---|
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:65:| **UNET Loader (GGUF)** | drop-in replacement for
+`Load Diffusion Model` |
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:66:| **UNET Loader (GGUF/Advanced)** | same, with
+`dequant_dtype` / `patch_dtype` / `patch_on_device` exposed |
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:67:| **CLIP Loader (GGUF)** | single text encoder, `.gguf`
+or `safetensors` |
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:68:| **Dual / Triple / Quadruple CLIP Loader (GGUF)** |
+the same for models taking several encoders |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:69:| **Dual VAE Loader (video + audio)** | two VAEs from
+one node, with the outputs named for their streams |
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:70:| **Text Encoder + ClipProj Loader** | loads a small
+encoder, GGUF included, and projects it into a large one's space |
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:71:| **Scenema Models Loader** | the Scenema Audio stack
+from your own folders — DiT, Gemma-3 text encoder (safetensors **or GGUF**), pipeline checkpoint, VAE encoder |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:72:| **Scenema VAE Encode (voice reference)** | reference
+clip → audio latent for voice cloning |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:73:| **Scenema Audio Generate** | expressive TTS with
+presets, scene/language, chunking and A2V voice cloning |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:74:| **Scenema Audio Voice Clone** | standalone offline
+SeedVC identity transfer |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:85:### Text Encoder + ClipProj Loader
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:86:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:87:Loads a small text encoder and projects it into a large
+one's space in a single node — for MiniMax-H3, a Qwen3-VL-4B or -8B standing in for the 32B the model expects, which
+takes the text encoder from 15.7 GB to about 5.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:88:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:89:The projection lives in `clipproj.py`, so there is no
+dependency on another node pack.[^clipproj] What you do need is a **matrix**, in `ComfyUI/models/clip_projections/`:
+`mmh3-4b-*` goes with a 4B and `mmh3-8b-*` with an 8B, and they are not interchangeable. The `<control:...>` entries
+are not projections but deliberate baselines — zero ignores your prompt entirely, identity copies the raw dimensions
+with no learning — and they run on any encoder. Run them first to see that the matrix is doing the work.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:90:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:93:Differences from the upstream node:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:94:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:95:- **It reads GGUF.** Routing is by extension: `.gguf`
+through this pack's loader, everything else through ComfyUI's stock one — deliberately not through the GGUF path,
+which refuses scaled-fp8 checkpoints, and `qwen3vl_*_fp8_scaled` is the encoder most people have.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:96:- **`type` defaults to `auto`** and is checked against
+the file even when set by hand. Detection reads headers only, so a 10 GB encoder costs nothing to identify — and an
+mmproj file, which is the vision projector alone with no text model in it, is refused before the load instead of
+surfacing later as a missing-attribute error.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:97:- **No `device` or `mode` widget.** Those exist
+upstream for multi-GPU pinning, which its own README calls actively harmful on a single card: a pinned encoder holds
+4–9 GB away from the diffusion model at every sampling step. This node uses ComfyUI's normal paging. If you do want
+an encoder pinned to a chosen card, install the upstream pack and use its `ClipProj Device Loader` → `ClipProj Apply`.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:98:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:103:| File | Folder | Dropdown |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:104:|---|---|---|
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:105:| `scenema-audio-transformer-int8.safetensors` (or
+bf16, or a GGUF quant) | `models/diffusion_models` (unet) | transformer |
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:106:| `gemma-3-12b-it-*.gguf` (or a safetensors
+single-file Gemma-3 12B) | `models/text_encoders` (clip) | text encoder |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:107:| `scenema-audio-pipeline.safetensors` | `models/vae`
+| pipeline |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:108:| `scenema-audio-vae-encoder.safetensors` |
+`models/vae` | VAE encoder |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:109:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:110:The Models Loader outputs plain comfy **MODEL / CLIP /
+VAE**: the audio DiT loads as a comfy LTX-AV model with the video paths gated off (the comfy-native equivalent of the
+original nodes' audio-only monkey-patch), the Gemma text encoder runs as comfy's `LTXAVTEModel` — a GGUF stays
+quantized through this pack's ops, with the tokenizer rebuilt from the GGUF metadata — and the VAE is comfy's
+`AudioVAE` (encoder + decoder + BigVGAN vocoder with the 16 kHz → 48 kHz bandwidth extension, so output is 48 kHz
+stereo). The pipeline checkpoint also supplies the text projection and embeddings connectors. `keep_loaded` (on by
+default) caches the built model/clip/vae keyed on the four filename dropdowns, so re-queuing with the same selections
+skips rebuilding from disk — the DiT alone is 7-10 GB and the text encoder ~24 GB, and unlike `LTXV23ModelsLoader`'s
+text-encoder cache, this loader previously cached nothing at all. Turn it off to force a genuine reload, e.g. after
+replacing a file on disk without renaming it.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:111:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:112:Generate keeps the original node's behaviour: the
+`<speak>` XML prompt compiler (with `[bracketed cues]` and per-line action tags), the 12 production presets,
+scene/language dropdowns, pace, seed, automatic sentence-boundary chunking with A2V voice chaining between chunks,
+and per-chunk trim/normalize before concatenation. Optional `ref_latent` (from Scenema VAE Encode fed by LoadAudio)
+gives zero-shot A2V cloning. A final offline SeedVC pass provides fixed identity consistency for multi-chunk output
+or an explicit `identity_reference`; `Scenema Audio Voice Clone` exposes the same conversion independently. The pass
+is seeded from the workflow seed, and Generate keeps the unpolished audio if conversion fails or returns anything
+other than a same-shape, same-length, audible waveform. Place the `seedvc`, `campplus`, `bigvgan`, and
+`whisper-small` folders from [ChrisColeTech/scenema-audio
+extras](https://huggingface.co/ChrisColeTech/scenema-audio/tree/main/extras) under `models/scenema-audio/extras`.
+Whisper word-match validation and the MelBandRoFormer SFX strip remain unported.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:113:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:120:| File | Folder |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:121:|---|---|
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:122:| `10Eros_v1.4_distilled-r72_Q4_K_M/Q6_K/Q8_0.gguf` or
+`..._fp8mixed.safetensors` | `models/diffusion_models` (unet) |
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:123:| `gemma-3-12b-*-Q4_K_M.gguf` (or a Gemma-3 12B
+safetensors) | `models/text_encoders` |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:124:| `10Eros_v1.4_projections.safetensors`
+(text_embedding_projection) | `models/text_encoders` |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:125:| `10Eros_v1.4_video_vae.safetensors` | `models/vae` |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:126:| `10Eros_v1.4_audio_vae.safetensors` | `models/vae` |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:127:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:128:The GGUF DiTs carry their transformer config as a GGUF
+KV — no metadata sidecar to lose — so comfy builds the real LTX-2.3 geometry (48 layers, 9-row modulation tables,
+4096/2048 embeddings connectors) instead of guessing the older LTX-2 layout. GGUF and fp8 weights stay quantized; the
+loader outputs plain comfy **MODEL / CLIP / VAE** plus the audio VAE, so everything composes with core nodes.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:129:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:130:Sampling: `CLIPTextEncode` → **LTX-2.3 Img/Audio to
+Video** (one prep node: leave both optionals unconnected for txt2video, connect `image` for i2v, connect
+`reference_audio` for lip-synced audio-to-video — the official IA2V recipe, with the audio encoded and
+noise-mask-locked and the video length derived from the clip) → **LTX-2.3 KSampler (distilled)** or **LTX-2.3
+Two-Stage Sampler (base + refine)**. Both pass the exact LTX-2 distilled schedules (cfg 1.0, euler) and stamp
+`frame_rate` onto the conditioning for RoPE; the two-stage sampler additionally runs the official 3-step `refine`
+pass after a spatial ×2 latent upscale (`LatentUpscaleModelLoader`'s output) in one node, splitting and rejoining the
+video/audio branches around the upscale model for you. Finish with **LTX-2.3 AV Decode** (video + audio VAE decode +
+mux, one `fps`) or, by hand, core `LTXVSeparateAVLatent` → `VAE Decode` + `LTXVAudioVAEDecode` → `CreateVideo`.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:131:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:162:### LTX-2.5 A/V
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:163:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:164:The same one-loader-plus-recipe-nodes treatment for
+LTX-2.5-family A/V checkpoints, under `🤖 CCTech/LTX-2.5` — a faithful mirror of ComfyUI's official
+`video_ltx2_5_i2v` workflow (verified end-to-end on real GPU, including the GGUF DiT path). LTX-2.5 is a different
+animal from 2.3 (128-channel /32-spatial /8-temporal video latents, a Gemma-4-12B text encoder with projection, its
+own VAE pair and trained schedules), which is why loading a 2.5 checkpoint in the 2.3 nodes errors — this family is
+the supported path.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:165:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:166:- **LTX-2.5 Models Loader** (`LTXV25ModelsLoader`):
+DiT (`comfy-int8` safetensors or Q6_K/Q8_0 GGUF — GGUF stays quantized), the `gemma4-12b-with-proj` text encoder,
+video VAE, audio VAE → `MODEL / CLIP / VAE / VAE`, with the same single-entry encoder cache as the 2.3 loader.
+Validates the checkpoint really is an `ltxav` A/V model and that the two VAEs aren't swapped.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:167:- **LTX-2.5 Img to Video** (`LTXV25ImgToVideo`):
+prompts + the stage-1 init latent for `t2v`/`i2v` (mode validated against what's connected). `width`/`height` are the
+FINAL resolution — stage 1 samples at half (the official recipe's `a/2` math) and the latent upscaler doubles it
+back. i2v runs core `LTXVPreprocess` (`img_compression` 18) then core `LTXVImgToVideoInplace`'s exact in-place
+first-frame hold at `image_strength` **0.7** (the workflow's link-traced stage-1 value). One or more LoRAs chain
+externally through core `LoraLoaderModelOnly` nodes on the model wire — exactly the ltx23 convention and the official
+workflow's own wiring (`LTX-2.3-ID-LoRA-TalkVid-3K` @ 0.6 → `LTX-2-Image2Vid-Adapter` @ 0.6; cross-version 2.3 LoRAs
+apply cleanly to the 2.5 DiT, zero key mismatches).
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:168:- **LTX-2.5 Video to Video (IC-LoRA)**
+(`LTXV25VidToVideo`): `LTXV23VidToVideo`'s full surface, mirrored widget-for-widget onto the 2.5 recipe — `mode`
+(`t2v`/`i2v`/`v2v`), `video` + `ic_lora`/`ic_lora_strength`/`guide_strength`/`latent_downscale_factor` (the same
+named in-node IC-LoRA selector, guide tokens appended via core `LTXVAddGuide` on the stage-1 half-res grid),
+`keep_original_audio` and `length_from_audio` switches, and `reference_audio` (note the on-disk IC-LoRA weights are
+2.3-trained; they load cleanly on 2.5, as with the ID-LoRAs). The one 2.5-specific widget is `img_compression`.
+Chain: prep → KSampler `distilled` → **LTX-2.5 Crop Video Guide** → Latent Upscale ×2 → KSampler `refine` → AV Decode.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:169:- **LTX-2.5 Crop Video Guide**
+(`LTXV25CropVideoGuide`): strips the appended guide/reference tokens back off after the stage-1 sampling pass (a
+no-op if none were appended) — crop BEFORE the latent upscale, exactly like the ltx23 chain.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:187:### Preprocessors
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:188:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:189:This repo keeps only the **minimum** preprocessing
+this pack's own img2img nodes actually derive internally: **Depth Anything V2** and plain **`cv2.Canny`** — the two
+preprocessors `Krea2Img2Img`/`QwenImageImg2Img`/`Flux Klein img2img`'s `control_mode="auto_depth"`/`"auto_canny"`
+have always used. Nothing beyond that is registered as its own node here.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:190:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:191:**For the full ControlNet-aux-style preprocessor set**
+(normal maps, soft edges, MLSD, lineart variants, OpenPose — 11 nodes total, each a real architecture+inference port
+from [`comfyui_controlnet_aux`](https://github.com/Fannovel16/comfyui_controlnet_aux), Apache-2.0), install the
+standalone **[ComfyUI-ControlNet-Nodes](https://github.com/ChrisColeTech/ComfyUI-ControlNet-Nodes)** package and wire
+its output into `control_image`/`control_source_image` yourself with `control_mode="manual"` — same pattern this pack
+already uses for any control type it doesn't auto-derive. That package also documents the two license caveats (Soft
+Edge PiDiNet's research-use note, OpenPose's CMU noncommercial-research-only license) in full.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:192:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:193:`Krea2 Depth Map`, `Flux Klein Depth Map`, and
+`Qwen-Image Canny` still work exactly as before — they're the same Depth Anything V2 / `cv2.Canny` implementation,
+kept under their original historical names (not exposed as generic `DepthMap`/`Canny` nodes here, to avoid a name
+collision with ComfyUI-ControlNet-Nodes if both packs are installed). Depth Anything V2 auto-downloads its own
+weights from HuggingFace on first use into the real ComfyUI install's `models/depth_anything_v2/` folder — nothing is
+ever vendored as a weight file in this repo.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:194:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:195:**`control_mode="none"`** is available on all three
+img2img nodes (`Krea2Img2Img`, `QwenImageImg2Img`, `Flux Klein img2img`): it skips control-image
+attachment/auto-derivation, even if a Control LoRA/`qwen_control`/`control_source_image` is connected upstream,
+instead of the previous behavior where a loaded Control LoRA or connected `qwen_control` *forced* every generation to
+either auto-derive or manually supply a control image — there was no way to just turn control off for one call
+without physically rewiring the graph. `none` fixes that: toggle it via the dropdown instead. `control_mode` only
+ever governs the dedicated control-source input (`control_image`/`control_source_image`) on all three nodes — it
+never touches `images` (or `Krea2Img2Img`/`QwenImageImg2Img`'s own img2img target), which is always attached when
+connected regardless of `control_mode`.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:196:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:197:`tools/smoke_preprocessors.py` covers `Depth
+Map`/`Canny`'s shape/dtype contract and confirms this module registers no nodes of its own — 4/4, no GPU.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:198:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:199:### Krea2 Control
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:200:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:201:Krea2 is natively detected by ComfyUI core
+(`comfy.sd.load_diffusion_model_state_dict` picks it up via `unet_config.image_model == "krea2"`,
+`comfy.sd.CLIPType.KREA2` selects its Qwen3-VL-4B text encoder) — there's no bespoke sampling algorithm or
+conditioning format to reimplement, unlike LTX-2.3. Only two things needed building: a GGUF-aware loader, and the
+Control LoRA mechanism, which has no comfy-native equivalent at all.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:202:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:203:| File | Folder | Dropdown |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:204:|---|---|---|
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:205:| Krea2 diffusion model (`.safetensors` or GGUF) |
+`models/diffusion_models` (unet) | unet_name |
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:206:| Krea2 text encoder, Qwen3-VL-4B (`.safetensors` or
+GGUF) | `models/text_encoders` (clip) | clip_name |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:207:| Krea2 VAE | `models/vae` | vae_name |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:208:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:209:**Krea2 Model Loader** is a thin convenience loader —
+MODEL/CLIP/VAE by name, matching `ZImageLoader`'s shape (no per-checkpoint surgery needed, unlike Scenema, since
+comfy already knows the architecture).
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:210:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:211:**Krea2 Control LoRA Loader** loads *any* Krea2 LoRA
+from `models/loras` and patches it onto a MODEL — it auto-detects which of two unrelated mechanisms the file actually
+needs, the same auto-detect-and-dispatch approach `Qwen-Image ControlNet Loader` uses for Qwen-Image's own two
+ControlNet formats, so you don't need to know in advance which loader a given file requires:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:212:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:213:- **Widened-projection Control LoRAs** (e.g.
+`depth-control-lora.safetensors`) ship with the DiT's `first` input-projection layer *widened* — trained to accept
+image tokens concatenated with control tokens — plus small LoRA-rank patches on the attention blocks. Detected by
+shape-matching an expanded `first` weight against the live model. The loader patches the block weights through the
+normal `ModelPatcher` machinery (so offload/low-VRAM handling still applies), and registers a `DIFFUSION_MODEL`
+wrapper plus a `PatcherInjection` that swap the widened projection in only for the duration of each forward call —
+image tokens still pass through the model's original `first` layer during that swap (summed with the control
+contribution), so an ordinary LoRA on the base model keeps working. The projection is restored immediately after each
+forward call, so removing this node leaves the base model untouched. Ported essentially verbatim from the local
+`comfyui-krea2-controlnet-main` pack (no LICENSE file shipped; its README credits
+[Tanmaypatil123/Krea-2-controlnet](https://github.com/Tanmaypatil123/Krea-2-controlnet) for documenting the reference
+pipeline and [Patil/Krea-2-depth-controlnet](https://huggingface.co/Patil/Krea-2-depth-controlnet) for the public
+depth LoRA weights) — this is correctness-critical low-level `ModelPatcher` plumbing validated against a working
+pack. Use `control_mode`/`control_image` on `Krea2 img2img` after this.
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:214:- **Ordinary in-context LoRAs** (e.g.
+[nynxz/NK2E](https://huggingface.co/nynxz/NK2E)'s `krea2_canny-v0.1.safetensors`) have no widened projection at all
+(confirmed by inspecting its actual tensor keys: plain `lora_down`/`lora_up`/`alpha`, nothing else). Detected by the
+*absence* of that expanded weight, and applied via `comfy.sd.load_lora_for_models` — the same call stock
+`LoraLoaderModelOnly` makes internally, no wrapper or injection needed since there's no runtime control-token swap to
+perform. `Krea2Img2Img` has no dedicated reference-conditioning input for this kind anymore — install
+[ComfyUI-Flux-Reference-Tools](https://github.com/ChrisColeTech/ComfyUI-Flux-Reference-Tools) and wire its
+reference-conditioning node onto `model` instead (works on any Flux-family model, not just Krea2).
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:215:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:216:**Krea2 Depth Map** turns a source photo into a depth
+map standalone — for hand-building a graph, or feeding something other than `Krea2 img2img`. Runs Depth Anything V2
+(DINOv2 encoder + DPT decoder head), ported from
+[Fannovel16/comfyui_controlnet_aux](https://github.com/Fannovel16/comfyui_controlnet_aux) (Apache-2.0) and
+consolidated into `vendor/depth_anything_v2.py` per this pack's flat-file convention. Weights (`ckpt_name`:
+vits/vitb/vitl/vitg) auto-download from HuggingFace on first use into `models/depth_anything_v2/`, same pattern as
+`Qwen3-TTS Models Loader` — nothing extra to install. This is now an alias for the shared `Depth Map (Depth Anything
+V2)` node under `🤖 CCTech/Preprocessors` (see that section above) — same node, kept registered under its original
+name so saved workflows keep working. For the common case (depth Control LoRA), you don't need this node at all — see
+below.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:217:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:218:**Krea2 img2img** + **Krea2 ControlNet img2img** are
+two separate, standalone nodes — split so a plain img2img graph never has to look at control-related sockets, and
+vice versa (see [Flux Klein](#flux-klein) below for the same split and the two real bugs that motivated it). Pick
+whichever matches what you're doing; neither depends on the other.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:219:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:220:**Krea2 img2img** — `model, clip, vae, prompt,
+negative_prompt, strength, width, height`, plus optional `images` (one or more source photos, batch-aware — leave
+unconnected for txt2img). No control-related inputs at all. `images` is real img2img — VAE-encoded, then partially
+denoised at `strength` (comfy's own img2img convention: noise added onto the encoded latent proportional to `1 -
+strength`, sampled from there). It's batch-aware: a batch of N photos naturally becomes N independent img2img
+generations, since `vae.encode()`/`KSampler` already process a batched latent as N parallel runs — no special-casing
+needed.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:221:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:222:**`identity_edit`** (optional, default off) switches
+this same node to drive the **Krea 2 Identity Edit LoRA** in place — no separate `Krea2 Identity Edit` nodes needed.
+When on, `images` stops being an img2img source and becomes the LoRA's source photo: it's injected as in-context
+tokens (the same model-forward wrapper `Krea2 Identity Edit (source patch)` uses) and grounds
+`prompt`/`negative_prompt` on that image through Qwen3-VL (the same path `Krea2 Identity Edit (grounded encode)`
+uses) instead of plain text encoding. `strength` is ignored when `identity_edit=True` — the target always starts at
+full noise, since source preservation now comes from the injected context rather than partial denoising, and mixing
+both fights the LoRA's trained recipe. This toggle only adds the *driving mechanism* — the LoRA itself still needs to
+be loaded upstream (e.g. `LoraLoaderModelOnly`); with `identity_edit=True` and no such LoRA loaded, the extra context
+tokens are simply inert. `ref_boost`/`grounding_px` mirror the standalone nodes' same-named dials. For the advanced
+cases this toggle doesn't cover (dual-reference, `ref_boost_mask`, `fit_mode="crop (legacy)"`, a custom
+`system_prompt`), use the standalone `Krea2 Identity Edit (source patch)`/`Krea2 Identity Edit (grounded encode)`
+nodes instead — they share the exact same underlying implementation, just with the full dial set exposed.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:223:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:224:**Krea2 ControlNet img2img** — everything `Krea2
+img2img` has, plus `control_image` for the loaded Control LoRA. `control_mode` (on the widened-projection path) picks
+how the control signal gets produced, since nothing in a LoRA file says what type it is:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:225:- `auto_depth` (default) — derives a depth map from
+`images` automatically, using the same Depth Anything V2 model as **Krea2 Depth Map**.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:234:Minimal graph (plain): `Krea2 Model Loader` → `Krea2
+img2img` (prompt typed directly into this node, `Load Image` → `images`) → `Krea2 KSampler` (or stock `KSampler`) →
+`VAE Decode`. With ControlNet: swap in `Krea2 ControlNet img2img`, with `Krea2 Control LoRA Loader` between the model
+loader and it.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:235:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:236:**Krea2 KSampler** is a drop-in for stock `KSampler`
+with one extra option, `denoise_mode`, mirroring `Z-Image KSampler`/`Qwen-Image KSampler`. Krea2 shares the exact
+same `ModelSamplingFlux`/`shift=1.15` setup as Qwen-Image (literally the same shift value, copy-pasted alongside the
+Qwen-Image-family config in comfy's own `supported_models.py`), so the same comfy-vs-diffusers denoise-slicing
+discrepancy applies — verified against a real loaded Krea2 model, not assumed: at 9 steps, denoise 0.9, comfy starts
+at sigma ≈0.9660 vs ≈0.9619 under the diffusers-style slice. `denoise_mode="comfy"` (default) is unchanged stock
+behavior; `"diffusers"` matches diffusers-pipeline img2img exactly.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:237:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:238:**Krea2 Identity Edit (source patch)** + **Krea2
+Identity Edit (grounded encode)** are a faithful port of
+[comfyui-krea2edit](https://github.com/lbouaraba/comfyui-krea2edit) (Apache-2.0, lbouaraba) — the nodes behind the
+separately-licensed **Krea 2 Identity Edit** LoRA (`krea2_identity_edit_v1_2.safetensors`,
+[huggingface.co/conradlocke/krea2-identity-edit](https://huggingface.co/conradlocke/krea2-identity-edit), Krea 2
+Community License Agreement — weights are NOT bundled or vendored here, download separately). This is a genuinely
+different mechanism from `Krea2 img2img`'s `control_image` path — comfy's native Krea2 forward only ever builds
+`[text | target]`, with no built-in way to prepend a clean source-image block, so the Identity Edit LoRA needs the
+diffusion model's forward wrapped directly to rebuild the sequence as `[text | source(frame=1) | target(frame=0)]`,
+exactly matching how it was trained (`ai-toolkit`'s `predict_velocity_edit`). Confirmed by reading
+`comfy/ldm/krea2/model.py`'s real `SingleStreamDiT` directly — attribute-for-attribute, the port matches. Ported via
+`comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL` — a real comfy `ModelPatcher` extension point (the same
+mechanism `Krea2ControlLoRALoader`'s own wrapper already uses in this file, and Klein's Identity Feature Transfer
+hooks use elsewhere in this pack) — not a from-scratch sampler; `CFGGuider`/`sampler_post_cfg_function` stays fully
+intact.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:239:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:240:**Krea2 Identity Edit (source patch)** takes `model` +
+`source_latent` (a `VAEEncode` of the photo being edited) and wraps the model's forward so that source gets prepended
+as clean in-context tokens at RoPE frame 1. `vae` + `source_image` (recommended) enables the blur-proof pixel-space
+path — the node fits the raw image to the target grid in pixel space instead of resizing an already-VAE-encoded
+latent. `target_latent` (recommended whenever using the pixel path) — wire the *same* latent that feeds
+`KSampler.latent_image`, so the source gets VAE-encoded during this node's own execution instead of on the first
+sampling step (skipping it can silently evict part of the resident diffusion model mid-sampling on VRAM-tight setups,
+streaming weights from CPU for the rest of the run — the console tells you which path you got).
+`source_latent_b`/`source_image_b` add a second reference (RoPE frame 2) for two-input edits (e.g. person + scene).
+`ref_boost`/`ref_boost_a` are reference-fidelity dials — how hard the model locks onto the reference's appearance
+(1.0 = neutral, model-specific optimum is usually higher). `fit_mode="fit"` (default, training-matched, needs
+`vae`+`source_image`) resamples the source to the target grid at a centered offset; `"crop (legacy)"` is the older
+v1/v1.1 geometry.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:241:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:242:**Krea2 Identity Edit (grounded encode)** encodes the
+prompt *together with* the source image through Qwen3-VL's own vision path — the semantic half of the training recipe
+the source-patch node's VAE tokens don't cover (appearance vs. scene semantics like "the man on the left"). **Both
+nodes are required** for correct results — a stock `CLIPTextEncode` never lets the model see the image while reading
+the instruction, and quality drops sharply, especially for scene-referential edits. `image`/`image_b` (optional —
+leave unconnected to fall back to plain text-only encoding, matching the LoRA's own trained unconditional for the
+negative prompt at CFG>1) mirror the patch node's dual-reference order (scene, then subject). `grounding_px` (default
+768, trained range 384–768) caps the resolution fed to the vision encoder — lower for stronger edit adherence, higher
+for stronger identity/likeness.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:243:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:244:Minimal graph: `LoadImage` → `VAEEncode` → `Krea2
+Identity Edit (source patch)`'s `source_latent` (model from `Krea2ModelLoader` → stock `LoraLoaderModelOnly` with the
+Identity Edit LoRA @ 1.0) → stock `KSampler`. Two `Krea2 Identity Edit (grounded encode)` instances (same source
+image, one with your instruction, one empty) feed `KSampler`'s positive/negative. `EmptySD3LatentImage` feeds both
+`KSampler.latent_image` and (recommended) the patch node's `target_latent`.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:245:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:246:`tools/smoke_krea2.py` covers the tensor-prep helpers
+(grayscale/normalize/invert/resize), the `Krea2ControlInputProjection` forward math (image-only fallback, and
+image+control summation), the widened-projection-vs-ordinary-LoRA auto-detection, `Krea2 ControlNet img2img`'s guard
+rails, auto_depth/auto_canny derivation from `images`, manual-override precedence, `Krea2 img2img`'s plain-node
+behavior (txt2img/img2img latent shapes, a multi-image batch producing a correctly-batched latent, zero
+control-related inputs), `Krea2 KSampler`'s two denoise modes, `Krea2 Identity Edit (source patch)`'s wrapper
+registration and the pixel-path pre-encode timing (`target_latent` present vs. absent, dual-reference pre-encoding),
+`krea2_edit_forward`'s `[text | source | target]` concatenation round-tripping to the original shape against a
+synthetic DiT, and `Krea2 Identity Edit (grounded encode)`'s image-grounded tokenize call
+(`images=`/`llama_template=` kwargs, vision-block count, `grounding_px` downscaling) — 39/39, no GPU. Loading real
+GGUF/LoRA weights end-to-end through the *same* `Krea2ControlLoRALoader` for both the widened-projection depth LoRA
+and the ordinary canny LoRA, the Depth Anything V2 port's `load_state_dict(strict=True)` against the real HuggingFace
+checkpoint, the new `images` slot's `INPUT_TYPES` shape, the diffusers-mode sigma math against that same real model,
+and — for the Edit nodes — every comfy API called (`SingleStreamDiT`'s real attributes, the
+`WrappersMP.DIFFUSION_MODEL` wrapper actually bridging through comfy's real `sampler_helpers.prepare_model_patcher`
+into `transformer_options`, `Krea2Tokenizer`'s real `images=`/`llama_template=` kwargs) were all verified separately
+against the actual portable ComfyUI environment.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:247:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:248:### Qwen-Image ControlNet
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:249:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:250:Unlike Krea2's Control LoRA, Qwen-Image ControlNet
+needed no algorithm ported at all — every format in circulation is already native to ComfyUI core:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:251:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:252:| Format | Example file | Comfy mechanism |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:253:|---|---|---|
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:254:| InstantX / Union |
+`*-InstantX-ControlNet-Union.safetensors` | `comfy.controlnet.load_controlnet_state_dict()` → a real `ControlNet`
+object, attaches to **CONDITIONING** (same as any classic ControlNet) |
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:255:| Qwen-Image-Fun ControlNet | — | same dispatcher,
+also a `ControlNet` object |
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:256:| DiffSynth patches (canny/depth/inpaint) |
+`qwen_image_{canny,depth,inpaint}_diffsynth_controlnet.safetensors` |
+`comfy_extras.nodes_model_patch.ModelPatchLoader` → a `MODEL_PATCH`, attaches to **MODEL** via `DiffSynthCnetPatch` —
+the same mechanism this pack's `nodes_zimage.py` already uses for Z-Image's ControlNet |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:257:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:258:**Qwen-Image Model Loader** is the same thin
+GGUF-aware convenience loader as `Krea2ModelLoader`/`ZImageLoader` — MODEL/CLIP/VAE by name (`type="qwen_image"` for
+CLIP).
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:259:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:260:**Qwen-Image ControlNet Loader** loads a checkpoint
+from `models/model_patches` or `models/controlnet` and auto-detects which of the two mechanisms above it needs,
+checking only the DiffSynth signature (`controlnet_blocks.0.y_rms.weight`, the only real MODEL_PATCH format) and
+falling through to `comfy.controlnet.load_controlnet_state_dict()` for everything else — InstantX/Union **and**
+Qwen-Image-Fun both land there, since Fun is a real `ControlNet` architecture despite its name, not a model patch
+(comfy's own dispatcher already checks the Fun signature — `control_blocks.0.after_proj.weight` +
+`control_img_in.weight` — internally). It's a dispatcher, not a reimplementation. Outputs a `QWEN_IMAGE_CONTROL`
+wrapper tagging which attachment point the loaded checkpoint needs.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:261:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:262:**Qwen-Image Canny** is the standalone version of
+`control_mode="auto_canny"` (below) — plain `cv2.Canny` edge detection, no model, no download. Same role `Krea2 Depth
+Map` plays for depth: wire it in explicitly to preview the edge map before it goes into `control_image`, or reuse it
+elsewhere, instead of it happening invisibly inside `Qwen-Image img2img`. This is now an alias for the shared `Canny`
+node under `🤖 CCTech/Preprocessors`.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:263:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:264:**Qwen-Image img2img** + **Qwen-Image ControlNet
+img2img** are two separate, standalone nodes, same split as Krea2/Klein — a plain img2img graph never has to look at
+control-related sockets, and vice versa.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:265:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:266:**Qwen-Image img2img** — `model, clip, vae, prompt,
+negative_prompt, strength, width, height`, plus optional `images` (one or more source photos, batch-aware). No
+control-related inputs at all. `images` is real img2img — VAE-encoded, then partially denoised at `strength`. It's
+batch-aware: a batch of N photos naturally becomes N independent img2img generations, since `vae.encode()`/`KSampler`
+already process a batched latent as N parallel runs. This is also the only mechanism this node has for "edit this
+photo" — for a Qwen-Image-**Edit** checkpoint, connect the photo here with a real `strength` so the model is actually
+denoising from it.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:267:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:268:**Qwen-Image ControlNet img2img** — everything
+`Qwen-Image img2img` has, plus `qwen_control` + `control_image` and `mask`. It routes to whichever attachment the
+loaded checkpoint needs automatically — `DiffSynthCnetPatch` on a cloned `MODEL` for DiffSynth patches, or the same
+`.set_cond_hint()`/`.set_previous_controlnet()` calls stock `ControlNetApplyAdvanced` makes, applied to
+**CONDITIONING**, for InstantX/Union/Fun — so you never need to know which mechanism a given checkpoint uses. Unlike
+Krea2 (one control type: depth), Qwen-Image checkpoints span several different preprocessing needs this pack can't
+detect from the file, so `control_mode` picks how `control_image` gets produced:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:269:- `manual` (default) — connect `control_image`
+yourself, matching whichever checkpoint you loaded (or install
+[ComfyUI-ControlNet-Nodes](https://github.com/ChrisColeTech/ComfyUI-ControlNet-Nodes) for normal/soft-edge/line/pose
+preprocessors this pack doesn't auto-derive).
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:270:- `auto_canny` — derives a canny edge map from
+`images` automatically (plain `cv2.Canny`, no model, no download).
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:271:- `auto_depth` — derives a depth map from `images`
+automatically, using the same Depth Anything V2 model as `Krea2 Depth Map`.
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:272:- `none` — skip control attachment entirely, even if
+`qwen_control` is connected. Previously a connected `qwen_control` *forced* every generation to either auto-derive or
+manually supply `control_image` — there was no way to just turn control off for one call. `none` fixes that.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:273:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:274:Connecting `control_image` explicitly always overrides
+auto-derivation, in any mode. `control_image` is required even for an inpaint checkpoint (outside `none` mode) —
+`mask` only refines the region, it doesn't replace it; there's no photo-only way to auto-derive a mask. Same guard
+rails as before the split: `qwen_control` with nothing usable to attach (and `control_mode` not `none`) raises;
+`control_image` with no `qwen_control` is ignored with a warning.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:275:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:276:Graph (plain): `Qwen-Image Model Loader` → `Qwen-Image
+img2img` (prompt typed directly into this node, `Load Image` → `images`) → stock `KSampler` → `VAE Decode`. With
+ControlNet: swap in `Qwen-Image ControlNet img2img`, alongside `Qwen-Image ControlNet Loader` → `qwen_control`, with
+`images` doing double duty as the `control_mode` derivation source (or your own control map via `control_image`).
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:277:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:278:Not ported: Lotus depth estimation (a diffusion-based
+depth model some Qwen-Image InstantX workflows use as their depth preprocessor) — it's a different architecture from
+Depth Anything V2, and a separate job (preprocessor, not ControlNet). `Krea2 Depth Map`'s Depth Anything V2 covers
+the same role for now.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:279:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:280:**Qwen-Image KSampler** is a drop-in for stock
+`KSampler` with one extra option, `denoise_mode`. Qwen-Image has no bespoke sampling code in comfy at all — it shares
+`ModelSamplingFlux` (`shift=1.15`) with the rest of the Flux family — but comfy's own denoise-slicing convention
+(`KSampler.set_steps`: re-expand to `int(steps/denoise)` steps, take the tail) provably diverges from the diffusers
+img2img convention (compute the schedule at `steps`, slice from `t_start = steps - round(steps*denoise)`), the same
+class of discrepancy `Z-Image KSampler` was built for. Verified against Qwen-Image's actual `shift` value on a real
+loaded model, not assumed: at 9 steps, denoise 0.9, comfy starts at sigma ≈0.9660 vs ≈0.9619 under the
+diffusers-style slice — smaller than Z-Image's measured gap (0.9643 vs 0.9567) but the identical mechanism.
+`denoise_mode="comfy"` (default) is unchanged stock behavior; `"diffusers"` matches the original pipeline's img2img
+exactly. This is a compatibility switch, not a quality fix — small in magnitude, worth having for exact parity.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:281:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:282:`tools/smoke_qwen_image.py` covers the
+control-dispatch helper (conditioning stamping, hint/strength passthrough), `Qwen-Image ControlNet img2img`'s guard
+rails and both control attachment paths (model_patch → cloned `MODEL`; controlnet → `CONDITIONING`, `MODEL` left
+untouched), `Qwen-Image img2img`'s plain-node latent shapes and a multi-image batch producing a correctly-batched
+latent, `Qwen-Image Canny`'s output shape, and `Qwen-Image KSampler`'s two denoise modes — 14/14, no GPU. The format
+auto-detection, both control attachment mechanisms, the new `images` slot's `INPUT_TYPES` shape, and the
+diffusers-mode sigma math were all verified separately against the real files/real loaded model in the actual
+portable ComfyUI environment.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:283:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:284:### Flux Klein
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:285:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:286:FLUX.2 Klein is natively detected by comfy core
+(`unet_config.image_model == "flux2"`, matched by `comfy/supported_models.py`) — like Krea2 and Qwen-Image, this
+needed only a thin GGUF-aware convenience loader plus a real port of the genuinely Klein-specific tooling from
+[`ComfyUI-Flux2Klein-Enhancer`](https://github.com/capitan01R/ComfyUI-Flux2Klein-Enhancer) (MIT License, capitan01R)
+— none of it is vendored or reimplemented from scratch, it's a faithful port of that pack's own mechanisms onto stock
+comfy `MODEL`/`CONDITIONING` objects.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:287:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:288:This pack keeps only the 5 nodes that actually need
+Klein-specific structure (Klein's own empty-latent shape, its Qwen3-layer-stacked conditioning, or its own CLIP
+tokenizer internals). The other 9 nodes originally built as part of this port turned out to be architecturally
+generic to *any* Flux-family model (Flux.1, Kontext, Klein) — they only read comfy's own shared
+`reference_latents`/`attn1_patch`/`sampler_post_cfg_function` mechanisms, nothing Klein-only — so they were
+extracted, renamed, and moved to the standalone
+**[ComfyUI-Flux-Reference-Tools](https://github.com/ChrisColeTech/ComfyUI-Flux-Reference-Tools)** package:
+`FluxMultiReferenceLatent`, `FluxColorAnchor`, `FluxDetailController`, `FluxTextEnhancer`, `FluxMaskRefController`,
+`FluxRefLatentController`, `FluxTextRefBalance`, `FluxRefLatentWeight`, `FluxIdentityGuidance`. Install that package
+for 3+ reference chaining, color/identity anchoring, or per-reference K/V weighting — on Klein or any other
+Flux-family model. **This was a breaking change** for any saved workflow using those 9 nodes' old Klein-branded type
+names directly (no in-repo alias is possible for a node that now lives in a different package).
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:289:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:290:**Flux Klein Model Loader** is the same thin
+GGUF-aware convenience loader as `Krea2ModelLoader`/`QwenImageModelLoader` — MODEL/CLIP/VAE by name
+(`clip_type=CLIPType.FLUX2`, matching core's `CLIPLoader` type dropdown).
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:291:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:292:**Flux Klein img2img** + **Flux Klein ControlNet
+img2img** are two separate, standalone nodes: `model, clip, vae, prompt, negative_prompt, batch_size, width, height`,
+plus optional `images` — outputs `model, positive, negative, latent`. There is no partial-denoise img2img path here
+at all — every real Klein edit example starts from a pure-noise `EmptyFlux2LatentImage` (`[batch_size, 128, height //
+16, width // 16]`, confirmed via comfy core's own `EmptyFlux2LatentImage` — not the generic 4-channel/8-downscale
+placeholder used elsewhere in this pack, since comfy's `fix_empty_latent_channels` only auto-corrects channel count,
+not the spatial downscale ratio unless `downscale_ratio_spacial` is explicitly passed). No `denoise` output either —
+it would always be a constant `1.0`, which is already stock `KSampler`'s own default `denoise` value, so it would
+carry zero information; leave `KSampler`'s `denoise` input disconnected.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:293:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:294:- **`images`** — one or more RAW reference photos,
+always attached to `reference_latents` on positive+negative when connected. This is a single `IMAGE` socket but
+batch-aware: if the incoming tensor has N images stacked in the batch dimension, each gets its own `VAEEncode` +
+`reference_latents` append — combine multiple photos upstream with a stock **Batch Images** node before wiring the
+result in here. This is Klein's real editing mechanism, confirmed by tracing the actual node graph inside the real
+shipped example workflows (single-reference `"Image Edit (Flux.2 Klein 9B)"` and dual-reference `"9B-base"`,
+`image_flux2_klein_image_edit_9b_base.json`): it never partially denoises the edited photo, it always starts from
+pure noise and drives the whole edit off reference images VAE-encoded and attached to positive **and** negative
+conditioning as `reference_latents`, plus a text instruction — a 2-image batch here reproduces the dual-reference
+subgraph's own two sequential `ReferenceLatent` calls per conditioning branch exactly.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:295:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:296:**Flux Klein ControlNet img2img** — everything `Flux
+Klein img2img` has, plus **`control_source_image`**: a photo to turn *into* a controlnet-style map before attaching
+it. Klein has no real ControlNet/Control-LoRA of its own, so "using it as a controlnet image" just means running it
+through this pack's preprocessor and feeding the result through the same `reference_latents` mechanism as `images`,
+appended after them. `control_mode` picks the preprocessor and applies **only to this slot**: `manual` (default)
+attaches it raw (e.g. if you already computed your own map elsewhere), `auto_depth` runs it through this pack's Depth
+Anything V2 first — reproducing the example workflow's own trick of feeding a reference through `AIO_Preprocessor`
+(set to `MiDaS-DepthMapPreprocessor`) before encoding it, the one mode CONFIRMED meaningful to Klein's own training —
+`auto_canny` does the same with plain `cv2.Canny`, mechanically valid but unverified for Klein specifically, and
+`none` skips `control_source_image` attachment entirely even if it's connected, for toggling it off without rewiring.
+This is the same minimum set `Krea2 ControlNet img2img`/`Qwen-Image ControlNet img2img` use — for normal maps/soft
+edges/lines/pose, install [ComfyUI-ControlNet-Nodes](https://github.com/ChrisColeTech/ComfyUI-ControlNet-Nodes) and
+wire its output into `control_source_image` yourself with `control_mode=manual`. `depth_ckpt_name` picks the Depth
+Anything V2 model size (downloads on first use, same as `Krea2 Depth Map`).
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:297:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:298:**This split exists because of a real bug**, caught by
+the user against a real edit test: an earlier revision had a single `reference_image` slot doing double duty as both
+the raw identity/content reference *and* the thing `control_mode` decided how to preprocess. That meant
+`control_mode="none"` — meant only to skip auto-depth/auto-canny preprocessing — silently skipped the **entire**
+reference attachment too, even with `reference_image` genuinely connected: a coherent image would still come out (the
+model just fell back to prompt-only generation), with no error, making it look like the reference mechanism itself
+was broken rather than a dropdown state. First fixed by splitting the one node's inputs into
+`images`/`control_source_image` (so `control_mode` could no longer reach `images`), then split further into two
+separate standalone nodes entirely — a plain img2img node can no longer show a control-related dropdown at all,
+closing the whole class of confusion by construction, not just this one bug.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:299:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:300:`width`/`height` are a **pixel budget**, not an exact
+literal size, confirmed by tracing the actual node graph inside the real shipped example workflow: whenever `images`
+(or, on the ControlNet node, `control_source_image`) is connected, the real canvas is re-derived from that photo's
+own aspect ratio at the same total-pixel budget (`_scale_to_megapixels`, an aspect-preserving port of comfy core's
+own `ImageScaleToTotalPixels` math, rounded to the nearest multiple of 16 to stay aligned with Flux.2's `/16` latent
+downscale) — exactly mirroring the example workflow's own `ImageScaleToTotalPixels` → `GetImageSize` →
+`EmptyFlux2LatentImage` chain, which never trusts an independent user-typed size when a photo is connected. Pure
+txt2img (nothing connected) still uses `width`/`height` literally.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:301:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:302:**Flux Klein Depth Map** is that same Depth Anything
+V2 detector exposed as its own standalone node — image in, depth map out — mirroring `Krea2 Depth Map`'s existing
+explicit-node convention. It's the same shared `Depth Map (Depth Anything V2)` implementation under its historical
+Klein-branded name (see Preprocessors above).
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:303:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:304:**Flux Klein Identity Feature Transfer** is a
+near-verbatim port of the source pack's flagship `IdentityFeatureTransferFinal` — multi-reference identity-preserving
+feature transfer, using only stock `ModelPatcher` hooks (`set_model_attn1_output_patch`, always;
+`set_model_attn1_patch`, only when `mask_behavior="zero_unmasked_tokens"` and a mask is wired). Both hooks fire
+generically from comfy's own `comfy/ldm/flux/layers.py` `DoubleStreamBlock`/`SingleStreamBlock` forward passes —
+shared Flux/Kontext/Klein code — and read four `extra_options` keys (`reference_image_num_tokens`, `block_index`,
+`block_type`, `img_slice`) that comfy's own model code already populates every forward call. The transfer does
+per-image centering of generated vs. reference features, normalized similarity matching with a configurable floor,
+temperature-controlled reference pooling, and confidence-gated pull at scheduled double/single blocks, all ported
+as-is: `preset` (`HARD_LOCK`/`MID_LOCK`/`SOFT_LOCK`/`custom`), `reference_index`/`reference_indices`,
+`similarity_floor`, `softmax_temperature`, `mask_threshold`, `double_blocks`/`single_blocks` schedule strings,
+optional `sigmas` (per-step strength decay), `debug`, `mask_behavior`, and up to eight `subject_mask_1..8` inputs.
+Stays in this repo because its default schedules/presets hardcode block counts (8 double / 24 single) tuned
+specifically for the Klein 9B layout — genuinely Klein-specific, not generalizable without redesigning the preset
+system.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:305:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:306:**Known caveat, carried over from the source rather
+than fixed speculatively**: those hardcoded block counts are never read from the live model. Out-of-range indices
+clamp harmlessly on a different-sized checkpoint (e.g. the 4B `klein-base` variant), but a preset may end up applying
+strength to the wrong semantic blocks — use `preset="custom"` with your own schedule strings for non-9B checkpoints.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:307:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:308:**Flux Klein Enhancer** — scalar/whitening ops on the
+active-token conditioning region, plus a Klein-specific per-Qwen3-layer scale (Klein conditioning stacks 3
+hidden-layer slices along the embed dim; `early_layer_scale`/`mid_layer_scale`/`late_layer_scale` target them
+individually). Genuinely Klein-specific — the 3-layer-stack assumption is meaningless on any other model's
+conditioning shape.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:309:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:310:**Flux Klein Sectioned Encoder** — tokenizes a
+front/mid/end sectioned prompt (three text boxes, or one `combined_prompt` with `[FRONT]`/`[MID]`/`[END]` markers)
+and stamps real per-section token ranges as conditioning metadata by reaching into the CLIP's own HF tokenizer
+(`clip.tokenizer.qwen3_4b.tokenizer` / `.qwen3_8b.tokenizer` depending on which Klein text-encoder variant is loaded
+— confirmed against a real loaded Klein CLIP object, not assumed). The one node in this repo with a genuine
+Klein-CLIP-internals dependency. Its `klein_sections` metadata is also read (optionally) by `FluxDetailController` in
+the separate ComfyUI-Flux-Reference-Tools package, if you have both installed.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:311:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:312:**Explicitly not ported**:
+`Flux2KleinKSamplerExperimental` — confirmed to reimplement Euler sampling from scratch (manual forward-pass loop,
+hand-rolled CFG, local shift/schedule math) instead of going through `comfy.samplers`/`CFGGuider`, which means it
+bypasses comfy's `sampler_post_cfg_function` pipeline entirely. Within the source pack itself this makes it strictly
+*less* compatible than stock `KSampler` — pairing it with the source's own Color Anchor or Identity Guidance nodes
+would silently do nothing. Use stock `KSampler` for Klein. Also not ported: the source pack's own superseded
+`IdentityFeatureTransfer`/`Advanced`/`V3` nodes, kept there only for that pack's backward compatibility.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:313:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:314:Graph (plain): `Flux Klein Model Loader` → `Flux Klein
+img2img` (prompt typed directly into this node, `images` for Klein's real edit mechanism) → optionally `Flux Klein
+Identity Feature Transfer` on `model` → stock `KSampler` → `VAE Decode`. With ControlNet: swap in `Flux Klein
+ControlNet img2img`. For 3+ references, more control types, color/identity anchoring, or per-reference weighting,
+install ComfyUI-Flux-Reference-Tools and/or ComfyUI-ControlNet-Nodes and chain their nodes in — see each package's
+own README for graph examples.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:315:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:316:`tools/smoke_flux_klein.py` covers all 7 nodes
+(`FluxKleinModelLoader`, `FluxKleinImg2Img`, `FluxKleinControlNetImg2Img`, `Flux2KleinDepthMap` alias,
+`Flux2KleinIdentityFeatureTransfer`, `Flux2KleinEnhancer`, `Flux2KleinSectionedEncoder`) — `Flux Klein img2img`'s
+plain-node latent shape (real Flux.2 128-channel shape, no denoise output, batch repeat), its `_scale_to_megapixels`
+canvas-sizing helper (aspect ratio preserved, hits the requested megapixel budget, rounds to 16), the canvas
+correctly deriving from a connected non-square `images` input instead of the square widget defaults, `Flux Klein
+ControlNet img2img`'s `images` taking sizing priority over `control_source_image` when both are connected, a 2-image
+batch in `images` attaching 2 separate `reference_latents` (one per image, not one batched encode), `images` and
+`control_source_image` combining correctly, its `control_source_image`/`control_mode` attachment (manual attaches
+raw, auto_depth/auto_canny each derive for real, `none` skips ONLY `control_source_image`, `control_mode`'s option
+list matches the minimum set exactly), `Flux Klein Depth Map`'s delegation to the shared depth helper, `Flux Klein
+Identity Feature Transfer`'s hook registration and similarity-pull math on a synthetic attention tensor, Enhancer's
+no-op passthrough and active-region scaling, and Sectioned Encoder's `klein_sections` emission with a fake HF
+tokenizer and its no-tokenizer fallback — 26/26, no GPU. Native Flux2 detection, `CLIPType.FLUX2`, the real
+`clip.tokenizer.qwen3_4b.tokenizer` attribute path, the canvas-sizing fix, and both nodes' `INPUT_TYPES` (plain has
+zero control keys, ControlNet is a strict superset) were all verified separately against the actual portable ComfyUI
+environment, the user's real `flux-2-klein-9b` GGUF checkpoint, a real loaded Klein CLIP object, and the real Flux.2
+VAE.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:317:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:318:### LM Studio
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:319:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:322:`tools/smoke_lmstudio.py` mocks the HTTP calls and
+validates payload assembly, response parsing and error handling — no GPU or running server required.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:323:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:324:### Qwen3-TTS
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:325:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:326:**Qwen3-TTS Models Loader** + **Qwen3-TTS Custom
+Voice**, under `🤖 CCTech/Qwen TTS`, are a local port of the `flybirdxx/ComfyUI-Qwen-TTS` pack's
+`FB_Qwen3TTSCustomVoice` node (used for the reference voice in the `ltxv23_talking_head` workflow), wrapping the
+`qwen-tts` pip package's own `Qwen3TTSModel` directly — the model itself is a `transformers` checkpoint plus a
+separate codec/vocoder submodel, not this repo's GGUF-quantization territory, so there's nothing to port at the
+weights level.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:327:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:328:The models-folder layout matches
+`DarioFT/ComfyUI-Qwen3-TTS`'s convention rather than inventing a new one: pick a `repo_id` from the loader's dropdown
+(CustomVoice/VoiceDesign/Base × 1.7B/0.6B) and it downloads once into `models/Qwen3-TTS/<folder_name>/` (the speech
+tokenizer/codec lives inside that same repo, no separate download) — an existing HuggingFace/ModelScope cache copy is
+migrated in place instead of re-downloading if found. Every load after the first is fully offline. To pre-fetch by
+hand instead:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:329:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:330:```
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:331:huggingface-cli download
+Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice --local-dir ComfyUI/models/Qwen3-TTS/Qwen3-TTS-12Hz-1.7B-CustomVoice
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:332:```
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:333:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:334:The loader always loads with `local_files_only=True` —
+no network access once the files are on disk. `speaker` is a built-in named voice baked into the checkpoint (e.g.
+`"Dylan"`); an unknown name raises an error listing every valid one. `instruct` is real model-native conditioning on
+the 1.7B checkpoint, but the 0.6B checkpoint silently drops it upstream — this node logs a warning instead of
+reproducing that silence. Needs the optional `qwen-tts` dependency (already in `requirements.txt`).
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:335:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:336:Six more nodes ported from the same pack's newer
+revision round out the family. These are **faithful ports of the flybirdxx surfaces**: each model-using node loads
+its *own* checkpoint in-node (`model_choice` 0.6B/1.7B, `device`, `precision`, `attention` widgets — including
+`sage_attn` and `custom_model_path` on Voice Clone), exactly like the source pack, so there is no upstream model
+wiring to get wrong:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:337:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:338:- **Qwen3-TTS Voice Clone** — clone a reference voice
+onto new text. Connect `ref_audio` (any Comfy `AUDIO`, stereo is downmixed, sub-1024-sample clips zero-padded) *or* a
+reusable `voice_clone_prompt`; the prompt wins when both are connected. Optional `instruct` styling, `x_vector_only`,
+and `custom_model_path` for fine-tuned checkpoints. Loads a `*-Base` checkpoint.
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:339:- **Qwen3-TTS Voice Clone Prompt** — extract the
+reusable `VOICE_CLONE_PROMPT` features from reference audio once (same `*-Base` family Voice Clone uses), then reuse
+them across any number of generations without re-encoding the audio.
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:340:- **Qwen3-TTS Voice Design** — describe a voice in
+text (`instruct`, e.g. *"a deep male voice with a calm tone"*) and speak the target text with it. Loads the
+`*-VoiceDesign` checkpoint (1.7B only — 0.6B is rejected, matching upstream).
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:341:- **Qwen3-TTS Role Bank** — collect up to 8 named
+`VOICE_CLONE_PROMPT`s into one bank for multi-role dialogue workflows (slots without a connected prompt are skipped).
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:342:- **Qwen3-TTS Save Voice** / **Qwen3-TTS Load
+Speaker** — persist a prompt under `models/qwen-tts/voices/` (the source pack's layout, so saved voices are
+interchangeable with it) as `<name>.qvp` + `.json` (transcript) + `.wav` preview, and load it back (fast-loading the
+cached `.qvp` and restoring the transcript; the audio output works standalone as a Voice Clone `ref_audio` when no
+`.qvp` exists). The wav write/read prefers torchaudio/soundfile and falls back to a stdlib 16-bit PCM path, so the
+round-trip needs no audio backend installed.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:343:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:344:Under the hood the in-node loading reuses this pack's
+plumbing: models are searched in `models/qwen-tts/` (the source pack's tree, also registered for
+`extra_model_paths.yaml`) *then* `models/Qwen3-TTS/`, downloaded from HuggingFace when found in neither, and a
+single-slot cache means two nodes with the same config share weights. The `Qwen3-TTS Models Loader` + `Qwen3-TTS
+Custom Voice` pair above is unchanged and still works alongside them.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:345:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:346:### OmniVoice TTS
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:347:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:354:Both generators return mono Comfy `AUDIO` at 24 kHz
+and retain the source's optional `WHISPER_ASR` socket. If no external Whisper pipeline or local model under
+`models/audio_encoders/` is available, OmniVoice's own internal transcription path is used. OmniVoice 0.2.1 requires
+Transformers 5.3+ for `HiggsAudioV2TokenizerModel`; the requirement is explicit rather than hidden behind an
+import-time package installer. `tools/smoke_omnivoice.py` covers the node surfaces, download/cache lifecycle,
+generation kwargs, resampling/transcription, long-reference trimming, multilingual chunking, fixed voice references,
+interrupts, and offload/reload without downloading weights.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:355:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:356:`tools/smoke_qwen_tts.py` stubs `folder_paths` and
+`qwen_tts.Qwen3TTSModel` and validates path discovery, loader kwargs/caching, the generate node's
+seeding/AUDIO-dict/unload logic, the new nodes' in-node model resolution (local search, cache reuse/eviction,
+attention fallback), audio conversion/kwargs, and the save/load round-trip — no GPU or real weights required. The
+full chain (CustomVoice reference speech → prompt extraction → save/load → clone from the *saved* prompt → role bank
+→ voice design) is verified end-to-end against real checkpoints on every port.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:357:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:358:### TripoSG (image → 3D mesh)
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:359:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:400:### TRELLIS.2 and Pixal3D (image → PBR-textured mesh,
+per-stage files)
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:401:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:402:ComfyUI core runs
+[TRELLIS.2](https://github.com/microsoft/TRELLIS.2) and [Pixal3D](https://github.com/TencentARC/Pixal3D) natively in
+pure PyTorch (Trellis2/Pixal3D Conditioning, Shape/Upsample/Texture stages, the TRELLIS VAE decoders and the
+3d/texturing nodes), but its loaders take Comfy-Org's merged single files. These nodes, under `🤖 CCTech/TRELLIS.2`,
+load the **per-stage** checkpoints as the owner publishes them — safetensors or GGUF (GGUF stays quantized through
+this pack's ops) — into core's own MODEL / VAE / CLIP_VISION / BACKGROUND_REMOVAL / MOGE_MODEL objects, so everything
+downstream is core. The tensors are identical; only the key prefixes differ (every file was checked key-for-key
+against core's modules). No CUDA extension wheels (flex_gemm, o_voxel, cumesh, flash-attn) are needed.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:403:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:404:| Node | What it does |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:405:|---|---|
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:419:|---|---|---|
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:420:|
+[ChrisColeTech/TRELLIS.2-4B-FP16](https://huggingface.co/ChrisColeTech/TRELLIS.2-4B-FP16) `fp16/`
+(`ss_flow_img_dit_1_3B_64`, `slat_flow_img2shape_dit_1_3B_512/1024`, `slat_flow_imgshape2tex_dit_1_3B_1024`,
+`shape_dec_next_dc_f16c32`, `tex_dec_next_dc_f16c32`), `microsoft/ckpts/ss_dec_conv3d_16l8_fp16`, `facebook/`
+(DINOv3) | `models/trellis2/` (any sub-folders) | TRELLIS.2 |
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:421:|
+[ChrisColeTech/Pixal3D](https://huggingface.co/ChrisColeTech/Pixal3D) `ckpts/` (safetensors) or
+[ChrisColeTech/Pixal3D-GGUF](https://huggingface.co/ChrisColeTech/Pixal3D-GGUF)
+`split/{Sparse,shape,texture,decoder}` | `models/pixal3d/` | Pixal3D |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:422:| either repo's
+`extras/{birefnet,dinov3-vitl16,moge-2-vitl}` | `models/pixal3d/extras/` | both (BiRefNet), Pixal3D (DINOv3, MoGe) |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:423:| `naf_release.pth`
+([valeoai/NAF](https://github.com/valeoai/NAF); torch hub caches it in `~/.cache/torch/hub/checkpoints/`) |
+`models/pixal3d/naf/` | Pixal3D Conditioning |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:424:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:425:Pixal3D needs the NAF upsampler; without it the DINOv3
+loader still works for TRELLIS.2. `tex_512` checkpoints are not offered (both pipelines run the 1024 cascade). Shape
+encoders (`*_enc_*`) are not used.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:426:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:427:`tools/smoke_trellis2.py` (real ComfyUI modules, CPU)
+checks the nodes, the two vendored stages, and every per-stage file against core's modules key by key from the
+headers alone; `--full` loads all of it for real through the nodes and runs BiRefNet, `--forward` adds a GGUF DiT
+forward.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:428:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:429:### MiniMax Music 3
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:430:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:433:| File | Folder |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:434:|---|---|
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:435:|
+`minimax_music3_text_encoder_pruned_int8_convrot.safetensors` (or a prepared GGUF) | `models/text_encoders` |
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:436:| `minimax_music3_dit_int8_convrot.safetensors` (or
+fp16/bf16/GGUF) | `models/diffusion_models` |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:437:| `minimax_music3_dav.safetensors` | `models/vae` |
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:438:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:439:The loader returns standard comfy **MODEL / CLIP /
+VAE** objects. Native ConvRot INT8 safetensors use Comfy's optimized mixed-precision path; GGUF remains packed
+through this pack's operations. Generate exposes caption, section-tagged lyrics, maximum duration (up to 360
+seconds), seed, AR CFG/top-k, Euler/simple steps and DiT CFG. Duration is an upper bound: the autoregressive model
+can end a musically complete song earlier. DAV decoding switches to tiled mode automatically for long outputs and
+returns 44.1 kHz stereo `AUDIO`.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:440:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:441:`tools/smoke_minimax_music3.py` validates the three
+real checkpoint load paths without generating a song.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:442:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:447:- OmniVoice TTS orchestration is ported from
+[Saganaki22/ComfyUI-OmniVoice-TTS](https://github.com/Saganaki22/ComfyUI-OmniVoice-TTS), Apache-2.0. Model/runtime
+licensing remains governed by [k2-fsa/OmniVoice](https://huggingface.co/k2-fsa/OmniVoice).
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:448:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:449:Fork of
+[city96/ComfyUI-GGUF](https://github.com/city96/ComfyUI-GGUF) (Apache-2.0) — the loader, the quantization tooling and
+the custom ops are theirs; the backported PRs are their authors', listed in [PR_BACKPORT.md](PR_BACKPORT.md). Report
+bugs in this fork here, not upstream.
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:450:
+> tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:451:`clipproj.py` is ported from
+[nicolab28/ComfyUI-ClipProj](https://github.com/nicolab28/ComfyUI-ClipProj) (MIT,
+[LICENSE-ClipProj](LICENSE-ClipProj)); the matrices are theirs too, on [Hugging
+Face](https://huggingface.co/NicoLab28/ClipProj-MiniMax-H3). GGUF comes from
+[llama.cpp](https://github.com/ggerganov/llama.cpp). The Scenema Audio nodes are ported from
+[ScenemaAI/ComfyUI-ScenemaAudio](https://github.com/ScenemaAI/ComfyUI-ScenemaAudio) (MIT). TripoSG (`vendor/triposg`)
+is a pure-PyTorch port of [VAST-AI-Research/TripoSG](https://github.com/VAST-AI-Research/TripoSG) (MIT), with the
+RMBG-1.4 architecture from [briaai/RMBG-1.4](https://huggingface.co/briaai/RMBG-1.4) (its weights carry Bria's own
+licence). `vendor/unirig` is [PozzettiAndrea/ComfyUI-UniRig](https://github.com/PozzettiAndrea/ComfyUI-UniRig)'s
+inference package and stays **GPL-3.0** ([its LICENSE](vendor/unirig/LICENSE)); UniRig itself is
+[VAST-AI-Research/UniRig](https://github.com/VAST-AI-Research/UniRig) (MIT). `vendor/trellis2` carries two stages
+from the owner's sidecar ports of [microsoft/TRELLIS.2](https://github.com/microsoft/TRELLIS.2) and
+[TencentARC/Pixal3D](https://github.com/TencentARC/Pixal3D) (both MIT); the networks themselves are ComfyUI core's.
+SeedVC inference is adapted from [billwuhao/ComfyUI_Seed-VC](https://github.com/billwuhao/ComfyUI_Seed-VC) and
+[Plachtaa/seed-vc](https://github.com/Plachtaa/seed-vc) (Apache-2.0).
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:452:
+  tools\ComfyUI\custom_nodes\ComfyUI-GGUF-Loader\README.md:453:Model weights stay under their own licences —
+MiniMax-H3's is a custom one, worth reading before any use.
+
+
+PS C:\Users\Zardakh>
