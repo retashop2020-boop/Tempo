@@ -1,0 +1,75 @@
+{
+  "schema_version": 4,
+  "exported_at": "2026-11-15T12:11:36.046Z",
+  "conversation_count": 1,
+  "embedded_markdown": false,
+  "capabilities": {
+    "bearer_token": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-11-15T12:10:19.755Z"
+    },
+    "conversation_api": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-11-15T12:11:36.046Z"
+    }
+  },
+  "files": [
+    {
+      "path": "2026-11-13_sans-titre.md",
+      "size": 1706560,
+      "sha256": "5d173261ae0600e8d0fe70c82d505247aae4234aded955e523f4367bb5b50dc2"
+    },
+    {
+      "path": "2026-11-13_sans-titre.html",
+      "size": 1990600,
+      "sha256": "d1e09bece0bcd99cb410c7c8bbc6b28d7018de79fcf4325aef244cc9bbb009a2"
+    },
+    {
+      "path": "branches/branch-001-da309c77.md",
+      "size": 1512518,
+      "sha256": "37258400d8f4a7043244906990172cd901e304210f5e3722681cebbf8dabf18f"
+    },
+    {
+      "path": "branches/branch-001-da309c77.html",
+      "size": 1758330,
+      "sha256": "f6b3c89eb45710391416304c40f23288b178c27237c0df9681f1c2e0f8ca607c"
+    },
+    {
+      "path": "branches/branch-002-35c83d0b.md",
+      "size": 1570814,
+      "sha256": "d393c9ce62337f797073c520f7aba07c5bb4cfaf03ef9d8c21503157b1f58d0f"
+    },
+    {
+      "path": "branches/branch-002-35c83d0b.html",
+      "size": 1824411,
+      "sha256": "b124a8201c38ec44f5399fefc392d5d3c140995d140ccd482906b7fb082a86b8"
+    },
+    {
+      "path": "branches/branch-003-3ec31615.md",
+      "size": 1600284,
+      "sha256": "8eecdb19173fdc44c63d5647ee5cce8ba6c364043aa858bff5bd05a5f6a93e59"
+    },
+    {
+      "path": "branches/branch-003-3ec31615.html",
+      "size": 1859797,
+      "sha256": "142ef43b8047f5d7bed8dfdd437b3777a6ae3ff42b950bc177be59a494ae8e7a"
+    },
+    {
+      "path": "2026-11-13_sans-titre.json",
+      "size": 18656590,
+      "sha256": "a722ff53c4319894d0ee885563f34f9b94b1547c63b99b13fad161434d1a174a"
+    },
+    {
+      "path": "2026-11-13_sans-titre.metadata.json",
+      "size": 789,
+      "sha256": "9f6fdaee56e942fa2d3a34766cb65cbd9fb467547dd34476e153f946ef3b97fa"
+    },
+    {
+      "path": "_capabilities.json",
+      "size": 236,
+      "sha256": "a2556fb042bbd5fa05e5eb1f73530642dbe7dde3f0f7d5bd86e6b0984ebf735f"
+    }
+  ]
+}
