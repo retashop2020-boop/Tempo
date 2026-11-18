@@ -1,0 +1,31 @@
+{
+  "schema_version": 2,
+  "conversation_id": "6afae7e2-49a8-83ed-868f-675ccef5bc2c",
+  "title": "ادامه طراحی ایلان 5",
+  "created_at": 1794828259.060344,
+  "updated_at": 1794957607.754875,
+  "exported_at": "2026-11-17T23:18:12.801Z",
+  "message_count": 84,
+  "branch": "current",
+  "branch_count": 2,
+  "project_id": null,
+  "project_title": null,
+  "archived": false,
+  "shared": false,
+  "share_id": null,
+  "workspace_id": "b1263d73-b449-435b-8fa8-6c023818f291",
+  "export_formats": {
+    "markdown": true,
+    "html": true,
+    "embedded_markdown": false,
+    "raw_json": true,
+    "thinking_summaries": false
+  },
+  "capability_snapshot": {
+    "bearer_token": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-11-17T23:18:09.746Z"
+    }
+  }
+}
