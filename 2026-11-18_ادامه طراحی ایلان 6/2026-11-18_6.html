@@ -1,0 +1,1987 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ادامه طراحی ایلان 6</title>
+<style>
+:root{--bg:#ffffff;--ink:#0d0d0d;--muted:#5d5d5d;--line:#e5e5e5;--chip:#f0f0f0;--chip-ink:#4a4a4a;--bubble:#e3ebf8;--bubble-ink:#0d0d0d;--link:#1f5fbf;--card:#f7f7f8;--pop:#ffffff;
+--font:ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#000000;--ink:#ececec;--muted:#afafaf;--line:#303030;--chip:#2f2f2f;--chip-ink:#cdcdcd;--bubble:#1c3b73;--bubble-ink:#ffffff;--link:#8ab4f8;--card:#171717;--pop:#2a2a2a}}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 var(--font);-webkit-font-smoothing:antialiased}
+.page{max-width:768px;margin:0 auto;padding:32px 20px 80px}
+header.conv{margin-bottom:40px}
+header.conv h1{font-size:18px;font-weight:600;line-height:1.4;margin:0}
+header.conv p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.turn{margin-bottom:40px}
+.turn-label{margin-bottom:10px;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.turn.assistant{border-left:3px solid var(--accent);padding-left:20px}
+.turn.user{display:flex;justify-content:flex-end}
+.turn.user .turn-label{align-self:flex-start;margin:10px 14px 0 0}
+.bubble{background:var(--bubble);color:var(--bubble-ink);padding:10px 20px;border-radius:24px;max-width:70%;line-height:1.6}
+.bubble .plain{white-space:pre-wrap;overflow-wrap:anywhere}
+.bubble figure{margin:6px 0}
+.bubble img{max-width:100%;border-radius:16px}
+.thought{color:var(--muted);font-size:15px;margin-bottom:12px}.thinking{border-left:3px solid var(--accent);padding-left:16px;opacity:.9}
+.body{overflow-wrap:break-word}
+.body p{margin:0 0 16px}
+.body strong{font-weight:600}
+.body h1{font-size:26px}.body h2{font-size:22px}.body h3{font-size:20px}.body h4{font-size:17px}
+.body h1,.body h2,.body h3,.body h4{font-weight:600;line-height:1.35;margin:28px 0 10px}
+.body a{color:var(--link);text-decoration:none}
+.body ul,.body ol{margin:0 0 16px;padding-left:26px}
+.body li{margin:4px 0}
+.body hr{border:0;border-top:1px solid var(--line);margin:28px 0}
+.body pre{background:var(--card);border-radius:12px;padding:14px 16px;overflow-x:auto;font-size:14px;line-height:1.55}
+.body code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.875em}
+.body :not(pre)>code{background:var(--chip);padding:2px 5px;border-radius:5px}
+.body blockquote{margin:0 0 16px;padding-left:16px;border-left:3px solid var(--line);color:var(--muted)}
+.table-wrap{overflow-x:auto;margin:4px 0 20px}
+table{border-collapse:collapse;width:100%;font-size:15px;line-height:1.7}
+th,td{padding:10px 20px 10px 0;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th:last-child,td:last-child{padding-right:0}
+th{font-weight:600}
+tbody tr:last-child td{border-bottom:0}
+th[align=right],td[align=right]{text-align:right;white-space:nowrap}
+th[align=center],td[align=center]{text-align:center}
+.cite{position:relative;display:inline-block;vertical-align:1px}
+.cite>a{display:inline-flex;align-items:center;gap:4px;font-size:12px;line-height:1;background:var(--chip);color:var(--chip-ink);padding:5px 9px;border-radius:999px;white-space:nowrap;max-width:190px;overflow:hidden;text-overflow:ellipsis}
+.cite>a:hover{filter:brightness(1.15)}
+.cite .more{opacity:.7}
+.cite .pop{display:none;position:absolute;left:0;top:100%;z-index:5;min-width:260px;max-width:360px;background:var(--pop);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.cite:hover .pop,.cite:focus-within .pop{display:block}
+.pop a{display:block;padding:6px 8px;border-radius:8px;font-size:13px;line-height:1.35;color:var(--ink)}
+.pop a:hover{background:var(--chip)}
+.pop small{display:block;color:var(--muted);font-size:11.5px}
+.gallery{display:flex;gap:4px;overflow-x:auto;margin:4px 0 20px;scrollbar-width:thin}
+.gallery a{flex:0 0 calc((100% - 8px) / 3)}
+.gallery img{display:block;width:100%;height:222px;border-radius:12px;object-fit:cover;object-position:top}
+.carousel{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;margin:8px 0 24px;padding-bottom:6px;scrollbar-width:thin}
+.product{flex:0 0 300px;scroll-snap-align:start;display:flex;flex-direction:column;color:inherit;text-decoration:none}
+.body a.product{color:inherit}
+.product img,.product .noimg{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:16px;background:var(--card);display:block;margin-bottom:10px}
+.product strong{font-size:16px;font-weight:500;line-height:1.4}
+.product .meta{color:var(--muted);font-size:15px;line-height:1.5}
+figure.asset{margin:0 0 16px}
+figure.asset img{max-width:min(100%,600px);border-radius:24px;display:block}
+.attachment{font-size:14px;color:var(--muted)}
+.filecite{font-size:12px;background:var(--chip);color:var(--chip-ink);padding:3px 7px;border-radius:999px;text-decoration:none}
+.index{list-style:none;padding:0;margin:0}
+.index li{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--line)}
+.index a{color:var(--link);text-decoration:none}
+.index span{color:var(--muted);font-size:14px;white-space:nowrap}
+footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+footer code{overflow-wrap:anywhere}
+@media (max-width:560px){.bubble{max-width:90%}.gallery a{flex-basis:45%}.gallery img{height:160px}.product{flex-basis:240px}}
+</style>
+</head>
+<body>
+<main class="page">
+<header class="conv"><h1>ادامه طراحی ایلان 6</h1></header>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">ادامه طراحی ایلان 6</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>🏹 خب، ادامه می‌دهیم: <strong>طراحی ایلان ۶</strong></p>
+<p>زمینهٔ پروژه را از گفت‌وگوهای قبلی بازیابی کردم. نقطهٔ تمرکز اخیرمان آزمایش مدل‌های محلی و انتخاب مدلی بود که بتواند واقعاً نقش توسعه‌دهندهٔ ایلان را بر عهده بگیرد.</p>
+<h3>وضعیت فعلی که از آن ادامه می‌دهیم</h3>
+<ul>
+<li><strong>Qwen 3.5 9.2B – Q4_K_M</strong> آماده و اجرا شده؛ تقریباً تمام بار پردازش روی CPU است.</li>
+<li>مدل در ابتدای آزمایش خودش را اشتباهاً Alid-AI معرفی کرده بود.</li>
+<li>قرار شد همان مصاحبهٔ ۱۰ سؤالی قبلی را با همان متن و ترتیب ادامه دهیم.</li>
+<li>هیچ راهنمایی بین سؤالات به مدل نمی‌دهیم.</li>
+<li>ارزیابی نهایی فقط پس از سؤال دهم انجام می‌شود.</li>
+<li>گزینه‌های جدی‌تر برای بررسی: Devstral Small 2 (24B) و Qwen3-Coder 30B-A3B.</li>
+<li>معماری Local-First ایلان همچنان پابرجاست؛ محلی بودن مانع دسترسی به اینترنت، تلگرام و ابزارها نیست.</li>
+</ul>
+<p>یک تفکیک مهم هم حفظ می‌کنیم:</p>
+<p><strong>Igor Model Bridge ابزار ارتباط و مصاحبهٔ مدل‌هاست، نه عامل اجرای کد ایلان.</strong></p>
+<hr>
+<p>من پیشنهاد می‌کنم دقیقاً از همان نقطه‌ای ادامه دهیم که در مصاحبهٔ Qwen 9B متوقف شدیم؛ نه اینکه دوباره معماری را از ابتدا طراحی کنیم.</p>
+<p>فقط آخرین پاسخ Qwen را بفرست تا سؤال بعدی را بدون تغییر پروتکل مطرح کنیم.</p>
+&lt;MemoryCite /&gt;</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">[https://github.com/retashop2020-boop/Tempo/blob/main/2026-11-16\_%D8%A7%D8%AF%D8%A7%D9%85%D9%87%20%D8%B7%D8%B1%D8%A7%D8%AD%DB%8C%20%D8%A7%DB%8C%D9%84%D8%A7%D9%86%205/2026-11-16_5.md](https://github.com/retashop2020-boop/Tempo/blob/main/2026-11-16_%D8%A7%D8%AF%D8%A7%D9%85%D9%87%20%D8%B7%D8%B1%D8%A7%D8%AD%DB%8C%20%D8%A7%DB%8C%D9%84%D8%A7%D9%86%205/2026-11-16_5.md)</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>این لینک را به‌عنوان مرجع اصلی ادامهٔ «طراحی ایلان ۶» در نظر می‌گیرم.</p>
+<p>اما در حال حاضر دریافت محتوای فایل از GitHub با خطای دسترسی مواجه شد؛ نمی‌خواهم وانمود کنم آن را خوانده‌ام.</p>
+<p>لطفاً فایل <code>2026-11-16_5.md</code> را همین‌جا بارگذاری کن.</p>
+<p>می‌خواهم آن را از ابتدا تا انتها مرور کنم و ادامه را دقیقاً از آخرین وضعیت واقعی پروژه پیش ببریم؛ نه بر اساس حدس و خلاصه‌های ناقص گفت‌وگوهای قبلی.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">باید تکه تکه بخونی</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>درست می‌گویی. قرار نیست فایل ۲۴۰ هزار کاراکتری را یک‌جا بخوانیم یا صرفاً خلاصه‌اش کنیم.</p>
+<p>روش کارمان این خواهد بود:</p>
+<ol>
+<li>فایل را به ترتیب و بخش‌بخش می‌خوانم.</li>
+<li>هر بخش را با بخش‌های قبلی تطبیق می‌دهم.</li>
+<li>تصمیم‌ها، تغییر مسیرها، آزمایش‌ها و مسائل حل‌نشده را دنبال می‌کنم.</li>
+<li>اگر تناقض یا تغییر معماری پیدا کنم، آن را نادیده نمی‌گیرم.</li>
+<li>پس از رسیدن به انتهای فایل، ادامهٔ طراحی را از همان نقطه پیش می‌بریم.</li>
+</ol>
+<p>فقط یک مانع فنی داریم: اتصال GitHub فعلاً فایل را تحویل نمی‌دهد. اگر فایل را اینجا پیوست کنی، از ابتدای آن شروع می‌کنم و هر بار یک قطعهٔ پیوسته را می‌خوانم و بعد سراغ قطعهٔ بعدی می‌روم.</p>
+<p><strong>تا پایان فایل جلو می‌رویم؛ نه انتخابی، نه پرش از بخش‌ها.</strong></p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">بیشتر تمرکزت بزار انتهای فایل تا ادامه کار باهم بریم</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>حتماً. پس اولویت خواندن را تغییر می‌دهیم:</p>
+<ul>
+<li>بخش‌های ابتدایی و میانی: برای فهم پیوستگی تصمیم‌ها و معماری.</li>
+<li>بخش‌های پایانی: با دقت و تمرکز بیشتر، تقریباً خط‌به‌خط.</li>
+<li>آخرین تصمیم‌ها، آزمایش‌های انجام‌شده، مشکلات باز و کاری که قرار بود بعدش انجام دهیم: اولویت اصلی.</li>
+</ul>
+<p>نمی‌خواهم بعد از خواندن فایل دوباره از تو بپرسم «حالا چه کار کنیم؟». هدف این است که خودم بفهمم دقیقاً کجا ایستاده‌ایم و بتوانیم همان‌جا ادامه بدهیم.</p>
+<p>فایل را بارگذاری کن؛ از ابتدا حرکت می‌کنیم، اما مقصد اصلی‌مان انتهای فایل است. 🏹</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain"># Selected text:
+
+## Selection 1
+نمی‌خواهم بعد از خواندن فایل دوباره از تو بپرسم «حالا چه کار کنیم؟». هدف این است که خودم بفهمم دقیقاً کجا ایستاده‌ایم و بتوانیم همان‌جا ادامه بدهیم.
+
+## My request:
+[https://github.com/retashop2020-boop/Tempo/blob/main/2026-11-16\_%D8%A7%D8%AF%D8%A7%D9%85%D9%87%20%D8%B7%D8%B1%D8%A7%D8%AD%DB%8C%20%D8%A7%DB%8C%D9%84%D8%A7%D9%86%205/2026-11-16_5.md](https://github.com/retashop2020-boop/Tempo/blob/main/2026-11-16_%D8%A7%D8%AF%D8%A7%D9%85%D9%87%20%D8%B7%D8%B1%D8%A7%D8%AD%DB%8C%20%D8%A7%DB%8C%D9%84%D8%A7%D9%86%205/2026-11-16_5.md)      آره خودت ببین چکارا کردیم</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>فایل را پیدا کردم و این بار واقعاً محتوایش را دریافت کردم: <strong>۱۰۶۹ خط و حدود ۹۸٫۵ هزار کاراکتر</strong>. لازم نیست دوباره چیزی بفرستی.</p>
+<p>از انتهای فایل شروع کردم؛ همان‌طور که خواسته بودی، تمرکز اصلی را روی آخرین مراحل گذاشتم. وضعیت فعلی را می‌توانم این‌طور تثبیت کنم:</p>
+<p><strong>ما در مرحلهٔ بررسی سازگاری <code>tgnet</code> با Telethon 1.46 هستیم؛ هنوز Adapter را ننوشته‌ایم و اتصال واقعی MTProto هم آزمایش نشده است.</strong></p>
+<p>چند موضوع با خروجی واقعی ترمینال روشن شده‌اند:</p>
+<ul>
+<li>کلاس <code>TgNetConnectionTls</code> از <code>ObfuscatedConnection</code> ارث می‌برد.</li>
+<li>سازندهٔ <code>TelegramClient</code> پارامتر <code>connection</code> را می‌پذیرد.</li>
+<li>Telethon هنگام ساخت اتصال، <code>ip</code>، <code>port</code>، <code>dc_id</code>، <code>loggers</code>، <code>proxy</code> و <code>local_addr</code> را به کلاس اتصال می‌دهد.</li>
+<li>اما در همان فراخوانی، <code>secret</code> را نمی‌فرستد؛ درحالی‌که سازندهٔ <code>TgNetConnection</code> آن را جداگانه دریافت می‌کند.</li>
+</ul>
+<p>پس مسئلهٔ باز، صرفاً «چطور کلاس اتصال را به Telethon معرفی کنیم» نیست؛ مسئله این است که <strong>چطور مقصد TCP و secret پراکسی را به کلاس اتصال سفارشی تزریق کنیم، بدون اینکه <code>dc_id</code> واقعی تلگرام از بین برود.</strong></p>
+<p>آخرین اقدام ثبت‌شده در فایل هم اجرای یک دستور برای بررسی <code>TelegramBaseClient.__init__</code> است؛ خروجی آن در فایل وجود ندارد. بنابراین هنوز نباید فرض کنیم این بررسی نهایی انجام شده است.</p>
+<p>یک نکتهٔ مهم دیگر هم از مرور بخش‌های قبلی روشن شد: در میانهٔ کار، من چند بار مسئله را اشتباه صورت‌بندی کرده‌ام. تو از ابتدا می‌خواستی <strong>همان دو بات، همان Bot Tokenها، همان Bot API و همان رسیور</strong> حفظ شوند و فقط مسیر ارتباطی از کامپیوتر به تلگرام از یک پراکسی عبور کند.</p>
+<p>بعد از روشن‌شدن اینکه حدود ۹۰٪ سرورهای در دسترس <code>ee</code> هستند، مسیر بررسی به <code>tgnet</code> و FakeTLS رسیده است. اما اینجا باید یک مرز فنی را محکم نگه داریم: <code>tgnet</code> یک انتقال‌دهندهٔ MTProto/FakeTLS است، نه تونل عمومی HTTPS. بنابراین موفقیت اتصال Telethon با آن، به‌خودی‌خود ثابت نمی‌کند درخواست‌های فعلی <code>urllib</code> به Bot API هم از همان مسیر عبور می‌کنند.</p>
+<p>این دو هدف را نباید یکی حساب کنیم؛ وگرنه ممکن است یک تست موفق بگیریم، ولی مسئلهٔ اصلی تو حل نشده باشد.</p>
+<h2>نقشهٔ وضعیت فعلی</h2>
+<h3>۱. کارهای انجام‌شده</h3>
+<p>&lt;badge color=&quot;success&quot;&gt;انجام‌شده&lt;/badge&gt;</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>مورد</th>
+<th>وضعیت ثبت‌شده</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ساخت محیط مستقل <code>mtproxy-test</code></td>
+<td>موفق</td>
+</tr>
+<tr>
+<td>نصب Telethon</td>
+<td>نسخهٔ <code>1.46.0</code></td>
+</tr>
+<tr>
+<td>نصب <code>tgnet</code></td>
+<td>نسخهٔ <code>0.1.0</code></td>
+</tr>
+<tr>
+<td>شناسایی کلاس <code>TgNetConnectionTls</code></td>
+<td>موفق</td>
+</tr>
+<tr>
+<td>بررسی ساختار FakeTLS و handshake</td>
+<td>سورس بررسی شده</td>
+</tr>
+<tr>
+<td>بررسی تجزیهٔ لینک پراکسی</td>
+<td><code>parse_proxy_link</code> بررسی شده</td>
+</tr>
+<tr>
+<td>بررسی امضای سازندهٔ Telethon</td>
+<td>انجام شده</td>
+</tr>
+<tr>
+<td>بررسی نحوهٔ ساخت اتصال در سورس Telethon</td>
+<td>بخشی از مسیر پیدا شده</td>
+</tr>
+</tbody></table></div>
+<p>نکتهٔ مهم: نصب <code>tgnet</code> روی commit مشخصی انجام شده:</p>
+<p><code>4f3ebe77c65fcb77afa5404926b13e38f5c4f43e</code></p>
+<p>پس اگر بعداً نسخهٔ کتابخانه تغییر کند، باید حواسمان به تفاوت کدها باشد.</p>
+<h3>۲. تصمیم‌هایی که گرفته‌ایم</h3>
+<p>این‌ها را به‌عنوان محدودیت‌های طراحی حفظ می‌کنم:</p>
+<ul>
+<li>دو بات فعلی باقی می‌مانند؛ بات جدیدی نمی‌سازیم.</li>
+<li>Bot Tokenهای فعلی تغییر نمی‌کنند.</li>
+<li>مشخصات پراکسی از فایل <code>telegram_proxy.env</code> خوانده می‌شوند.</li>
+<li>قالب فایل دقیقاً چهار متغیر توافق‌شده را دارد.</li>
+<li>محیط آزمایش از رسیور اصلی جدا می‌ماند.</li>
+<li>تا وقتی آزمایش مستقل موفق نشده، به <code>telegram_receiver.py</code> دست نمی‌زنیم.</li>
+<li>هدف آزمایش اول، اتصال و احراز هویت بات است؛ نه ارسال پیام به گروه.</li>
+</ul>
+<h3>۳. مسئلهٔ فنی حل‌نشده</h3>
+<p>اینجا مهم‌ترین بخش ماجراست.</p>
+<p>ما دو مسیر متفاوت را در طول گفتگو بررسی کرده‌ایم:</p>
+&lt;box border radius=&quot;lg&quot; padding={3} gap={2}&gt;
+  **مسیر فعلی رسیور**
+  &lt;box background=&quot;surface-secondary&quot; padding={2} radius=&quot;md&quot; align=&quot;center&quot;&gt;
+    `urllib`
+  &lt;/box&gt;
+  &lt;box align=&quot;center&quot;&gt;
+    &lt;icon name=&quot;arrow-down&quot; /&gt;
+  &lt;/box&gt;
+  &lt;box background=&quot;surface-secondary&quot; padding={2} radius=&quot;md&quot; align=&quot;center&quot;&gt;
+    HTTPS / Telegram Bot API
+  &lt;/box&gt;
+  &lt;box align=&quot;center&quot;&gt;
+    &lt;icon name=&quot;arrow-down&quot; /&gt;
+  &lt;/box&gt;
+  &lt;box background=&quot;surface-secondary&quot; padding={2} radius=&quot;md&quot; align=&quot;center&quot;&gt;
+    تلگرام
+  &lt;/box&gt;
+  &lt;divider color=&quot;subtle&quot; /&gt;
+  **مسیر آزمایشی جدید**
+  &lt;box background=&quot;surface-secondary&quot; padding={2} radius=&quot;md&quot; align=&quot;center&quot;&gt;
+    Telethon
+  &lt;/box&gt;
+  &lt;box align=&quot;center&quot;&gt;
+    &lt;icon name=&quot;arrow-down&quot; /&gt;
+  &lt;/box&gt;
+  &lt;box background=&quot;surface-secondary&quot; padding={2} radius=&quot;md&quot; align=&quot;center&quot;&gt;
+    `tgnet` / FakeTLS (`ee`)
+  &lt;/box&gt;
+  &lt;box align=&quot;center&quot;&gt;
+    &lt;icon name=&quot;arrow-down&quot; /&gt;
+  &lt;/box&gt;
+  &lt;box background=&quot;surface-secondary&quot; padding={2} radius=&quot;md&quot; align=&quot;center&quot;&gt;
+    سرور MTProto
+  &lt;/box&gt;
+&lt;/box&gt;
+
+<p>این دو مسیر یکسان نیستند. MTProto Proxy یک تونل عمومی برای درخواست‌های HTTPS نیست. بنابراین راه‌اندازی موفق مسیر دوم، به‌تنهایی مشکل مسیر اول را حل نمی‌کند.</p>
+<p>اگر بخواهیم حتماً Bot API و <code>urllib</code> را نگه داریم، به یک راهکار واقعی برای واسطه‌گری Bot API نیاز داریم؛ نه صرفاً یک تنظیم پراکسی.</p>
+<p>اگر از مسیر Telethon برویم، ارسال و دریافت تلگرام باید به MTProto منتقل شود. این کار شدنی به نظر می‌رسد، اما تغییر لایهٔ ارتباطی رسیور خواهد بود.</p>
+<p><strong>هنوز دربارهٔ این انتخاب تصمیم نهایی نگرفته‌ایم.</strong></p>
+<h3>۴. دقیقاً کجا متوقف شده‌ایم؟</h3>
+<p>آخرین خروجی واقعی ترمینال در فایل نشان می‌دهد:</p>
+<ul>
+<li><code>TgNetConnectionTls</code> پارامتر <code>secret</code> را جداگانه می‌خواهد.</li>
+<li>Telethon هنگام ساخت اتصال، <code>ip</code>، <code>port</code>، <code>dc_id</code> و <code>loggers</code> را می‌فرستد.</li>
+<li><code>secret</code> در آن فراخوانی وجود ندارد.</li>
+<li>پس Adapter باید اطلاعات پراکسی را به کلاس اتصال تزریق کند.</li>
+<li>همچنین باید مقصد TCP را به سرور MTProxy تغییر دهد، اما <code>dc_id</code> واقعی تلگرام را حفظ کند.</li>
+</ul>
+<p>آخرین دستور درخواست‌شده در فایل، این است:</p>
+<pre><code class="language-powershell">python -c &quot;import inspect; from telethon.client.telegrambaseclient import TelegramBaseClient; s=inspect.getsource(TelegramBaseClient.__init__); lines=s.splitlines; [(print(f&#39;{i+1}: {line}&#39;)) for i,line in enumerate(lines) if &#39;_connection&#39; in line or &#39;connection&#39; in line]&quot;
+</code></pre>
+<p>&lt;badge color=&quot;warning&quot;&gt;خروجی این دستور در فایل ثبت نشده&lt;/badge&gt;</p>
+<h2>قدم بعدی من</h2>
+<p>همین بررسی را ادامه می‌دهیم؛ نه اینکه از اول نصب کنیم یا دوباره سراغ انتخاب کتابخانه برویم.</p>
+<p>این خروجی باید مشخص کند Telethon کلاس اتصال را کجا نگه می‌دارد و آیا می‌توانیم با یک Adapter سفارشی، بدون دست‌کاری کتابخانه‌ها، <code>secret</code> و مقصد پراکسی را تزریق کنیم.</p>
+<p>بعد از آن باید Adapter را با تست‌های مستقل بررسی کنیم؛ پیش از هر اتصال واقعی.</p>
+<hr>
+<h3>یک یادداشت دربارهٔ مصاحبهٔ Qwen</h3>
+<p>در بخش قبلی سند، سؤال‌های اول و دوم مصاحبه ارزیابی شده‌اند:</p>
+<ul>
+<li>سؤال اول: <code>7/10</code></li>
+<li>سؤال دوم: <code>5.5/10</code></li>
+<li>سؤال سوم با شناسهٔ پیام <code>200</code> ارسال شده و مصاحبه در همین نقطه متوقف شده است.</li>
+</ul>
+<p>این موضوع را هم از دست نمی‌دهیم، ولی آخرین کار فعال در انتهای سند، آزمایش پراکسی FakeTLS است.</p>
+<p><strong>پس نقطهٔ شروع ادامهٔ ما مشخص است: بررسی خروجی آخرین دستور، سپس طراحی Adapter برای <code>tgnet</code> و Telethon.</strong> 🏹</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">می خوای چندتا خروجی آخر پاورشل برات بفرستم؟</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>آره، اتفاقاً الان بهترین کار همینه. 😁</p>
+<p>چند خروجی آخر پاورشل رو به‌ترتیب بفرست؛ مخصوصاً خروجی دستور بررسی <code>TelegramBaseClient.__init__</code> که آخر فایل بهش رسیده بودیم.</p>
+<p>اگر چند دستور اجرا کردی، دستور و خروجی هرکدوم رو با هم بفرست تا ترتیب و ارتباطشون حفظ بشه.</p>
+<p>من از روی خروجی‌ها ادامه می‌دم؛ نه نصب مجدد می‌خوایم، نه برگشت به نقطهٔ شروع.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">توی 2 تا پرامپ برات میفرستم</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>باشه، هر دو بخش رو بفرست. فعلاً تا رسیدن بخش دوم تحلیل نهایی نمی‌کنم که چیزی از قلم نیفته. 😁</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import inspect; from tgnet.connection.faketls.mtproxy_link import parse_proxy_link; print(inspect.signature(parse_proxy_link)); print(inspect.getsource(parse_proxy_link))&quot;
+(link: str) -&gt; dict
+def parse_proxy_link(link: str) -&gt; dict:
+    &quot;&quot;&quot;
+    Parse a `https://t.me/proxy?...` or `tg://proxy?...` MTProxy link.
+
+    Not from tgnet -- the Android client receives these through an intent
+    handler in the Java layer, which hands the parsed fields down to
+    ConnectionsManager::setProxySettings. Included here so tests and callers
+    can use the same link format users copy from Telegram.
+
+    Returns:
+        {&#39;server&#39;: str, &#39;port&#39;: int, &#39;secret&#39;: bytes}
+    &quot;&quot;&quot;
+    try:
+        parsed = urllib.parse.urlparse(link)
+        params = urllib.parse.parse_qs(parsed.query)
+
+        server = params[&quot;server&quot;][0]
+        port = int(params[&quot;port&quot;][0])
+        raw = params[&quot;secret&quot;][0]
+    except (KeyError, IndexError, ValueError) as e:
+        raise ValueError(f&quot;Invalid MTProxy link format: {link!r}&quot;) from e
+
+    # Telegram accepts hex or base64url for the secret field
+    try:
+        secret = bytes.fromhex(raw)
+    except ValueError:
+        try:
+            secret = base64.urlsafe_b64decode(raw + &quot;=&quot; * (-len(raw) % 4))
+        except Exception as e:
+            raise ValueError(f&quot;Invalid secret encoding in proxy link: {raw!r}&quot;) from e
+
+    return {&quot;server&quot;: server, &quot;port&quot;: port, &quot;secret&quot;: secret}
+
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;from tgnet.connection.faketls import TgNetConnectionTls; from telethon import TelegramClient; import inspect; print(&#39;Telethon:&#39;, inspect.signature(TelegramClient)); print(&#39;Connection MRO:&#39;, TgNetConnectionTls.__mro__)&quot;
+Telethon: (session: &#39;typing.Union[str, pathlib.Path, Session]&#39;, api_id: int, api_hash: str, *, connection: &#39;typing.Type[Connection]&#39; = &lt;class &#39;telethon.network.connection.tcpfull.ConnectionTcpFull&#39;&gt;, use_ipv6: bool = False, proxy: tuple | dict = None, local_addr: str | tuple = None, timeout: int = 10, request_retries: int = 5, connection_retries: int = 5, retry_delay: int = 1, auto_reconnect: bool = True, sequential_updates: bool = False, flood_sleep_threshold: int = 60, raise_last_call_error: bool = False, device_model: str = None, system_version: str = None, app_version: str = None, lang_code: str = &#39;en&#39;, system_lang_code: str = &#39;en&#39;, loop: asyncio.events.AbstractEventLoop = None, base_logger: str | logging.Logger = None, receive_updates: bool = True, catch_up: bool = False, entity_cache_limit: int = 5000)
+Connection MRO: (&lt;class &#39;tgnet.connection.faketls.TgNetConnectionTls&#39;&gt;, &lt;class &#39;tgnet.connection.TgNetConnection&#39;&gt;, &lt;class &#39;telethon.network.connection.connection.ObfuscatedConnection&#39;&gt;, &lt;class &#39;telethon.network.connection.connection.Connection&#39;&gt;, &lt;class &#39;abc.ABC&#39;&gt;, &lt;class &#39;object&#39;&gt;)
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import inspect; from telethon.client.telegrambaseclient import TelegramBaseClient; print(inspect.getsource(TelegramBaseClient._create_connection))&quot;
+Traceback (most recent call last):
+  File &quot;&lt;string&gt;&quot;, line 1, in &lt;module&gt;
+    import inspect; from telethon.client.telegrambaseclient import TelegramBaseClient; print(inspect.getsource(TelegramBaseClient._create_connection))
+                                                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object &#39;TelegramBaseClient&#39; has no attribute &#39;_create_connection&#39;
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import telethon, pathlib; p=pathlib.Path(telethon.__file__).parent; print(&#39;Telethon source:&#39;,p); [(print(&#39;\n---&#39;,f,&#39;---&#39;),print(&#39;\n&#39;.join(f.read_text(encoding=&#39;utf-8&#39;).splitlines()[max(0,i-5):i+10]))) for f in p.rglob(&#39;*.py&#39;) for i,line in enumerate(f.read_text(encoding=&#39;utf-8&#39;).splitlines()) if &#39;self._connection(&#39; in line or &#39;connection=connection&#39; in line]&quot;
+Telethon source: C:\Users\Zardakh\mtproxy-test\.venv\Lib\site-packages\telethon
+
+--- C:\Users\Zardakh\mtproxy-test\.venv\Lib\site-packages\telethon\client\telegrambaseclient.py ---
+                    DEFAULT_PORT
+                )
+            )
+            await utils.maybe_async(self.session.save())
+
+        if not await self._sender.connect(self._connection(
+            self.session.server_address,
+            self.session.port,
+            self.session.dc_id,
+            loggers=self._log,
+            proxy=self._proxy,
+            local_addr=self._local_addr
+        )):
+            # We don&#39;t want to init or modify anything if we were already connected
+            return
+
+--- C:\Users\Zardakh\mtproxy-test\.venv\Lib\site-packages\telethon\client\telegrambaseclient.py ---
+        # Can&#39;t reuse self._sender._connection as it has its own seqno.
+        #
+        # If one were to do that, Telegram would reset the connection
+        # with no further clues.
+        sender = MTProtoSender(None, loggers=self._log)
+        await sender.connect(self._connection(
+            dc.ip_address,
+            dc.port,
+            dc.id,
+            loggers=self._log,
+            proxy=self._proxy,
+            local_addr=self._local_addr
+        ))
+        self._log[__name__].info(&#39;Exporting auth for new borrowed sender in %s&#39;, dc)
+        auth = await self(functions.auth.ExportAuthorizationRequest(dc_id))
+
+--- C:\Users\Zardakh\mtproxy-test\.venv\Lib\site-packages\telethon\client\telegrambaseclient.py ---
+                sender.dc_id = dc_id
+                self._borrowed_senders[dc_id] = (state, sender)
+
+            elif state.need_connect():
+                dc = await self._get_dc(dc_id)
+                await sender.connect(self._connection(
+                    dc.ip_address,
+                    dc.port,
+                    dc.id,
+                    loggers=self._log,
+                    proxy=self._proxy,
+                    local_addr=self._local_addr
+                ))
+
+            state.add_borrow()
+
+--- C:\Users\Zardakh\mtproxy-test\.venv\Lib\site-packages\telethon\client\telegrambaseclient.py ---
+            timeout=self._timeout,
+            loop=self.loop
+        )
+
+        session.auth_key = self._sender.auth_key
+        await client._sender.connect(self._connection(
+            session.server_address,
+            session.port,
+            session.dc_id,
+            loggers=self._log,
+            proxy=self._proxy,
+            local_addr=self._local_addr
+        ))
+        return client
+
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import inspect; from telethon.client.telegrambaseclient import TelegramBaseClient; print(inspect.getsource(TelegramBaseClient._connection))&quot;
+Traceback (most recent call last):
+  File &quot;&lt;string&gt;&quot;, line 1, in &lt;module&gt;
+    import inspect; from telethon.client.telegrambaseclient import TelegramBaseClient; print(inspect.getsource(TelegramBaseClient._connection))
+                                                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object &#39;TelegramBaseClient&#39; has no attribute &#39;_connection&#39;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>بخش اول رسید. 👍</p>
+<p>چند نکتهٔ مهم در آن هست، از جمله اینکه <code>_create_connection</code> و <code>_connection</code> متدهای کلاس نیستند و فراخوانی اتصال مستقیماً از <code>self._connection(...)</code> انجام می‌شود؛ اما فعلاً نتیجه‌گیری نمی‌کنم تا بخش دوم را هم کنار این یکی بررسی کنم.</p>
+<p>بفرست.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import inspect; from tgnet.connection import TgNetConnection; print(inspect.getsource(TgNetConnection.__init__))&quot;
+    def __init__(
+        self,
+        ip,
+        port,
+        dc_id,
+        *,
+        loggers,
+        proxy=None,
+        local_addr=None,
+        secret=b&quot;&quot;,
+        is_media=False,
+        test_backend=False,
+        debug_buffers=False,
+    ):
+        super().__init__(
+            ip, port, dc_id, loggers=loggers, proxy=proxy, local_addr=local_addr
+        )
+        # MTProxy / connection secret (Connection.cpp:448-472)
+        self._tgnet_secret = secret
+        # Media connections negate the DC ID in the header
+        # (Connection.cpp:538-542)
+        self._tgnet_is_media = is_media
+        # Test backend offsets DC IDs by 10000 (Connection.cpp:546)
+        self._tgnet_test_backend = test_backend
+        self._tgnet_debug_buffers = debug_buffers
+        # Quick-ack IDs seen on this connection (Connection.cpp:167,208)
+        self._tgnet_quick_acks = []
+
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>خوب، حالا هر دو بخش را داریم. یک نکتهٔ فنی مهم روشن شد: <strong>مشکل اصلی در سازگارکردن امضای سازندهٔ اتصال است، نه در تجزیهٔ لینک MTProxy.</strong></p>
+<p>از خروجی‌ها می‌دانیم:</p>
+<ol>
+<li><code>parse_proxy_link</code> لینک را به <code>server</code>، <code>port</code> و <code>secret</code> تبدیل می‌کند. پس برای خواندن تنظیمات پراکسی، ابزار آماده داریم.</li>
+<li><code>TelegramClient</code> پارامتر <code>connection</code> را می‌پذیرد؛ بنابراین می‌توانیم کلاس اتصال سفارشی معرفی کنیم.</li>
+<li>Telethon هنگام ساخت اتصال، آدرس سرور و پورت دیتاسنتر تلگرام را به کلاس می‌دهد و <code>secret</code> را نمی‌فرستد.</li>
+<li>سازندهٔ <code>TgNetConnection</code> پارامتر <code>secret</code> را دارد، اما آن را اختیاری با مقدار پیش‌فرض خالی تعریف کرده است. اگر همین کلاس را بدون واسطه به Telethon بدهیم، اتصال با secret خالی ساخته می‌شود؛ یعنی چیزی که می‌خواهیم نیست.</li>
+</ol>
+<p>پس مسیر Adapter همچنان منطقی است؛ ولی یک ظرافت مهم دارد: باید مقصد اتصال را به سرور MTProxy تغییر دهیم، secret را تزریق کنیم و در عین حال شناسهٔ دیتاسنتر تلگرام را خراب نکنیم.</p>
+<p>اما هنوز Adapter را نمی‌نویسیم. قبلش باید دو قطعه از سورس را ببینیم تا راه‌حل بر اساس رفتار واقعی کتابخانه باشد، نه حدس.</p>
+<p><strong>قدم بعدی: این دو دستور را در همان محیط <code>mtproxy-test</code> اجرا کن.</strong></p>
+<p><strong>۱. ببینیم Telethon کلاس اتصال را چطور ذخیره می‌کند:</strong></p>
+<pre><code class="language-powershell">python -c &quot;import inspect; from telethon.client.telegrambaseclient import TelegramBaseClient; s=inspect.getsource(TelegramBaseClient.__init__).splitlines; [(print(f&#39;{i+1}: {s[i]}&#39;)) for i in range(len(s)) if &#39;_connection&#39; in s[i]]&quot;
+</code></pre>
+<p><strong>۲. ببینیم کلاس FakeTLS دقیقاً چطور ساخته می‌شود و چه پارامترهایی می‌گیرد:</strong></p>
+<pre><code class="language-powershell">python -c &quot;import inspect; from tgnet.connection.faketls import TgNetConnectionTls; print(&#39;SIGNATURE:&#39;,inspect.signature(TgNetConnectionTls)); print(&#39;INIT:&#39;); print(inspect.getsource(TgNetConnectionTls.__init__)); print(&#39;CONNECT METHODS:&#39;); [(print(&#39;\n---&#39;,n,&#39;---&#39;),print(inspect.getsource(getattr(TgNetConnectionTls,n)))) for n in [&#39;connect&#39;,&#39;_connect&#39;,&#39;_connect_via_proxy&#39;] if hasattr(TgNetConnectionTls,n)]&quot;
+</code></pre>
+<p>بعد از این دو خروجی می‌توانیم Adapter را با حداقل تغییر طراحی کنیم.</p>
+<p>فعلاً به <code>telegram_receiver.py</code> دست نمی‌زنیم. آزمایش مستقل باقی می‌ماند؛ توکن‌ها و دو بات هم دست‌نخورده می‌مانند.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import inspect; from telethon.client.telegrambaseclient import TelegramBaseClient; s=inspect.getsource(TelegramBaseClient.__init__).splitlines(); [(print(f&#39;{i+1}: {s[i]}&#39;)) for i in range(len(s)) if &#39;_connection&#39; in s[i]]&quot;
+98:         self._connection_retries = connection_retries
+109:         self._connection = connection
+195:             retries=self._connection_retries,
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import inspect; from tgnet.connection.faketls import TgNetConnectionTls; print(&#39;SIGNATURE:&#39;,inspect.signature(TgNetConnectionTls)); print(&#39;INIT:&#39;); print(inspect.getsource(TgNetConnectionTls.__init__)); print(&#39;CONNECT METHODS:&#39;); [(print(&#39;\n---&#39;,n,&#39;---&#39;),print(inspect.getsource(getattr(TgNetConnectionTls,n)))) for n in [&#39;connect&#39;,&#39;_connect&#39;,&#39;_connect_via_proxy&#39;] if hasattr(TgNetConnectionTls,n)]&quot;
+SIGNATURE: (ip, port, dc_id, *, loggers, proxy=None, local_addr=None, secret=b&#39;&#39;, is_media=False, test_backend=False, debug_buffers=False)
+INIT:
+    def __init__(
+        self,
+        ip,
+        port,
+        dc_id,
+        *,
+        loggers,
+        proxy=None,
+        local_addr=None,
+        secret=b&quot;&quot;,
+        is_media=False,
+        test_backend=False,
+        debug_buffers=False,
+    ):
+        super().__init__(
+            ip,
+            port,
+            dc_id,
+            loggers=loggers,
+            proxy=proxy,
+            local_addr=local_addr,
+            secret=secret,
+            is_media=is_media,
+            test_backend=test_backend,
+            debug_buffers=debug_buffers,
+        )
+
+        # ConnectionSocket.cpp:593-597 -- fail fast on a secret that would
+        # leave tgnet in proxyAuthState 0, silently falling back to a
+        # non-TLS transport the proxy will not accept
+        self._tls_key, self._tls_domain = parse_tls_secret(secret)
+
+        # Set while the parent&#39;s _connect() runs, so _init_conn() knows to
+        # defer the obfuscated header until the tunnel exists
+        self._tls_pending = False
+        self._tls_records = None
+        self._tls_client_hello = None
+
+CONNECT METHODS:
+
+--- connect ---
+    async def connect(self, timeout=None, ssl=None):
+        &quot;&quot;&quot;
+        Establishes a connection with the server.
+        &quot;&quot;&quot;
+        await self._connect(timeout=timeout, ssl=ssl)
+        self._connected = True
+
+        loop = helpers.get_running_loop()
+        self._send_task = loop.create_task(self._send_loop())
+        self._recv_task = loop.create_task(self._recv_loop())
+
+
+--- _connect ---
+    async def _connect(self, timeout=None, ssl=None):
+        &quot;&quot;&quot;
+        Connect, then run the fake-TLS handshake before anything MTProto.
+
+        Telethon&#39;s Connection._connect (connection.py:207-244) opens the
+        socket, builds the codec, calls _init_conn() and drains -- all in one
+        method, with no hook between &quot;socket is up&quot; and &quot;send the first
+        bytes&quot;. tgnet needs one there, because the ClientHello has to go out
+        and be answered first.
+
+        Rather than duplicate the parent&#39;s proxy and local_addr handling, we
+        let it run with _init_conn() suppressed by `_tls_pending`, then do the
+        handshake, install the record layer, and finally run the real
+        _init_conn().
+        &quot;&quot;&quot;
+        self._tls_pending = True
+        try:
+            # Opens the socket and applies TCP_NODELAY
+            # (TgNetConnection._connect), and calls a no-op _init_conn()
+            await super()._connect(timeout=timeout, ssl=None)
+
+            # ConnectionSocket.cpp:919-941 -- proxyAuthState 10 -&gt; 11
+            self._tls_client_hello = build_client_hello(self._tls_key, self._tls_domain)
+            self._writer.write(self._tls_client_hello)
+            await self._writer.drain()
+
+            # ConnectionSocket.cpp:715-782 -- proxyAuthState 11 -&gt; 0,
+            # tlsState 0 -&gt; 1
+            await read_server_hello(self._reader, self._tls_key, self._tls_client_hello)
+
+            # ConnectionSocket.cpp:1013-1044 -- from here on, everything is
+            # wrapped in ApplicationData records. Swapping both reader and
+            # writer means TgNetObfuscatedIO layers on top without changes.
+            self._tls_records = TlsRecordLayer(self._reader, self._writer)
+            self._reader = self._tls_records
+            self._writer = self._tls_records
+        finally:
+            self._tls_pending = False
+
+        # Now the deferred work: obfuscated header inside the first record
+        self._init_conn()
+        await self._writer.drain()
+
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>عالی. این دو خروجی یک ابهام مهم را برطرف کردند و حالا تصویر معماری اتصال خیلی روشن‌تر است.</p>
+<p><strong>نتیجهٔ اول:</strong> در Telethon، خط ۱۰۹ نشان می‌دهد که کلاس اتصال مستقیماً در <code>self._connection</code> ذخیره می‌شود. پس لازم نیست دنبال متد مخفی یا factory جداگانه‌ای بگردیم. Telethon همان کلاسی را که به پارامتر <code>connection</code> داده‌ایم، هنگام اتصال فراخوانی می‌کند.</p>
+<p><strong>نتیجهٔ دوم:</strong> <code>TgNetConnectionTls</code> خودش FakeTLS handshake را مدیریت می‌کند:</p>
+<ul>
+<li>ابتدا سوکت TCP را باز می‌کند.</li>
+<li>ClientHello را می‌فرستد.</li>
+<li>پاسخ سرور را اعتبارسنجی می‌کند.</li>
+<li>لایهٔ TLS record را نصب می‌کند.</li>
+<li>سپس سربرگ رمزگذاری‌شدهٔ MTProto را می‌فرستد.</li>
+</ul>
+<p>بنابراین نباید منطق handshake را دوباره پیاده‌سازی کنیم یا در آن دست ببریم. Adapter باید فقط پارامترهای درست را به این کلاس برساند.</p>
+<p><strong>اما هنوز یک سؤال حیاتی باقی است:</strong> آیا <code>TgNetConnection</code> آدرس و پورت ورودی را مستقیماً به‌عنوان مقصد TCP استفاده می‌کند؟ اگر بله، Adapter ساده خواهد بود؛ اگر نه، باید مسیر دیگری را بررسی کنیم.</p>
+<p>این سه دستور را اجرا کن:</p>
+<pre><code class="language-powershell">python -c &quot;import inspect; from tgnet.connection import TgNetConnection; print(&#39;INIT:&#39;); print(inspect.getsource(TgNetConnection.__init__)); print(&#39;CONNECT:&#39;); print(inspect.getsource(TgNetConnection._connect))&quot;
+</code></pre>
+<pre><code class="language-powershell">python -c &quot;import inspect; from telethon.network.connection.connection import Connection; print(&#39;INIT:&#39;); print(inspect.getsource(Connection.__init__)); print(&#39;CONNECT:&#39;); print(inspect.getsource(Connection._connect))&quot;
+</code></pre>
+<pre><code class="language-powershell">python -c &quot;import inspect; from tgnet.connection import TgNetConnection; print(&#39;MRO:&#39;); print(TgNetConnection.__mro__); print(&#39;IP/PORT REFERENCES:&#39;); s=inspect.getsource(TgNetConnection); [(print(f&#39;{i+1}: {line}&#39;)) for i,line in enumerate(s.splitlines) if &#39;_ip&#39; in line or &#39;_port&#39; in line or &#39;create_connection&#39; in line]&quot;
+</code></pre>
+<p>بعد از این بررسی، می‌توانیم یک Adapter کوچک بسازیم که:</p>
+<ol>
+<li>آدرس و پورت MTProxy را برای اتصال TCP استفاده کند.</li>
+<li>Secret مربوط به FakeTLS را تزریق کند.</li>
+<li><code>dc_id</code> اصلی تلگرام را حفظ کند.</li>
+<li>هیچ تغییری در کد رسیور اصلی ایجاد نکند.</li>
+</ol>
+<p>یک نکته را هم فراموش نکنیم: موفقیت handshake به‌تنهایی اثبات نمی‌کند که احراز هویت MTProto و اتصال به دیتاسنتر هم درست کار می‌کنند. آن‌ها را جداگانه تست خواهیم کرد.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import inspect; from tgnet.connection import TgNetConnection; print(&#39;INIT:&#39;); print(inspect.getsource(TgNetConnection.__init__)); print(&#39;CONNECT:&#39;); print(inspect.getsource(TgNetConnection._connect))&quot;
+INIT:
+    def __init__(
+        self,
+        ip,
+        port,
+        dc_id,
+        *,
+        loggers,
+        proxy=None,
+        local_addr=None,
+        secret=b&quot;&quot;,
+        is_media=False,
+        test_backend=False,
+        debug_buffers=False,
+    ):
+        super().__init__(
+            ip, port, dc_id, loggers=loggers, proxy=proxy, local_addr=local_addr
+        )
+        # MTProxy / connection secret (Connection.cpp:448-472)
+        self._tgnet_secret = secret
+        # Media connections negate the DC ID in the header
+        # (Connection.cpp:538-542)
+        self._tgnet_is_media = is_media
+        # Test backend offsets DC IDs by 10000 (Connection.cpp:546)
+        self._tgnet_test_backend = test_backend
+        self._tgnet_debug_buffers = debug_buffers
+        # Quick-ack IDs seen on this connection (Connection.cpp:167,208)
+        self._tgnet_quick_acks = []
+
+CONNECT:
+    async def _connect(self, timeout=None, ssl=None):
+        # tgnet never wraps the socket in TLS: the obfuscation layer is its
+        # own thing, and ConnectionSocket.cpp:499,570 create a plain
+        # SOCK_STREAM socket. Force ssl=None so this cannot be bypassed.
+        await super()._connect(timeout=timeout, ssl=None)
+        self._apply_tgnet_socket_options()
+
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import inspect; from telethon.network.connection.connection import Connection; print(&#39;INIT:&#39;); print(inspect.getsource(Connection.__init__)); print(&#39;CONNECT:&#39;); print(inspect.getsource(Connection._connect))&quot;
+INIT:
+    def __init__(self, ip, port, dc_id, *, loggers, proxy=None, local_addr=None):
+        self._ip = ip
+        self._port = port
+        self._dc_id = dc_id  # only for MTProxy, it&#39;s an abstraction leak
+        self._log = loggers[__name__]
+        self._proxy = proxy
+        self._local_addr = local_addr
+        self._reader = None
+        self._writer = None
+        self._connected = False
+        self._send_task = None
+        self._recv_task = None
+        self._codec = None
+        self._obfuscation = None  # TcpObfuscated and MTProxy
+        self._send_queue = asyncio.Queue(1)
+        self._recv_queue = asyncio.Queue(1)
+
+CONNECT:
+    async def _connect(self, timeout=None, ssl=None):
+        if self._local_addr is not None:
+            # NOTE: If port is not specified, we use 0 port
+            # to notify the OS that port should be chosen randomly
+            # from the available ones.
+            if isinstance(self._local_addr, tuple) and len(self._local_addr) == 2:
+                local_addr = self._local_addr
+            elif isinstance(self._local_addr, str):
+                local_addr = (self._local_addr, 0)
+            else:
+                raise ValueError(&quot;Unknown local address format: {}&quot;.format(self._local_addr))
+        else:
+            local_addr = None
+
+        if not self._proxy:
+            self._reader, self._writer = await asyncio.wait_for(
+                asyncio.open_connection(
+                    host=self._ip,
+                    port=self._port,
+                    ssl=ssl,
+                    local_addr=local_addr
+                ), timeout=timeout)
+        else:
+            # Proxy setup, connection and negotiation is performed here.
+            sock = await self._proxy_connect(
+                timeout=timeout,
+                local_addr=local_addr
+            )
+
+            # Wrap socket in SSL context (if provided)
+            if ssl:
+                sock = self._wrap_socket_ssl(sock)
+
+            self._reader, self._writer = await asyncio.open_connection(sock=sock)
+
+        self._codec = self.packet_codec(self)
+        self._init_conn()
+        await self._writer.drain()
+
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import inspect; from tgnet.connection import TgNetConnection; print(&#39;MRO:&#39;); print(TgNetConnection.__mro__); print(&#39;IP/PORT REFERENCES:&#39;); s=inspect.getsource(TgNetConnection); [(print(f&#39;{i+1}: {line}&#39;)) for i,line in enumerate(s.splitlines()) if &#39;_ip&#39; in line or &#39;_port&#39; in line or &#39;create_connection&#39; in line]&quot;
+MRO:
+(&lt;class &#39;tgnet.connection.TgNetConnection&#39;&gt;, &lt;class &#39;telethon.network.connection.connection.ObfuscatedConnection&#39;&gt;, &lt;class &#39;telethon.network.connection.connection.Connection&#39;&gt;, &lt;class &#39;abc.ABC&#39;&gt;, &lt;class &#39;object&#39;&gt;)
+IP/PORT REFERENCES:
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>این دقیقاً همان خروجی‌ای بود که لازم داشتیم. حالا می‌توانیم یک نکته را با اطمینان بگوییم:</p>
+<p><strong>برای رساندن اتصال به MTProxy، تغییر <code>_ip</code> و <code>_port</code> در نمونهٔ اتصال کافی است.</strong></p>
+<p>دلیلش روشن است: سازندهٔ پایهٔ Telethon این دو مقدار را در <code>self._ip</code> و <code>self._port</code> ذخیره می‌کند و <code>Connection._connect</code> در نهایت از همین دو مقدار برای <code>asyncio.open_connection</code> استفاده می‌کند.</p>
+<p>در نتیجه، طرح Adapter ساده‌تر از چیزی است که ابتدا تصور می‌کردیم:</p>
+<ul>
+<li>Telethon آدرس دیتاسنتر را به کلاس می‌دهد.</li>
+<li>Adapter آدرس و پورت MTProxy را جایگزین می‌کند.</li>
+<li>Secret به سازندهٔ <code>TgNetConnectionTls</code> تزریق می‌شود.</li>
+<li><code>dc_id</code> دست‌نخورده باقی می‌ماند.</li>
+<li>FakeTLS و لایهٔ MTProto را خود <code>tgnet</code> مدیریت می‌کنند.</li>
+</ul>
+<p>یک ظرافت را هم باید رعایت کنیم: پارامتر <code>proxy</code> خود Telethon نباید با MTProxy اشتباه گرفته شود. اینجا MTProxy مقصد مستقیم TCP ماست؛ نباید آن را به‌عنوان HTTP/SOCKS proxy به Telethon معرفی کنیم.</p>
+<p>پس از این مرحله، به نظرم دیگر نیازی به جست‌وجوی بیشتر در سورس Telethon نداریم. مسیر اصلی اتصال را پیدا کرده‌ایم.</p>
+<p>حالا قبل از نوشتن Adapter فقط باید قالب Secret را دقیق بررسی کنیم؛ چون <code>parse_proxy_link</code> آن را به <code>bytes</code> تبدیل می‌کند، اما <code>parse_tls_secret</code> باید همین نوع و قالب را قبول کند.</p>
+<p>این دو دستور را اجرا کن:</p>
+<p><strong>۱. بررسی اعتبارسنجی Secret در tgnet:</strong></p>
+<pre><code class="language-powershell">python -c &quot;import inspect; from tgnet.connection.faketls import parse_tls_secret; print(&#39;SIGNATURE:&#39;,inspect.signature(parse_tls_secret)); print(inspect.getsource(parse_tls_secret))&quot;
+</code></pre>
+<p><strong>۲. بررسی نسخه و محل نصب کتابخانه‌ها:</strong></p>
+<pre><code class="language-powershell">python -c &quot;import tgnet,telethon; print(&#39;tgnet:&#39;,tgnet.__file__); print(&#39;Telethon:&#39;,telethon.__version__); print(&#39;tgnet version:&#39;,getattr(tgnet,&#39;__version__&#39;,&#39;unknown&#39;))&quot;
+</code></pre>
+<p>بعد از آن می‌توانیم Adapter را در یک فایل مستقل، مثلاً <code>mtproxy_adapter.py</code>، بسازیم.</p>
+<p>طرح اولیه‌اش این خواهد بود:</p>
+<pre><code class="language-python">class MTProxyConnection(TgNetConnectionTls):
+    def __init__(self, ip, port, dc_id, *, loggers,
+                 proxy=None, local_addr=None):
+        super.__init__(
+            MT_PROXY_HOST,
+            MT_PROXY_PORT,
+            dc_id,
+            loggers=loggers,
+            proxy=None,
+            local_addr=local_addr,
+            secret=MT_PROXY_SECRET,
+        )
+</code></pre>
+<p>این صرفاً طرح اولیه است، نه کد نهایی؛ باید بعد از بررسی قالب Secret و نحوهٔ مقداردهی آن را تکمیل کنیم.</p>
+<p><strong>یک تصمیم معماری مهم هم حفظ می‌شود:</strong> فعلاً فقط اتصال MTProto را در محیط آزمایش مستقل امتحان می‌کنیم. هنوز هیچ تغییری در دو بات، Bot Tokenها، SQLite یا منطق رسیور اصلی انجام نمی‌دهیم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import inspect; from tgnet.connection.faketls import parse_tls_secret; print(&#39;SIGNATURE:&#39;,inspect.signature(parse_tls_secret)); print(inspect.getsource(parse_tls_secret))&quot;
+SIGNATURE: (secret) -&gt; tuple
+def parse_tls_secret(secret) -&gt; tuple:
+    &quot;&quot;&quot;
+    Split a fake-TLS proxy secret into its key and domain.
+
+    ConnectionSocket.cpp:593-597:
+        if (secret.size() &gt; 17 &amp;&amp; secret[0] == &#39;\\xee&#39;) {
+            proxyAuthState = 10;
+            currentSecret = secret.substr(1, 16);
+            currentSecretDomain = secret.substr(17);
+        }
+
+    Layout:
+        byte 0      0xee marker
+        bytes 1-16  the 16-byte shared key
+        bytes 17+   the SNI domain to impersonate, as ASCII
+
+    Note the strict `&gt; 17`: a secret of exactly 17 bytes has an empty domain
+    and does *not* enable fake-TLS. Connection.cpp:465 agrees, requiring
+    `length() &gt; 17` before selecting ProtocolTypeTLS, whereas the 0xdd check
+    at :463 only needs `&gt;= 17`.
+
+    Args:
+        secret: raw bytes, or a hex string
+
+    Returns:
+        (key_16_bytes, domain_str)
+
+    Raises:
+        ValueError: not a fake-TLS secret
+    &quot;&quot;&quot;
+    if isinstance(secret, str):
+        secret = bytes.fromhex(secret)
+
+    if len(secret) &lt;= 17 or secret[0] != 0xEE:
+        raise ValueError(
+            &quot;not a fake-TLS secret: needs a 0xee marker and length &gt; 17, &quot;
+            &quot;got first byte %s and length %d (ConnectionSocket.cpp:593)&quot;
+            % (hex(secret[0]) if secret else &quot;empty&quot;, len(secret))
+        )
+
+    key = secret[1:17]
+    domain = secret[17:].decode(&quot;ascii&quot;, errors=&quot;replace&quot;)
+    return key, domain
+
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import tgnet,telethon; print(&#39;tgnet:&#39;,tgnet.__file__); print(&#39;Telethon:&#39;,telethon.__version__); print(&#39;tgnet version:&#39;,getattr(tgnet,&#39;__version__&#39;,&#39;unknown&#39;))&quot;
+tgnet: C:\Users\Zardakh\mtproxy-test\.venv\Lib\site-packages\tgnet\__init__.py
+Telethon: 1.46.0
+tgnet version: unknown
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>خوب؛ حالا قالب FakeTLS Secret هم مشخص شد و یک نکتهٔ مهم را تأیید کردیم.</p>
+<p><code>parse_tls_secret</code> برای FakeTLS به این ساختار نیاز دارد:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>بخش</th>
+<th>محتوا</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>بایت اول</td>
+<td>نشانگر <code>0xee</code></td>
+</tr>
+<tr>
+<td>بایت‌های ۱ تا ۱۶</td>
+<td>کلید ۱۶ بایتی</td>
+</tr>
+<tr>
+<td>بایت ۱۷ به بعد</td>
+<td>دامنهٔ SNI به‌صورت ASCII</td>
+</tr>
+</tbody></table></div>
+<p>یعنی Secret باید بیش از ۱۷ بایت باشد. صرفاً داشتن یک Secret معتبر MTProxy کافی نیست؛ باید از نوع FakeTLS باشد.</p>
+<p>یک نکتهٔ مثبت دیگر: <code>parse_proxy_link</code> و <code>parse_tls_secret</code> با یکدیگر سازگارند؛ اولی Secret را به <code>bytes</code> تبدیل می‌کند و دومی همین نوع را می‌پذیرد.</p>
+<p>نسخه‌های محیط آزمایش هم مشخص شدند: Telethon <code>1.46.0</code> و tgnet از همان محیط مجازی نصب شده است.</p>
+<p>خب، از نظر ساختار Secret دیگر مانعی نداریم. حتی می‌توانیم قبل از برقراری اتصال، Secret را اعتبارسنجی کنیم تا اگر نوع آن FakeTLS نبود، برنامه همان ابتدا خطای واضح بدهد.</p>
+<p>حالا پیشنهاد من ساخت یک Adapter کارخانه‌ای است؛ یعنی به‌جای تغییر کلاس اصلی tgnet، یک کلاس مشتق‌شده بسازیم که تنظیمات MTProxy را دریافت کند.</p>
+<h3>نسخهٔ پیشنهادی Adapter</h3>
+<p>فایل <code>mtproxy_adapter.py</code> را در پوشهٔ <code>mtproxy-test</code> بساز و این کد را داخلش قرار بده:</p>
+&lt;CodeBlock language=&quot;python&quot; editable&gt;
+from tgnet.connection.faketls import (
+    TgNetConnectionTls,
+    parse_tls_secret,
+)
+
+<p>def build_mtproxy_connection(host: str, port: int, secret: bytes):
+    &quot;&quot;&quot;
+    Build a Telethon-compatible connection class for MTProxy FakeTLS.
+    &quot;&quot;&quot;</p>
+<pre><code>if not host or not isinstance(host, str):
+    raise ValueError(&quot;Invalid MTProxy host&quot;)
+
+if not isinstance(port, int) or not 1 &lt;= port &lt;= 65535:
+    raise ValueError(&quot;Invalid MTProxy port&quot;)
+
+if not isinstance(secret, bytes):
+    raise TypeError(&quot;MTProxy secret must be bytes&quot;)
+
+# Validate FakeTLS secret before any network operation.
+parse_tls_secret(secret)
+
+class MTProxyConnection(TgNetConnectionTls):
+
+    def __init__(
+        self,
+        dc_ip,
+        dc_port,
+        dc_id,
+        *,
+        loggers,
+        proxy=None,
+        local_addr=None,
+    ):
+        if proxy is not None:
+            raise ValueError(
+                &quot;Telethon proxy must be None; &quot;
+                &quot;MTProxy is the direct TCP destination.&quot;
+            )
+
+        super.__init__(
+            host,
+            port,
+            dc_id,
+            loggers=loggers,
+            proxy=None,
+            local_addr=local_addr,
+            secret=secret,
+        )
+
+MTProxyConnection.__name__ = &quot;MTProxyConnection&quot;
+return MTProxyConnection
+</code></pre>
+&lt;/CodeBlock&gt;
+
+<h3>چرا این طراحی؟</h3>
+<ul>
+<li><code>dc_ip</code> و <code>dc_port</code> ورودی Telethon هستند، ولی مقصد TCP را به Host و Port پراکسی تغییر می‌دهیم.</li>
+<li><code>dc_id</code> را حفظ می‌کنیم تا سربرگ MTProto همچنان شناسهٔ دیتاسنتر واقعی را داشته باشد.</li>
+<li>Secret به‌صورت مستقیم به <code>TgNetConnectionTls</code> می‌رسد.</li>
+<li>منطق FakeTLS دست‌نخورده می‌ماند.</li>
+<li>پراکسی HTTP/SOCKS تلثون عمداً غیرفعال است.</li>
+</ul>
+<h3>یک مرز معماری که نباید فراموش کنیم</h3>
+<p>این Adapter فقط مسیر اتصال MTProto را آماده می‌کند. استفاده از Telethon یعنی مسیر دریافت و ارسال پیام از Bot API فعلی به MTProto منتقل می‌شود؛ Bot Token می‌تواند همچنان برای ورود بات استفاده شود، اما Telethon علاوه بر آن به <code>api_id</code> و <code>api_hash</code> نیاز دارد.</p>
+<p>بنابراین هنوز این را به‌عنوان تصمیم نهایی مهاجرت رسیور تلقی نمی‌کنیم.</p>
+<p><strong>قدم بعدی:</strong> فایل را بساز و این دستور را اجرا کن تا اعتبارسنجی Adapter را بدون اتصال به اینترنت امتحان کنیم:</p>
+<pre><code class="language-powershell">python -c &quot;from mtproxy_adapter import build_mtproxy_connection; import inspect; print(inspect.signature(build_mtproxy_connection)); print(&#39;Adapter module imported successfully&#39;)&quot;
+</code></pre>
+<p>فقط یک نکتهٔ امنیتی: Secret واقعی را در خروجی پاورشل یا پیام اینجا چاپ نکن. همان‌جا در محیط خودت نگهش می‌داریم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;from mtproxy_adapter import build_mtproxy_connection; import inspect; print(inspect.signature(build_mtproxy_connection)); print(&#39;Adapter module imported successfully&#39;)&quot;
+(host: str, port: int, secret: bytes)
+Adapter module imported successfully
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>خوب، اولین تست Adapter موفق بود. یعنی:</p>
+<ul>
+<li>فایل بدون خطای import بارگذاری می‌شود.</li>
+<li>تابع سازنده در دسترس است.</li>
+<li>امضای تابع همان چیزی است که انتظار داشتیم.</li>
+<li>هنوز هیچ اتصال شبکه‌ای برقرار نشده و Secret واقعی هم افشا نشده است.</li>
+</ul>
+<p>اما این فقط تست بارگذاری ماژول است؛ هنوز نمی‌دانیم کلاس تولیدشده واقعاً با قرارداد Telethon سازگار است یا مقصد و Secret را درست به اتصال منتقل می‌کند.</p>
+<p>حالا برویم سراغ تست مهم‌تر: <strong>ساخت واقعی نمونهٔ اتصال، بدون برقراری ارتباط شبکه‌ای.</strong></p>
+<p>این تست بررسی می‌کند که Adapter واقعاً Host و Port پراکسی، Secret و شناسهٔ دیتاسنتر را درست به کلاس tgnet منتقل می‌کند.</p>
+<p>این دستور را اجرا کن؛ از Secret آزمایشی و غیرواقعی استفاده می‌کند:</p>
+<pre><code class="language-powershell">python -c &quot;import logging; from collections import defaultdict; from mtproxy_adapter import build_mtproxy_connection; secret=b&#39;\xee&#39;+b&#39;\x11&#39;*16+b&#39;example.com&#39;; C=build_mtproxy_connection(&#39;127.0.0.1&#39;,443,secret); c=C(&#39;149.154.167.51&#39;,443,2,loggers=defaultdict(logging.getLogger)); checks={&#39;proxy_host&#39;:c._ip==&#39;127.0.0.1&#39;,&#39;proxy_port&#39;:c._port==443,&#39;dc_id_preserved&#39;:c._dc_id==2,&#39;secret_preserved&#39;:c._tgnet_secret==secret,&#39;tls_domain&#39;:c._tls_domain==&#39;example.com&#39;,&#39;proxy_disabled&#39;:c._proxy is None}; [print(k+&#39;:&#39;, &#39;PASS&#39; if v else &#39;FAIL&#39;) for k,v in checks.items]; assert all(checks.values)&quot;
+</code></pre>
+<p>&lt;badge color=&quot;success&quot;&gt;تست مورد انتظار: ۶ مورد PASS&lt;/badge&gt;</p>
+<p>اگر همه PASS شدند، مرحلهٔ بعدی تست اتصال واقعی به MTProxy است؛ ابتدا TCP و FakeTLS handshake و بعد احراز هویت MTProto.</p>
+<p>هنوز سراغ رسیور اصلی نمی‌رویم. می‌خواهم اول مطمئن شویم خود اتصال مستقل درست کار می‌کند.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import logging; from collections import defaultdict; from mtproxy_adapter import build_mtproxy_connection; secret=b&#39;\xee&#39;+b&#39;\x11&#39;*16+b&#39;example.com&#39;; C=build_mtproxy_connection(&#39;127.0.0.1&#39;,443,secret); c=C(&#39;149.154.167.51&#39;,443,2,loggers=defaultdict(logging.getLogger)); checks={&#39;proxy_host&#39;:c._ip==&#39;127.0.0.1&#39;,&#39;proxy_port&#39;:c._port==443,&#39;dc_id_preserved&#39;:c._dc_id==2,&#39;secret_preserved&#39;:c._tgnet_secret==secret,&#39;tls_domain&#39;:c._tls_domain==&#39;example.com&#39;,&#39;proxy_disabled&#39;:c._proxy is None}; [print(k+&#39;:&#39;, &#39;PASS&#39; if v else &#39;FAIL&#39;) for k,v in checks.items()]; assert all(checks.values())&quot;
+proxy_host: PASS
+proxy_port: PASS
+dc_id_preserved: PASS
+secret_preserved: PASS
+tls_domain: PASS
+proxy_disabled: PASS
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>&lt;badge color=&quot;success&quot;&gt;۶ از ۶ تست موفق&lt;/badge&gt;</p>
+<p>عالی! این بار فقط بارگذاری فایل را تست نکردیم؛ نمونهٔ واقعی اتصال ساخته شد و هر شش ویژگی موردنظر درست بودند:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>مورد</th>
+<th>نتیجه</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>مقصد TCP برابر Host پراکسی</td>
+<td>&lt;badge color=&quot;success&quot;&gt;PASS&lt;/badge&gt;</td>
+</tr>
+<tr>
+<td>پورت پراکسی</td>
+<td>&lt;badge color=&quot;success&quot;&gt;PASS&lt;/badge&gt;</td>
+</tr>
+<tr>
+<td>حفظ DC ID</td>
+<td>&lt;badge color=&quot;success&quot;&gt;PASS&lt;/badge&gt;</td>
+</tr>
+<tr>
+<td>انتقال Secret</td>
+<td>&lt;badge color=&quot;success&quot;&gt;PASS&lt;/badge&gt;</td>
+</tr>
+<tr>
+<td>استخراج دامنهٔ TLS</td>
+<td>&lt;badge color=&quot;success&quot;&gt;PASS&lt;/badge&gt;</td>
+</tr>
+<tr>
+<td>غیرفعال بودن proxy داخلی Telethon</td>
+<td>&lt;badge color=&quot;success&quot;&gt;PASS&lt;/badge&gt;</td>
+</tr>
+</tbody></table></div>
+<h3>ارزیابی ایگور 🧐</h3>
+<p>تا اینجا Adapter از نظر سازگاری سازنده و انتقال پارامترها درست عمل می‌کند.</p>
+<p>اما هنوز سه چیز اثبات نشده‌اند:</p>
+<ol>
+<li>اتصال TCP به سرور واقعی MTProxy.</li>
+<li>موفقیت FakeTLS handshake.</li>
+<li>برقراری ارتباط MTProto و احراز هویت بات.</li>
+</ol>
+<p>یک نکتهٔ مهم: Secret آزمایشی <code>example.com</code> فقط برای تست ساخت نمونه بود؛ نباید آن را با Secret واقعی پراکسی اشتباه بگیریم.</p>
+<h3>قدم بعدی: آماده‌سازی تست اتصال واقعی</h3>
+<p>قبل از اتصال، می‌خواهم یک کنترل کوچک اضافه کنیم: خطاهای اتصال باید بدون چاپ Secret یا اطلاعات حساس ثبت شوند.</p>
+<p>فعلاً این دستور را اجرا کن تا وضعیت فایل و محتوای فعلی Adapter را ببینیم:</p>
+<pre><code class="language-powershell">Get-Content .\mtproxy_adapter.py
+</code></pre>
+<p>خروجی را بفرست. می‌خواهم پیش از تست شبکه، نسخهٔ نهایی Adapter را از نظر خطاهای احتمالی و مدیریت اتصال بررسی کنم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; Get-Content .\mtproxy_adapter.py
+Get-Content : Cannot find path &#39;C:\Users\Zardakh\mtproxy-test\mtproxy_adapter.py&#39; because it does not exist.
+At line:1 char:1
++ Get-Content .\mtproxy_adapter.py
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\Zardak...roxy_adapter.py:String) [Get-Content], ItemNotFoundEx
+   ception
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.GetContentCommand
+
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>اینجا یک تناقض جالب داریم که باید قبل از ادامه حلش کنیم. 😁</p>
+<p>در تست قبلی، <code>from mtproxy_adapter import ...</code> موفق شده؛ اما حالا PowerShell می‌گوید فایل <code>mtproxy_adapter.py</code> در پوشهٔ فعلی وجود ندارد.</p>
+<p>پس فعلاً نباید سراغ تست شبکه برویم. ممکن است پایتون ماژول را از مسیر دیگری بارگذاری کرده باشد؛ یا فایل بعد از تست جابه‌جا یا حذف شده باشد.</p>
+<p>این دستور را اجرا کن:</p>
+<pre><code class="language-powershell">python -c &quot;import mtproxy_adapter,os,sys; print(&#39;MODULE FILE:&#39;,mtproxy_adapter.__file__); print(&#39;CURRENT DIR:&#39;,os.getcwd); print(&#39;PYTHON PATH:&#39;); print(&#39;\n&#39;.join(sys.path))&quot;
+</code></pre>
+<p>این خروجی مشخص می‌کند دقیقاً کدام فایل در تست قبلی اجرا شده است.</p>
+<p>یک اصلاح هم از طرف من: موفقیت Import را نباید به معنی وجود فایل در پوشهٔ پروژه تلقی می‌کردم. باید همان ابتدا مسیر واقعی ماژول را بررسی می‌کردیم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import mtproxy_adapter,os,sys; print(&#39;MODULE FILE:&#39;,mtproxy_adapter.__file__); print(&#39;CURRENT DIR:&#39;,os.getcwd()); print(&#39;PYTHON PATH:&#39;); print(&#39;\n&#39;.join(sys.path))&quot;
+MODULE FILE: C:\Users\Zardakh\mtproxy-test\.venv\mtproxy_adapter.py
+CURRENT DIR: C:\Users\Zardakh\mtproxy-test
+PYTHON PATH:
+
+C:\Users\Zardakh\AppData\Local\Programs\Python\Python314\python314.zip
+C:\Users\Zardakh\AppData\Local\Programs\Python\Python314\DLLs
+C:\Users\Zardakh\AppData\Local\Programs\Python\Python314\Lib
+C:\Users\Zardakh\AppData\Local\Programs\Python\Python314
+C:\Users\Zardakh\mtproxy-test\.venv
+C:\Users\Zardakh\mtproxy-test\.venv\Lib\site-packages
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>پیداش کردیم! 😁</p>
+<p>فایل واقعاً وجود دارد، اما در مسیر دیگری:</p>
+<pre><code class="language-text">C:\Users\Zardakh\mtproxy-test\.venv\mtproxy_adapter.py
+</code></pre>
+<p>نه اینجا:</p>
+<pre><code class="language-text">C:\Users\Zardakh\mtproxy-test\mtproxy_adapter.py
+</code></pre>
+<p>بنابراین تناقض حل شد؛ پایتون ماژول را از داخل <code>.venv</code> پیدا کرده است. تست‌های قبلی هم واقعاً همین فایل را اجرا کرده‌اند.</p>
+<h3>نظر من</h3>
+<p>این فایل بهتر است بیرون از <code>.venv</code> و در ریشهٔ پروژه قرار بگیرد. پوشهٔ <code>.venv</code> باید مخصوص محیط مجازی و وابستگی‌های آن باشد، نه کد پروژه.</p>
+<p>این دو دستور را اجرا کن:</p>
+<pre><code class="language-powershell">Move-Item .\.venv\mtproxy_adapter.py .\mtproxy_adapter.py
+</code></pre>
+<pre><code class="language-powershell">python -c &quot;import mtproxy_adapter; print(mtproxy_adapter.__file__)&quot;
+</code></pre>
+<p>باید مسیر دوم به این ختم شود:</p>
+<pre><code class="language-text">mtproxy-test\mtproxy_adapter.py
+</code></pre>
+<p>بعد محتوای فایل را بررسی می‌کنیم و سراغ تست اتصال واقعی می‌رویم.</p>
+<p>یک نکتهٔ مثبت: این اتفاق نشان داد تست‌های ما به فایل موجود در ریشهٔ پروژه وابسته نبودند؛ پایتون از مسیر جست‌وجوی خودش ماژول را پیدا کرده بود. خوب شد پیش از تست شبکه این موضوع را کشف کردیم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; Move-Item .\.venv\mtproxy_adapter.py .\mtproxy_adapter.py
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import mtproxy_adapter; print(mtproxy_adapter.__file__)&quot;
+C:\Users\Zardakh\mtproxy-test\mtproxy_adapter.py
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>درست شد. حالا Adapter در جای صحیح قرار دارد:</p>
+<pre><code class="language-text">mtproxy-test/
+├── .venv/
+└── mtproxy_adapter.py
+</code></pre>
+<p>&lt;badge color=&quot;success&quot;&gt;مسیر ماژول تأیید شد&lt;/badge&gt;</p>
+<p>یک نکتهٔ مهم: چون فایل جابه‌جا شده، بهتر است تست شش‌گانه را یک بار دیگر از مسیر جدید اجرا کنیم تا مطمئن شویم همان نسخهٔ منتقل‌شده بارگذاری می‌شود.</p>
+<pre><code class="language-powershell">python -c &quot;import logging; from collections import defaultdict; from mtproxy_adapter import build_mtproxy_connection; secret=b&#39;\xee&#39;+b&#39;\x11&#39;*16+b&#39;example.com&#39;; C=build_mtproxy_connection(&#39;127.0.0.1&#39;,443,secret); c=C(&#39;149.154.167.51&#39;,443,2,loggers=defaultdict(logging.getLogger)); checks={&#39;proxy_host&#39;:c._ip==&#39;127.0.0.1&#39;,&#39;proxy_port&#39;:c._port==443,&#39;dc_id_preserved&#39;:c._dc_id==2,&#39;secret_preserved&#39;:c._tgnet_secret==secret,&#39;tls_domain&#39;:c._tls_domain==&#39;example.com&#39;,&#39;proxy_disabled&#39;:c._proxy is None}; [print(k+&#39;:&#39;, &#39;PASS&#39; if v else &#39;FAIL&#39;) for k,v in checks.items]; assert all(checks.values)&quot;
+</code></pre>
+<p>اگر دوباره ۶ مورد PASS شدند، می‌رویم سراغ بررسی نهایی کد و بعد اتصال واقعی. هنوز هیچ تغییری در رسیور اصلی نمی‌دهیم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import logging; from collections import defaultdict; from mtproxy_adapter import build_mtproxy_connection; secret=b&#39;\xee&#39;+b&#39;\x11&#39;*16+b&#39;example.com&#39;; C=build_mtproxy_connection(&#39;127.0.0.1&#39;,443,secret); c=C(&#39;149.154.167.51&#39;,443,2,loggers=defaultdict(logging.getLogger)); checks={&#39;proxy_host&#39;:c._ip==&#39;127.0.0.1&#39;,&#39;proxy_port&#39;:c._port==443,&#39;dc_id_preserved&#39;:c._dc_id==2,&#39;secret_preserved&#39;:c._tgnet_secret==secret,&#39;tls_domain&#39;:c._tls_domain==&#39;example.com&#39;,&#39;proxy_disabled&#39;:c._proxy is None}; [print(k+&#39;:&#39;, &#39;PASS&#39; if v else &#39;FAIL&#39;) for k,v in checks.items()]; assert all(checks.values())&quot;
+proxy_host: PASS
+proxy_port: PASS
+dc_id_preserved: PASS
+secret_preserved: PASS
+tls_domain: PASS
+proxy_disabled: PASS
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>&lt;badge color=&quot;success&quot;&gt;۶ از ۶ — دوباره موفق&lt;/badge&gt;</p>
+<p>خوب؛ این بار تست از مسیر صحیح پروژه اجرا شد و هر شش بررسی مجدداً PASS شدند. بنابراین مشکل جابه‌جایی فایل هم بسته شد.</p>
+<p>اما قبل از اتصال واقعی، یک اصلاح فنی در برنامه‌مان دارم: <strong>باید رفتار اتصال در حالت reconnect و اتصال‌های فرعی Telethon را هم در نظر بگیریم.</strong> Telethon ممکن است برای دیتاسنترهای دیگر هم نمونهٔ اتصال بسازد؛ Adapter ما باید در همهٔ این موارد مقصد MTProxy و Secret را حفظ کند. طراحی فعلی از این نظر امیدوارکننده است، ولی هنوز تست نشده.</p>
+<p>قدم بعدی را با بررسی فایل انجام بده:</p>
+<pre><code class="language-powershell">Get-Content .\mtproxy_adapter.py
+</code></pre>
+<p>محتوا را بفرست تا نسخهٔ نهایی را بازبینی کنم. بعد تست اتصال واقعی را با timeout مشخص و بدون افشای Secret اجرا می‌کنیم.</p>
+<p>فعلاً هنوز هیچ اتصال واقعی و هیچ احراز هویتی انجام نشده؛ این مرز را دقیق نگه می‌داریم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; Get-Content .\mtproxy_adapter.py
+
+from tgnet.connection.faketls import (
+    TgNetConnectionTls,
+    parse_tls_secret,
+)
+
+
+def build_mtproxy_connection(host: str, port: int, secret: bytes):
+    &quot;&quot;&quot;
+    Build a Telethon-compatible connection class for MTProxy FakeTLS.
+    &quot;&quot;&quot;
+
+    if not host or not isinstance(host, str):
+        raise ValueError(&quot;Invalid MTProxy host&quot;)
+
+    if not isinstance(port, int) or not 1 &lt;= port &lt;= 65535:
+        raise ValueError(&quot;Invalid MTProxy port&quot;)
+
+    if not isinstance(secret, bytes):
+        raise TypeError(&quot;MTProxy secret must be bytes&quot;)
+
+    # Validate FakeTLS secret before any network operation.
+    parse_tls_secret(secret)
+
+    class MTProxyConnection(TgNetConnectionTls):
+
+        def __init__(
+            self,
+            dc_ip,
+            dc_port,
+            dc_id,
+            *,
+            loggers,
+            proxy=None,
+            local_addr=None,
+        ):
+            if proxy is not None:
+                raise ValueError(
+                    &quot;Telethon proxy must be None; &quot;
+                    &quot;MTProxy is the direct TCP destination.&quot;
+                )
+
+            super().__init__(
+                host,
+                port,
+                dc_id,
+                loggers=loggers,
+                proxy=None,
+                local_addr=local_addr,
+                secret=secret,
+            )
+
+    MTProxyConnection.__name__ = &quot;MTProxyConnection&quot;
+    return MTProxyConnection
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>کد را بررسی کردم. برخلاف نگرانی اولیه، Adapter فعلی از نظر ساختار با قرارداد سازندهٔ Telethon سازگار است و فعلاً ایراد مسدودکننده‌ای در آن نمی‌بینم.</p>
+<p>چند نکتهٔ مهم:</p>
+<ul>
+<li><code>dc_ip</code> و <code>dc_port</code> عمداً استفاده نمی‌شوند؛ چون مقصد TCP باید MTProxy باشد.</li>
+<li><code>dc_id</code> حفظ می‌شود؛ این موضوع برای ساخت سربرگ MTProto مهم است.</li>
+<li><code>secret</code> به کلاس FakeTLS می‌رسد و پیش از ساخت کلاس اعتبارسنجی می‌شود.</li>
+<li>هر اتصال جدیدی که Telethon برای دیتاسنتر دیگری بسازد نیز از همان Host و Port پراکسی استفاده خواهد کرد.</li>
+<li><code>proxy</code> داخلی Telethon رد می‌شود تا دو نوع پراکسی با هم اشتباه نشوند.</li>
+</ul>
+<p>یک اصلاح کوچک پیشنهادی دارم: در کد فعلی <code>dc_ip</code> و <code>dc_port</code> استفاده نمی‌شوند، ولی بهتر است کامنتی اضافه کنیم که این رفتار عمدی است؛ تا بعداً کسی تصور نکند فراموش شده‌اند.</p>
+<h3>حالا مرحلهٔ بعد: آماده‌سازی اتصال واقعی</h3>
+<p>پیش از اتصال، باید مطمئن شویم تنظیمات واقعی MTProxy را بدون چاپ Secret می‌توانیم بخوانیم.</p>
+<p>در پوشهٔ <code>mtproxy-test</code> این دستور را اجرا کن:</p>
+<pre><code class="language-powershell">Get-ChildItem -Force
+</code></pre>
+<p>می‌خواهم ببینم فایل تنظیمات پراکسی را قبلاً در این محیط ساخته‌ای یا هنوز باید بسازیم.</p>
+<p>فعلاً هیچ اتصال شبکه‌ای برقرار نمی‌کنیم. اول تنظیمات را امن و قابل‌اعتماد می‌خوانیم؛ بعد سراغ FakeTLS handshake می‌رویم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; Get-ChildItem -Force
+
+
+    Directory: C:\Users\Zardakh\mtproxy-test
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----        11/18/2026  10:50 AM                .venv
+d-----        11/18/2026  10:50 AM                __pycache__
+-a----        11/18/2026  10:45 AM           1463 mtproxy_adapter.py
+
+
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>پس محیط آزمایش فعلاً تمیز است و فقط Adapter و محیط مجازی را دارد. فایل تنظیمات پراکسی هنوز ساخته نشده.</p>
+<p>پیشنهاد می‌کنم همان قالب چهارمتغیره‌ای را که قبلاً برای پروژه در نظر گرفته بودیم حفظ کنیم؛ نیازی به تغییر قرارداد تنظیمات نداریم.</p>
+<h3>۱. ساخت فایل تنظیمات</h3>
+<p>این دستور را اجرا کن:</p>
+<pre><code class="language-powershell">@&quot;
+TELEGRAM_PROXY_TYPE=mtproto
+TELEGRAM_PROXY_HOST=
+TELEGRAM_PROXY_PORT=
+TELEGRAM_PROXY_SECRET=
+&quot;@ | Set-Content -Encoding ascii .\telegram_proxy.env
+</code></pre>
+<h3>۲. بازکردن فایل برای ویرایش</h3>
+<pre><code class="language-powershell">notepad .\telegram_proxy.env
+</code></pre>
+<p>مقادیر واقعی پراکسی را در فایل وارد کن. Secret را در چت نفرست.</p>
+<h3>۳. نکتهٔ امنیتی</h3>
+<p>فایل تنظیمات نباید وارد Git شود. فعلاً این دستور را اجرا کن:</p>
+<pre><code class="language-powershell">&quot;telegram_proxy.env&quot; | Add-Content .\.gitignore
+</code></pre>
+<p>اگر <code>.gitignore</code> وجود نداشته باشد، این دستور آن را می‌سازد.</p>
+<p><strong>بعد از این مرحله</strong> یک Loader کوچک می‌نویسیم که فایل را بخواند، Secret را به‌صورت امن Decode کند و Adapter را بسازد. سپس اتصال واقعی را با timeout و گزارش خطای کنترل‌شده آزمایش می‌کنیم.</p>
+<p>فعلاً هیچ تغییری در رسیور اصلی لازم نیست.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain"># Selected text:
+
+## Selection 1
+این دستور را اجرا کن:
+powershell
+
+
+
+@&quot;
+TELEGRAM_PROXY_TYPE=mtproto
+TELEGRAM_PROXY_HOST=
+TELEGRAM_PROXY_PORT=
+TELEGRAM_PROXY_SECRET=
+&quot;@ | Set-Content -Encoding ascii .\telegram_proxy.env
+
+## My request:
+توی یه خط لطفن</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><pre><code class="language-powershell">&quot;TELEGRAM_PROXY_TYPE=mtproto`nTELEGRAM_PROXY_HOST=`nTELEGRAM_PROXY_PORT=`nTELEGRAM_PROXY_SECRET=&quot; | Set-Content -Encoding ascii .\telegram_proxy.env
+</code></pre>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; &quot;TELEGRAM_PROXY_TYPE=mtproto`nTELEGRAM_PROXY_HOST=`nTELEGRAM_PROXY_PORT=`nTELEGRAM_PROXY_SECRET=&quot; | Set-Content -Encoding ascii .\telegram_proxy.env
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; notepad .\telegram_proxy.env
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; &quot;telegram_proxy.env&quot; | Add-Content .\.gitignore
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>خوب، فایل تنظیمات ساخته شد و به <code>.gitignore</code> هم اضافه شد. 👍</p>
+<p>حالا داخل Notepad مقادیر واقعی را وارد و ذخیره کن.</p>
+<p>بعد فقط این دستور را اجرا کن تا مطمئن شویم فایل درست خوانده می‌شود، بدون اینکه Host یا Secret نمایش داده شوند:</p>
+<pre><code class="language-powershell">python -c &quot;from pathlib import Path; p=Path(&#39;telegram_proxy.env&#39;); d=dict(line.split(&#39;=&#39;,1) for line in p.read_text(encoding=&#39;ascii&#39;).splitlines if &#39;=&#39; in line); print(&#39;TYPE:&#39;,d.get(&#39;TELEGRAM_PROXY_TYPE&#39;)); print(&#39;HOST:&#39;, &#39;SET&#39; if d.get(&#39;TELEGRAM_PROXY_HOST&#39;) else &#39;EMPTY&#39;); print(&#39;PORT:&#39;, &#39;SET&#39; if d.get(&#39;TELEGRAM_PROXY_PORT&#39;) else &#39;EMPTY&#39;); print(&#39;SECRET:&#39;, &#39;SET&#39; if d.get(&#39;TELEGRAM_PROXY_SECRET&#39;) else &#39;EMPTY&#39;)&quot;
+</code></pre>
+<p>مقادیر واقعی را اینجا نفرست؛ فقط نتیجهٔ چهار وضعیت را بفرست.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;from pathlib import Path; p=Path(&#39;telegram_proxy.env&#39;); d=dict(line.split(&#39;=&#39;,1) for line in p.read_text(encoding=&#39;ascii&#39;).splitlines() if &#39;=&#39; in line); print(&#39;TYPE:&#39;,d.get(&#39;TELEGRAM_PROXY_TYPE&#39;)); print(&#39;HOST:&#39;, &#39;SET&#39; if d.get(&#39;TELEGRAM_PROXY_HOST&#39;) else &#39;EMPTY&#39;); print(&#39;PORT:&#39;, &#39;SET&#39; if d.get(&#39;TELEGRAM_PROXY_PORT&#39;) else &#39;EMPTY&#39;); print(&#39;SECRET:&#39;, &#39;SET&#39; if d.get(&#39;TELEGRAM_PROXY_SECRET&#39;) else &#39;EMPTY&#39;)&quot;
+TYPE: mtproto
+HOST: SET
+PORT: SET
+SECRET: SET
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>عالی! هر چهار متغیر مقدار دارند. &lt;badge color=&quot;success&quot;&gt;تنظیمات موجودند&lt;/badge&gt;</p>
+<p>اما این هنوز اعتبار Secret را تأیید نمی‌کند. حالا باید مطمئن شویم Secret واقعاً از نوع FakeTLS است و قالب رمزگذاری‌اش درست خوانده می‌شود.</p>
+<p>این دستور را اجرا کن؛ هیچ‌کدام از مقادیر حساس را چاپ نمی‌کند:</p>
+<pre><code class="language-powershell">python -c &quot;from pathlib import Path; import base64; from tgnet.connection.faketls import parse_tls_secret; d=dict(x.split(&#39;=&#39;,1) for x in Path(&#39;telegram_proxy.env&#39;).read_text(encoding=&#39;ascii&#39;).splitlines if &#39;=&#39; in x); raw=d[&#39;TELEGRAM_PROXY_SECRET&#39;].strip; exec(\&quot;try: secret=bytes.fromhex(raw)\\nexcept ValueError: secret=base64.urlsafe_b64decode(raw+&#39;=&#39;*(-len(raw)%4))\&quot;); parse_tls_secret(secret); assert d[&#39;TELEGRAM_PROXY_TYPE&#39;].strip==&#39;mtproto&#39;; assert d[&#39;TELEGRAM_PROXY_HOST&#39;].strip; assert 1&lt;=int(d[&#39;TELEGRAM_PROXY_PORT&#39;])&lt;=65535; print(&#39;Proxy configuration: PASS&#39;); print(&#39;FakeTLS secret: PASS&#39;); print(&#39;Secret length:&#39;,len(secret),&#39;bytes&#39;)&quot;
+</code></pre>
+<p>اگر هر دو مورد PASS شدند، Loader را به Adapter متصل می‌کنیم و برای اولین بار سراغ تست اتصال واقعی می‌رویم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;from pathlib import Path; import base64; from tgnet.connection.faketls import parse_tls_secret; d=dict(x.split(&#39;=&#39;,1) for x in Path(&#39;telegram_proxy.env&#39;).read_text(encoding=&#39;ascii&#39;).splitlines() if &#39;=&#39; in x); raw=d[&#39;TELEGRAM_PROXY_SECRET&#39;].strip(); exec(\&quot;try: secret=bytes.fromhex(raw)\\nexcept ValueError: secret=base64.urlsafe_b64decode(raw+&#39;=&#39;*(-len(raw)%4))\&quot;); parse_tls_secret(secret); assert d[&#39;TELEGRAM_PROXY_TYPE&#39;].strip()==&#39;mtproto&#39;; assert d[&#39;TELEGRAM_PROXY_HOST&#39;].strip(); assert 1&lt;=int(d[&#39;TELEGRAM_PROXY_PORT&#39;])&lt;=65535; print(&#39;Proxy configuration: PASS&#39;); print(&#39;FakeTLS secret: PASS&#39;); print(&#39;Secret length:&#39;,len(secret),&#39;bytes&#39;)&quot;
+raw : The term &#39;raw&#39; is not recognized as the name of a cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:294
++ ... _PROXY_SECRET&#39;].strip(); exec(\&quot;try: secret=bytes.fromhex(raw)\\nexce ...
++                                                               ~~~
+    + CategoryInfo          : ObjectNotFound: (raw:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>این خطا از خود Secret یا tgnet نیست؛ از تداخل نحوهٔ نقل‌قول‌گذاری <code>exec</code> در دستور یک‌خطی با PowerShell است. دستور قبلی من برای PowerShell به‌اندازهٔ کافی مطمئن نوشته نشده بود.</p>
+<p>این بار ساده‌ترش می‌کنیم و اصلاً از <code>exec</code> استفاده نمی‌کنیم:</p>
+<pre><code class="language-powershell">python -c &quot;from pathlib import Path; import base64; from tgnet.connection.faketls import parse_tls_secret; d=dict(x.split(&#39;=&#39;,1) for x in Path(&#39;telegram_proxy.env&#39;).read_text(encoding=&#39;ascii&#39;).splitlines if &#39;=&#39; in x); s=d[&#39;TELEGRAM_PROXY_SECRET&#39;].strip; secret=bytes.fromhex(s) if len(s)%2==0 and all(c in &#39;0123456789abcdefABCDEF&#39; for c in s) else base64.urlsafe_b64decode(s+&#39;=&#39;*(-len(s)%4)); parse_tls_secret(secret); assert d[&#39;TELEGRAM_PROXY_TYPE&#39;].strip==&#39;mtproto&#39;; assert d[&#39;TELEGRAM_PROXY_HOST&#39;].strip; assert 1&lt;=int(d[&#39;TELEGRAM_PROXY_PORT&#39;])&lt;=65535; print(&#39;Proxy configuration: PASS&#39;); print(&#39;FakeTLS secret: PASS&#39;); print(&#39;Secret length:&#39;,len(secret),&#39;bytes&#39;)&quot;
+</code></pre>
+<p>این دستور هر دو قالب Hex و Base64URL را بررسی می‌کند و Secret را نمایش نمی‌دهد.</p>
+<p>فقط خروجی را بفرست؛ اگر خطا داد، متن خطا کافی است.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;from pathlib import Path; import base64; from tgnet.connection.faketls import parse_tls_secret; d=dict(x.split(&#39;=&#39;,1) for x in Path(&#39;telegram_proxy.env&#39;).read_text(encoding=&#39;ascii&#39;).splitlines() if &#39;=&#39; in x); s=d[&#39;TELEGRAM_PROXY_SECRET&#39;].strip(); secret=bytes.fromhex(s) if len(s)%2==0 and all(c in &#39;0123456789abcdefABCDEF&#39; for c in s) else base64.urlsafe_b64decode(s+&#39;=&#39;*(-len(s)%4)); parse_tls_secret(secret); assert d[&#39;TELEGRAM_PROXY_TYPE&#39;].strip()==&#39;mtproto&#39;; assert d[&#39;TELEGRAM_PROXY_HOST&#39;].strip(); assert 1&lt;=int(d[&#39;TELEGRAM_PROXY_PORT&#39;])&lt;=65535; print(&#39;Proxy configuration: PASS&#39;); print(&#39;FakeTLS secret: PASS&#39;); print(&#39;Secret length:&#39;,len(secret),&#39;bytes&#39;)&quot;
+Traceback (most recent call last):
+  File &quot;&lt;string&gt;&quot;, line 1, in &lt;module&gt;
+    from pathlib import Path; import base64; from tgnet.connection.faketls import parse_tls_secret; d=dict(x.split(&#39;=&#39;,1) for x in Path(&#39;telegram_proxy.env&#39;).read_text(encoding=&#39;ascii&#39;).splitlines() if &#39;=&#39; in x); s=d[&#39;TELEGRAM_PROXY_SECRET&#39;].strip(); secret=bytes.fromhex(s) if len(s)%2==0 and all(c in &#39;0123456789abcdefABCDEF&#39; for c in s) else base64.urlsafe_b64decode(s+&#39;=&#39;*(-len(s)%4)); parse_tls_secret(secret); assert d[&#39;TELEGRAM_PROXY_TYPE&#39;].strip()==&#39;mtproto&#39;; assert d[&#39;TELEGRAM_PROXY_HOST&#39;].strip(); assert 1&lt;=int(d[&#39;TELEGRAM_PROXY_PORT&#39;])&lt;=65535; print(&#39;Proxy configuration: PASS&#39;); print(&#39;FakeTLS secret: PASS&#39;); print(&#39;Secret length:&#39;,len(secret),&#39;bytes&#39;)
+                                                                                                                                                                                                                                                                                                                                                                                                      ~~~~~~~~~~~~~~~~^^^^^^^^
+  File &quot;C:\Users\Zardakh\mtproxy-test\.venv\Lib\site-packages\tgnet\connection\faketls\crypto.py&quot;, line 165, in parse_tls_secret
+    raise ValueError(
+    ...&lt;3 lines&gt;...
+    )
+ValueError: not a fake-TLS secret: needs a 0xee marker and length &gt; 17, got first byte 0x79 and length 16 (ConnectionSocket.cpp:593)
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>خب، این بار به یک تفاوت مهم رسیدیم: <strong>Secret فعلی از نظر قالب با FakeTLS سازگار نیست.</strong></p>
+<p>خروجی می‌گوید:</p>
+<pre><code class="language-text">First byte: 0x79
+Length: 16 bytes
+</code></pre>
+<p>اما <code>tgnet</code> برای FakeTLS انتظار دارد:</p>
+<ul>
+<li>بایت اول <code>0xee</code> باشد.</li>
+<li>۱۶ بایت کلید بعد از آن قرار بگیرد.</li>
+<li>بعد از کلید، دامنهٔ SNI وجود داشته باشد.</li>
+<li>طول کل بیشتر از ۱۷ بایت باشد.</li>
+</ul>
+<p>بنابراین Secret فعلی احتمالاً یک Secret معمولی MTProxy است، نه FakeTLS. البته هنوز یک احتمال دیگر را هم باید بررسی کنیم: اشتباه گرفتن رمزگذاری Hex و Base64URL.</p>
+<h3>یک بررسی بدون افشای Secret</h3>
+<p>این دستور را اجرا کن:</p>
+<pre><code class="language-powershell">python -c &quot;from pathlib import Path; s=dict(x.split(&#39;=&#39;,1) for x in Path(&#39;telegram_proxy.env&#39;).read_text(encoding=&#39;ascii&#39;).splitlines if &#39;=&#39; in x)[&#39;TELEGRAM_PROXY_SECRET&#39;].strip; print(&#39;RAW LENGTH:&#39;,len(s)); print(&#39;HEX FORMAT:&#39;,all(c in &#39;0123456789abcdefABCDEF&#39; for c in s) and len(s)%2==0); print(&#39;STARTS WITH EE:&#39;,s.lower.startswith(&#39;ee&#39;)); print(&#39;STARTS WITH DD:&#39;,s.lower.startswith(&#39;dd&#39;))&quot;
+</code></pre>
+<h3>چرا این بررسی مهم است؟</h3>
+<p>نمی‌خواهم صرفاً با تغییر کد، یک Secret معمولی را به‌اشتباه به FakeTLS تبدیل کنیم. این دو نوع پراکسی رفتار متفاوتی دارند.</p>
+<p>فعلاً Adapter را تغییر نده و Secret را هم اینجا نفرست. ابتدا خروجی این چهار بررسی را ببینیم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain"># Selected text:
+
+## Selection 1
+این دستور را اجرا کن:
+powershell
+
+
+
+python -c &quot;from pathlib import Path; s=dict(x.split(&#39;=&#39;,1) for x in Path(&#39;telegram_proxy.env&#39;).read_text(encoding=&#39;ascii&#39;).splitlines() if &#39;=&#39; in x)[&#39;TELEGRAM_PROXY_SECRET&#39;].strip(); print(&#39;RAW LENGTH:&#39;,len(s)); print(&#39;HEX FORMAT:&#39;,all(c in &#39;0123456789abcdefABCDEF&#39; for c in s) and len(s)%2==0); print(&#39;STARTS WITH EE:&#39;,s.lower().startswith(&#39;ee&#39;)); print(&#39;STARTS WITH DD:&#39;,s.lower().startswith(&#39;dd&#39;))&quot;
+
+## My request:
+ریستارت کردم پرید باید از اول بریم توی محیطش</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>مشکلی نیست؛ از همان پوشه دوباره محیط مجازی را فعال می‌کنیم. لازم نیست چیزی را از اول نصب کنیم.</p>
+<p>در PowerShell این دستور را اجرا کن:</p>
+<pre><code class="language-powershell">cd C:\Users\Zardakh\mtproxy-test; .\.venv\Scripts\Activate.ps1
+</code></pre>
+<p>اگر ابتدای خط فرمان این را دیدی:</p>
+<pre><code class="language-text">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;
+</code></pre>
+<p>یعنی آماده‌ایم.</p>
+<p>بعد همان دستور بررسی Secret را اجرا می‌کنیم و از نقطه‌ای که متوقف شدیم ادامه می‌دهیم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">PS C:\Users\Zardakh&gt; cd C:\Users\Zardakh\mtproxy-test; .\.venv\Scripts\Activate.ps1
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;from pathlib import Path; s=dict(x.split(&#39;=&#39;,1) for x in Path(&#39;telegram_proxy.env&#39;).read_text(encoding=&#39;ascii&#39;).splitlines() if &#39;=&#39; in x)[&#39;TELEGRAM_PROXY_SECRET&#39;].strip(); print(&#39;RAW LENGTH:&#39;,len(s)); print(&#39;HEX FORMAT:&#39;,all(c in &#39;0123456789abcdefABCDEF&#39; for c in s) and len(s)%2==0); print(&#39;STARTS WITH EE:&#39;,s.lower().startswith(&#39;ee&#39;)); print(&#39;STARTS WITH DD:&#39;,s.lower().startswith(&#39;dd&#39;))&quot;
+RAW LENGTH: 22
+HEX FORMAT: False
+STARTS WITH EE: True
+STARTS WITH DD: False
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>خوب، این خروجی یک سرنخ مهم دارد:</p>
+<ul>
+<li>طول رشته: ۲۲ کاراکتر</li>
+<li>قالب Hex: خیر</li>
+<li>شروع با <code>ee</code>: بله</li>
+<li>شروع با <code>dd</code>: خیر</li>
+</ul>
+<p>پس Secret احتمالاً به شکل <strong>Base64URL</strong> ذخیره شده، نه Hex. اما هنوز نمی‌دانیم بعد از Decode چه ساختاری دارد.</p>
+<p>یک نکته را هم اصلاح کنم: شروع رشته با <code>ee</code> به‌تنهایی اثبات نمی‌کند که Secret از نوع FakeTLS است؛ باید بایت‌های Decode‌شده را بررسی کنیم.</p>
+<h3>مرحلهٔ بعد: بررسی رمزگشایی Base64URL</h3>
+<p>این دستور را اجرا کن؛ هیچ بخشی از Secret را نمایش نمی‌دهد:</p>
+<pre><code class="language-powershell">python -c &quot;from pathlib import Path; import base64; from tgnet.connection.faketls import parse_tls_secret; s=dict(x.split(&#39;=&#39;,1) for x in Path(&#39;telegram_proxy.env&#39;).read_text(encoding=&#39;ascii&#39;).splitlines if &#39;=&#39; in x)[&#39;TELEGRAM_PROXY_SECRET&#39;].strip; b=base64.urlsafe_b64decode(s+&#39;=&#39;*(-len(s)%4)); print(&#39;DECODED LENGTH:&#39;,len(b)); print(&#39;FIRST BYTE:&#39;,hex(b[0]) if b else &#39;EMPTY&#39;); print(&#39;FAKETLS:&#39;,end=&#39; &#39;); exec(\&quot;try:\\n parse_tls_secret(b); print(&#39;VALID&#39;)\\nexcept Exception as e:\\n print(type(e).__name__+&#39;: &#39;+str(e))\&quot;)&quot;
+</code></pre>
+<p>فعلاً هیچ فایلی را تغییر نمی‌دهیم. اول مشخص کنیم Secret واقعاً چه نوعی است؛ بعد تصمیم می‌گیریم باید تنظیمات FakeTLS را اصلاح کنیم یا روش اتصال را.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;from pathlib import Path; import base64; from tgnet.connection.faketls import parse_tls_secret; s=dict(x.split(&#39;=&#39;,1) for x in Path(&#39;telegram_proxy.env&#39;).read_text(encoding=&#39;ascii&#39;).splitlines() if &#39;=&#39; in x)[&#39;TELEGRAM_PROXY_SECRET&#39;].strip(); b=base64.urlsafe_b64decode(s+&#39;=&#39;*(-len(s)%4)); print(&#39;DECODED LENGTH:&#39;,len(b)); print(&#39;FIRST BYTE:&#39;,hex(b[0]) if b else &#39;EMPTY&#39;); print(&#39;FAKETLS:&#39;,end=&#39; &#39;); exec(\&quot;try:\\n parse_tls_secret(b); print(&#39;VALID&#39;)\\nexcept Exception as e:\\n print(type(e).__name__+&#39;: &#39;+str(e))\&quot;)&quot;
+b : The term &#39;b&#39; is not recognized as the name of a cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:443
++ ...  print(&#39;FAKETLS:&#39;,end=&#39; &#39;); exec(\&quot;try:\\n parse_tls_secret(b); print ...
++                                                                 ~
+    + CategoryInfo          : ObjectNotFound: (b:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+e : The term &#39;e&#39; is not recognized as the name of a cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:501
++ ... t(b); print(&#39;VALID&#39;)\\nexcept Exception as e:\\n print(type(e).__name ...
++                                                                 ~
+    + CategoryInfo          : ObjectNotFound: (e:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>باز هم مشکل از تداخل کوتیشن‌ها و <code>exec</code> با PowerShell است، نه از Secret. اشتباه از من بود که دوباره دستور پیچیده‌ای با <code>exec</code> دادم.</p>
+<p>این بار ساده‌ترش می‌کنیم و اصلاً <code>exec</code> نداریم. دستور زیر فقط اطلاعات غیرحساس را چاپ می‌کند:</p>
+<pre><code class="language-powershell">python -c &quot;from pathlib import Path; import base64; s=dict(x.split(&#39;=&#39;,1) for x in Path(&#39;telegram_proxy.env&#39;).read_text(encoding=&#39;ascii&#39;).splitlines if &#39;=&#39; in x)[&#39;TELEGRAM_PROXY_SECRET&#39;].strip; b=base64.urlsafe_b64decode(s+&#39;=&#39;*(-len(s)%4)); print(&#39;DECODED LENGTH:&#39;,len(b)); print(&#39;FIRST BYTE:&#39;,hex(b[0]) if b else &#39;EMPTY&#39;); print(&#39;FAKETLS MARKER:&#39;,bool(b) and b[0]==238); print(&#39;FAKETLS MINIMUM LENGTH:&#39;,len(b)&gt;17)&quot;
+</code></pre>
+<p>خروجی را بفرست. فعلاً فقط همین را بررسی می‌کنیم؛ هنوز به اتصال شبکه نمی‌رویم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;from pathlib import Path; import base64; s=dict(x.split(&#39;=&#39;,1) for x in Path(&#39;telegram_proxy.env&#39;).read_text(encoding=&#39;ascii&#39;).splitlines() if &#39;=&#39; in x)[&#39;TELEGRAM_PROXY_SECRET&#39;].strip(); b=base64.urlsafe_b64decode(s+&#39;=&#39;*(-len(s)%4)); print(&#39;DECODED LENGTH:&#39;,len(b)); print(&#39;FIRST BYTE:&#39;,hex(b[0]) if b else &#39;EMPTY&#39;); print(&#39;FAKETLS MARKER:&#39;,bool(b) and b[0]==238); print(&#39;FAKETLS MINIMUM LENGTH:&#39;,len(b)&gt;17)&quot;
+DECODED LENGTH: 16
+FIRST BYTE: 0x79
+FAKETLS MARKER: False
+FAKETLS MINIMUM LENGTH: False
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>حالا تشخیص روشن‌تر شد: مقدار فعلی بعد از Base64URL Decode به <strong>۱۶ بایت</strong> تبدیل می‌شود و بایت اول آن <code>0x79</code> است.</p>
+<p>&lt;badge color=&quot;warning&quot;&gt;FakeTLS نیست&lt;/badge&gt;</p>
+<p>این مقدار با قالب FakeTLS مورد انتظار <code>tgnet</code> سازگار نیست. به احتمال زیاد Secret معمولی MTProxy است.</p>
+<p>اما قبل از تغییر هر چیزی، باید منشأ Secret را مشخص کنیم؛ چون ممکن است لینک پراکسی از ابتدا از نوع معمولی بوده باشد.</p>
+<p><strong>یک سؤال:</strong> این پراکسی را از کجا گرفتی؟</p>
+<ol>
+<li>لینک <code>t.me/proxy</code> که خودت یا شخص دیگری ساخته؟</li>
+<li>لینک پراکسی از یک کانال یا سایت؟</li>
+<li>سرور MTProxy خودت که با دامنه و FakeTLS راه‌اندازی شده؟</li>
+</ol>
+<p>اگر لینک کامل را داری، لازم نیست Secret را اینجا بفرستی؛ فقط بگو کدام‌یک از این سه حالت است. بر اساس آن مسیر درست را انتخاب می‌کنیم، نه اینکه Secret را به زور با FakeTLS سازگار کنیم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain"># Selected text:
+
+## Selection 1
+یک سؤال: این پراکسی را از کجا گرفتی؟
+
+## My request:
+یه کانال تلگرامی که پراکسی امتی پروتو میده</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>پس احتمالاً قضیه روشن شد. پراکسی‌ای که از کانال گرفتی به‌احتمال زیاد یک <strong>MTProxy معمولی</strong> است، نه MTProxy با FakeTLS.</p>
+<p>ما تا اینجا Adapter را بر اساس <code>TgNetConnectionTls</code> ساخته‌ایم؛ بنابراین احتمالاً از ابتدا نوع اتصال را اشتباه انتخاب کرده‌ایم.</p>
+<p>دو مسیر داریم:</p>
+<ul>
+<li><strong>MTProxy معمولی:</strong> باید ببینیم <code>tgnet</code> چه Connection مناسبی برای آن دارد.</li>
+<li><strong>MTProxy FakeTLS:</strong> باید پراکسی‌ای داشته باشیم که Secret مخصوص FakeTLS با پیشوند <code>ee</code> و دامنهٔ SNI معتبر ارائه کند.</li>
+</ul>
+<p>پیشنهاد من این است که فعلاً مسیر اول را بررسی کنیم؛ لازم نیست صرفاً برای حفظ Adapter فعلی دنبال پراکسی FakeTLS بگردیم.</p>
+<p><strong>یک بررسی کوچک:</strong> اگر روی لینک پراکسی کانال کلیک کنی، معمولاً تلگرام آن را به‌عنوان Proxy اضافه می‌کند. آیا در مشخصات پراکسی، گزینه یا عبارتی مثل FakeTLS یا Secure MTProxy دیده‌ای، یا فقط Server، Port و Secret دارد؟</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain"># Selected text:
+
+## Selection 1
+یک بررسی کوچک: اگر روی لینک پراکسی کانال کلیک کنی، معمولاً تلگرام آن را به‌عنوان Proxy اضافه می‌کند. آیا در مشخصات پراکسی، گزینه یا عبارتی مثل FakeTLS یا Secure MTProxy دیده‌ای، یا فقط Server، Port و Secret دارد؟
+
+## My request:
+فقط پورت و سرور و سکرت</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>پس فعلاً با یک <strong>MTProxy معمولی</strong> طرفیم: فقط Server، Port و Secret؛ نشانه‌ای از FakeTLS نداریم.</p>
+<p>این یعنی انتخاب قبلی ما برای <code>TgNetConnectionTls</code> احتمالاً مناسب این پراکسی نیست. بهتر است به‌جای دست‌کاری Secret، نوع Connection را اصلاح کنیم.</p>
+<p>نکتهٔ مهم: این پراکسی ممکن است برای تلگرام کاملاً کار کند، اما این به‌معنای سازگاری خودکار آن با Telethon و <code>tgnet</code> نیست.</p>
+<p>من بررسی مستندات Telethon را هم انجام دادم و خبر خوب این است که برای این حالت اصلاً به Adapter سفارشی <code>tgnet</code> نیاز نداریم.</p>
+<p>خود Telethon اتصال استاندارد MTProxy را پشتیبانی می‌کند:</p>
+<ul>
+<li><code>ConnectionTcpMTProxyRandomizedIntermediate</code> برای نوع انتقال پراکسی</li>
+<li><code>proxy=(host, port, secret)</code> برای مشخصات پراکسی</li>
+</ul>
+<p>این دقیقاً همان مسیری است که مستندات رسمی Telethon برای MTProxy معمولی پیشنهاد می‌کنند. &lt;Cite refs={[&quot;turn134454search3&quot;,&quot;turn134454search0&quot;]}/&gt;</p>
+<p><strong>اما یک نکتهٔ مهم:</strong> مقدار Secret ما به شکل Base64URL است و به ۱۶ بایت Decode می‌شود. باید آن را با قالب ورودی مورد انتظار Telethon تطبیق بدهیم؛ نباید فرض کنیم رشتهٔ فعلی را بدون تبدیل می‌توان به آن داد.</p>
+<p>پیشنهاد من: پیش از هر تغییری، کد فعلی Telethon نصب‌شده را بررسی کنیم تا دقیقاً بدانیم Secret را چگونه می‌خواند.</p>
+<p>این دستور را اجرا کن:</p>
+<pre><code class="language-powershell">python -c &quot;import inspect; from telethon.network.connection import ConnectionTcpMTProxyRandomizedIntermediate as C; print(inspect.getfile(C)); print(inspect.getsource(C))&quot;
+</code></pre>
+<p>خروجی را بفرست. بعد Adapter اشتباه FakeTLS را کنار می‌گذاریم و مسیر استاندارد را با کمترین تغییر در پروژه آزمایش می‌کنیم. هنوز به <code>telegram_receiver.py</code> دست نمی‌زنیم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">قبل کد یه سوال دارم بعضی سکرتها طولانی ان و بعضی کوتاه به نظرت این موجب تفاوتشون؟</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>بله، اتفاقاً طول Secret می‌تواند سرنخ مهمی دربارهٔ نوع پراکسی باشد؛ اما به‌تنهایی معیار قطعی نیست.</p>
+<p>در MTProxy چند قالب Secret داریم:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>نوع</th>
+<th>قالب معمول</th>
+<th align="right">طول تقریبی</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>معمولی</td>
+<td>کلید رمزنگاری Hex</td>
+<td align="right">۳۲ کاراکتر Hex (۱۶ بایت)</td>
+</tr>
+<tr>
+<td>FakeTLS</td>
+<td>پیشوند <code>ee</code> + کلید + دامنهٔ SNI</td>
+<td align="right">متغیر و طولانی‌تر</td>
+</tr>
+<tr>
+<td>رمزگذاری‌شده با Base64URL</td>
+<td>نمایش همان داده با کدگذاری متفاوت</td>
+<td align="right">بسته به داده و کدگذاری متغیر</td>
+</tr>
+</tbody></table></div>
+<p>برای مثال:</p>
+<ul>
+<li>Secret معمولی می‌تواند ۳۲ کاراکتر Hex باشد.</li>
+<li>Secret نوع FakeTLS معمولاً با <code>ee</code> شروع می‌شود و بعد از کلید ۱۶ بایتی، دامنه‌ای مثل <code>google.com</code> دارد.</li>
+<li>یک Secret ممکن است به‌جای Hex با Base64URL نمایش داده شود؛ بنابراین کوتاه یا بلند بودن متن الزاماً به معنی متفاوت بودن ساختار داخلی نیست.</li>
+</ul>
+<p><strong>نکتهٔ جالب:</strong> در مورد Secret خودمان، طول ۲۲ کاراکتر Base64URL بعد از Decode دقیقاً ۱۶ بایت شد. این با یک کلید معمولی ۱۲۸ بیتی سازگار است، نه FakeTLS.</p>
+<p>پس حدس من این است که تفاوت طولی که در کانال می‌بینی احتمالاً ناشی از تفاوت قالب یا نوع پراکسی است؛ ولی برای تشخیص قطعی باید محتوای Decode‌شده و ساختار Secret را بررسی کرد.</p>
+<p>یک نکتهٔ دیگر هم مهم است: FakeTLS صرفاً «Secret طولانی‌تر» نیست؛ وجود ساختار مشخص و دامنهٔ SNI در آن اهمیت دارد.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import inspect; from telethon.network.connection import ConnectionTcpMTProxyRandomizedIntermediate as C; print(inspect.getfile(C)); print(inspect.getsource(C))&quot;
+C:\Users\Zardakh\mtproxy-test\.venv\Lib\site-packages\telethon\network\connection\tcpmtproxy.py
+class ConnectionTcpMTProxyRandomizedIntermediate(TcpMTProxy):
+    &quot;&quot;&quot;
+    Connect to proxy using randomized intermediate protocol (dd-secrets)
+    &quot;&quot;&quot;
+    packet_codec = RandomizedIntermediatePacketCodec
+
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>خوب؛ این خروجی یک نکتهٔ مهم را تأیید کرد:</p>
+<p><code>ConnectionTcpMTProxyRandomizedIntermediate</code> در Telethon برای پروتکل <strong>Randomized Intermediate (dd-secrets)</strong> است.</p>
+<p>اما هنوز نباید آن را برای پراکسی خودمان انتخاب کنیم؛ چون مستندات همین کلاس می‌گویند <code>dd-secrets</code> و ما هنوز نوع Secret کانال را قطعی نکرده‌ایم.</p>
+<h3>قدم بعدی: بررسی کلاس پایه</h3>
+<p>این دستور را اجرا کن:</p>
+<pre><code class="language-powershell">python -c &quot;import inspect; from telethon.network.connection.tcpmtproxy import TcpMTProxy; print(inspect.getsource(TcpMTProxy))&quot;
+</code></pre>
+<p>می‌خواهم ببینم Telethon دقیقاً Secret را چگونه پردازش می‌کند و چه قالب‌هایی را می‌پذیرد.</p>
+<p>یک اصلاح هم دربارهٔ توضیح قبلی‌ام: Secret کوتاه و بلند الزاماً به معنی دو پروتکل متفاوت نیست. تفاوت ممکن است از نوع رمزگذاری و نحوهٔ نمایش Secret ناشی شود. نباید صرفاً از طول آن نوع پراکسی را تعیین کنیم.</p>
+<p>بعد از این بررسی، می‌توانیم بدون تغییر کد اصلی رسیور، اتصال مناسب را انتخاب کنیم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import inspect; from telethon.network.connection.tcpmtproxy import TcpMTProxy; print(inspect.getsource(TcpMTProxy))&quot;
+class TcpMTProxy(ObfuscatedConnection):
+    &quot;&quot;&quot;
+    Connector which allows user to connect to the Telegram via proxy servers
+    commonly known as MTProxy.
+    Implemented very ugly due to the leaky abstractions in Telethon networking
+    classes that should be refactored later (TODO).
+
+    .. warning::
+
+        The support for TcpMTProxy classes is **EXPERIMENTAL** and prone to
+        be changed. You shouldn&#39;t be using this class yet.
+    &quot;&quot;&quot;
+    packet_codec = None
+    obfuscated_io = MTProxyIO
+
+    # noinspection PyUnusedLocal
+    def __init__(self, ip, port, dc_id, *, loggers, proxy=None, local_addr=None):
+        # connect to proxy&#39;s host and port instead of telegram&#39;s ones
+        proxy_host, proxy_port = self.address_info(proxy)
+        self._secret = self.normalize_secret(proxy[2])
+        super().__init__(
+            proxy_host, proxy_port, dc_id, loggers=loggers)
+
+    async def _connect(self, timeout=None, ssl=None):
+        await super()._connect(timeout=timeout, ssl=ssl)
+
+        # Wait for EOF for 2 seconds (or if _wait_for_data&#39;s definition
+        # is missing or different, just sleep for 2 seconds). This way
+        # we give the proxy a chance to close the connection if the current
+        # codec (which the proxy detects with the data we sent) cannot
+        # be used for this proxy. This is a work around for #1134.
+        # TODO Sleeping for N seconds may not be the best solution
+        # TODO This fix could be welcome for HTTP proxies as well
+        try:
+            await asyncio.wait_for(self._reader._wait_for_data(&#39;proxy&#39;), 2)
+        except asyncio.TimeoutError:
+            pass
+        except Exception:
+            await asyncio.sleep(2)
+
+        if self._reader.at_eof():
+            await self.disconnect()
+            raise ConnectionError(
+                &#39;Proxy closed the connection after sending initial payload&#39;)
+
+    @staticmethod
+    def address_info(proxy_info):
+        if proxy_info is None:
+            raise ValueError(&quot;No proxy info specified for MTProxy connection&quot;)
+        return proxy_info[:2]
+
+    @staticmethod
+    def normalize_secret(secret):
+        if secret[:2] in (&quot;ee&quot;, &quot;dd&quot;):  # Remove extra bytes
+            secret = secret[2:]
+
+        try:
+            secret_bytes = bytes.fromhex(secret)
+        except ValueError:
+            secret = secret + &#39;=&#39; * (-len(secret) % 4)
+            secret_bytes = base64.b64decode(secret.encode())
+
+        return secret_bytes[:16]  # Remove the domain from the secret (until domain support is added)
+
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>عالی! این خروجی بالاخره رفتار واقعی Telethon را روشن کرد. چند نکتهٔ مهم در آن هست که مسیرمان را عوض می‌کند.</p>
+<h3>۱. Telethon با Secret چه می‌کند؟</h3>
+<p>در تابع <code>normalize_secret</code> این منطق وجود دارد:</p>
+<ol>
+<li>اگر دو کاراکتر اول <code>ee</code> یا <code>dd</code> باشند، آن‌ها را حذف می‌کند.</li>
+<li>ابتدا تلاش می‌کند باقی‌مانده را Hex بخواند.</li>
+<li>اگر Hex نبود، سراغ Base64 می‌رود.</li>
+<li>در نهایت فقط ۱۶ بایت اول را نگه می‌دارد.</li>
+</ol>
+<h3>۲. یک تله در Secret خودمان پیدا کردیم</h3>
+<p>Secret ما ۲۲ کاراکتر دارد، با <code>ee</code> شروع می‌شود و Base64URL آن به ۱۶ بایت تبدیل می‌شود.</p>
+<p>اما Telethon ممکن است دو حرف اول را به‌اشتباه پیشوند پروتکل فرض کند و حذفشان کند؛ درحالی‌که ممکن است آن دو حرف صرفاً بخشی از رشتهٔ Base64 باشند!</p>
+<p>پس نباید رشتهٔ فعلی را بدون بررسی به Telethon بدهیم.</p>
+<p>راه‌حل احتمالی این است که ابتدا Base64URL را Decode کنیم و سپس همان ۱۶ بایت را به شکل Hex استاندارد به Telethon بدهیم. این کار ابهام پیشوند را برطرف می‌کند؛ البته هنوز باید نوع پروتکل را انتخاب کنیم.</p>
+<h3>۳. هنوز یک بررسی لازم داریم</h3>
+<p>کلاسی که قبلاً انتخاب کردیم مخصوص <code>Randomized Intermediate</code> است و توضیح خودش به <code>dd-secrets</code> اشاره می‌کند. نباید بدون بررسی فرض کنیم برای پراکسی معمولی ما مناسب است.</p>
+<p>این دستور را اجرا کن:</p>
+<pre><code class="language-powershell">python -c &quot;import telethon.network.connection.tcpmtproxy as m; print(&#39;\n&#39;.join(n for n in dir(m) if n.startswith(&#39;ConnectionTcpMTProxy&#39;)))&quot;
+</code></pre>
+<p>می‌خواهم کلاس‌های موجود را ببینم تا اتصال درست را انتخاب کنیم.</p>
+<p><strong>یک نکتهٔ معماری:</strong> تا اینجا هنوز چیزی از رسیور اصلی تغییر نداده‌ایم؛ و همین‌طور ادامه می‌دهیم. اول نوع پروتکل و تفسیر Secret را قطعی می‌کنیم، بعد یک آزمایش مستقل انجام می‌دهیم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import telethon.network.connection.tcpmtproxy as m; print(&#39;\n&#39;.join(n for n in dir(m) if n.startswith(&#39;ConnectionTcpMTProxy&#39;)))&quot;
+ConnectionTcpMTProxyAbridged
+ConnectionTcpMTProxyIntermediate
+ConnectionTcpMTProxyRandomizedIntermediate
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>خوب، سه گزینهٔ واقعی در نسخهٔ نصب‌شدهٔ Telethon داریم:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>کلاس</th>
+<th>نوع انتقال</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ConnectionTcpMTProxyAbridged</code></td>
+<td>Abridged</td>
+</tr>
+<tr>
+<td><code>ConnectionTcpMTProxyIntermediate</code></td>
+<td>Intermediate</td>
+</tr>
+<tr>
+<td><code>ConnectionTcpMTProxyRandomizedIntermediate</code></td>
+<td>Randomized Intermediate</td>
+</tr>
+</tbody></table></div>
+<p>اما یک نکتهٔ فنی مهم: <strong>این سه کلاس، سه نوع رمزنگاری مستقل نیستند؛ تفاوت اصلی‌شان در قالب انتقال بسته‌های MTProto است.</strong></p>
+<p>از طرف دیگر، <code>TcpMTProxy.normalize_secret</code> در نسخهٔ نصب‌شدهٔ ما پیشوندهای <code>ee</code> و <code>dd</code> را حذف می‌کند و فقط ۱۶ بایت اول را نگه می‌دارد. حتی در توضیح کد آمده که پشتیبانی از دامنه در Secret هنوز پیاده‌سازی نشده است.</p>
+<h3>پیشنهاد من</h3>
+<p>قبل از انتخاب کلاس، دو کلاس دیگر را هم بررسی کنیم تا تفاوت واقعی‌شان را از روی کد ببینیم.</p>
+<p>این دستور را اجرا کن:</p>
+<pre><code class="language-powershell">python -c &quot;import inspect; from telethon.network.connection import ConnectionTcpMTProxyAbridged as A, ConnectionTcpMTProxyIntermediate as I; print(&#39;--- Abridged ---&#39;); print(inspect.getsource(A)); print(&#39;--- Intermediate ---&#39;); print(inspect.getsource(I))&quot;
+</code></pre>
+<p>بعد از آن می‌توانیم یک تصمیم مستند بگیریم، نه اینکه صرفاً یکی را حدس بزنیم.</p>
+<p>ضمناً هنوز مشخص نیست پراکسی کانال کدام Packet Codec را می‌پذیرد؛ این را در نهایت فقط با تست اتصال واقعی می‌توانیم تأیید کنیم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import inspect; from telethon.network.connection import ConnectionTcpMTProxyAbridged as A, ConnectionTcpMTProxyIntermediate as I; print(&#39;--- Abridged ---&#39;); print(inspect.getsource(A)); print(&#39;--- Intermediate ---&#39;); print(inspect.getsource(I))&quot;
+--- Abridged ---
+class ConnectionTcpMTProxyAbridged(TcpMTProxy):
+    &quot;&quot;&quot;
+    Connect to proxy using abridged protocol
+    &quot;&quot;&quot;
+    packet_codec = AbridgedPacketCodec
+
+--- Intermediate ---
+class ConnectionTcpMTProxyIntermediate(TcpMTProxy):
+    &quot;&quot;&quot;
+    Connect to proxy using intermediate protocol
+    &quot;&quot;&quot;
+    packet_codec = IntermediatePacketCodec
+
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>حالا تصویر فنی کامل‌تر شد. هر سه کلاس از <code>TcpMTProxy</code> ارث می‌برند و فقط <code>packet_codec</code> متفاوتی دارند:</p>
+<ul>
+<li>Abridged → <code>AbridgedPacketCodec</code></li>
+<li>Intermediate → <code>IntermediatePacketCodec</code></li>
+<li>Randomized Intermediate → <code>RandomizedIntermediatePacketCodec</code></li>
+</ul>
+<h3>برداشت من</h3>
+<p>برای پراکسی معمولی کانال، فعلاً نباید Randomized Intermediate را انتخاب قطعی کنیم. بهتر است اول Abridged و Intermediate را هم در آزمایش داشته باشیم.</p>
+<p>اما یک نکته را نباید فراموش کنیم: کد <code>TcpMTProxy</code> در Telethon صراحتاً پشتیبانی MTProxy را Experimental معرفی کرده است.</p>
+<h3>قدم بعدی: بررسی Secret واقعی بدون افشای آن</h3>
+<p>می‌خواهم بفهمیم آیا Secret فعلی واقعاً با قالب معمولی MTProxy سازگار است یا نه، و آیا Decode آن به همان ۱۶ بایت مورد انتظار می‌رسد.</p>
+<p>این دستور را اجرا کن:</p>
+<pre><code class="language-powershell">python -c &quot;from pathlib import Path; import base64; s=dict(x.split(&#39;=&#39;,1) for x in Path(&#39;telegram_proxy.env&#39;).read_text(encoding=&#39;ascii&#39;).splitlines if &#39;=&#39; in x)[&#39;TELEGRAM_PROXY_SECRET&#39;].strip; b=base64.urlsafe_b64decode(s+&#39;=&#39;*(-len(s)%4)); print(&#39;Decoded bytes:&#39;,len(b)); print(&#39;Standard 16-byte key:&#39;,len(b)==16); print(&#39;Hex representation valid:&#39;,len(b)==16)&quot;
+</code></pre>
+<p>اگر نتیجه ۱۶ بایت بود، می‌توانیم در مرحلهٔ بعد یک تست مستقل بسازیم که هر سه Codec را با همان پراکسی امتحان کند؛ بدون تغییر در رسیور اصلی.</p>
+<p>البته تست هر سه Codec باید با اتصال‌های جداگانه و کنترل‌شده انجام شود، نه هم‌زمان.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;from pathlib import Path; import base64; s=dict(x.split(&#39;=&#39;,1) for x in Path(&#39;telegram_proxy.env&#39;).read_text(encoding=&#39;ascii&#39;).splitlines() if &#39;=&#39; in x)[&#39;TELEGRAM_PROXY_SECRET&#39;].strip(); b=base64.urlsafe_b64decode(s+&#39;=&#39;*(-len(s)%4)); print(&#39;Decoded bytes:&#39;,len(b)); print(&#39;Standard 16-byte key:&#39;,len(b)==16); print(&#39;Hex representation valid:&#39;,len(b)==16)&quot;
+Decoded bytes: 16
+Standard 16-byte key: True
+Hex representation valid: True
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>خوب. حالا یک بخش مهم را تأیید کردیم:</p>
+<p>&lt;badge color=&quot;success&quot;&gt;۱۶ بایت تأیید شد&lt;/badge&gt;</p>
+<p>Secret فعلی پس از Base64URL Decode دقیقاً ۱۶ بایت است؛ یعنی از نظر اندازه، یک کلید استاندارد ۱۲۸ بیتی MTProxy است.</p>
+<p>اما هنوز یک ابهام داریم: آیا رشتهٔ اصلی واقعاً Base64URL است یا یک قالب دیگر؟ چون Telethon خودش اول Hex را امتحان می‌کند و بعد Base64 را.</p>
+<h3>قدم بعدی: بررسی تبدیل Secret برای Telethon</h3>
+<p>می‌خواهیم Secret را به Hex تبدیل کنیم تا Telethon آن را بدون ابهام به‌عنوان کلید ۱۶ بایتی بخواند.</p>
+<p>این دستور را اجرا کن؛ فقط طول خروجی را نشان می‌دهد، نه خود کلید:</p>
+<pre><code class="language-powershell">python -c &quot;from pathlib import Path; import base64; s=dict(x.split(&#39;=&#39;,1) for x in Path(&#39;telegram_proxy.env&#39;).read_text(encoding=&#39;ascii&#39;).splitlines if &#39;=&#39; in x)[&#39;TELEGRAM_PROXY_SECRET&#39;].strip; b=base64.urlsafe_b64decode(s+&#39;=&#39;*(-len(s)%4)); h=b.hex; print(&#39;Normalized secret length:&#39;,len(h)); print(&#39;Valid hex:&#39;,len(h)==32 and all(c in &#39;0123456789abcdef&#39; for c in h))&quot;
+</code></pre>
+<p>اگر PASS شد، می‌توانیم یک اسکریپت آزمایشی بسازیم که با همین کلید و سه Codec، اتصال را به‌ترتیب امتحان کند.</p>
+<p>فقط یادمان باشد: موفقیت TCP به‌تنهایی کافی نیست؛ باید اتصال MTProto هم تأیید شود.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;from pathlib import Path; import base64; s=dict(x.split(&#39;=&#39;,1) for x in Path(&#39;telegram_proxy.env&#39;).read_text(encoding=&#39;ascii&#39;).splitlines() if &#39;=&#39; in x)[&#39;TELEGRAM_PROXY_SECRET&#39;].strip(); b=base64.urlsafe_b64decode(s+&#39;=&#39;*(-len(s)%4)); h=b.hex(); print(&#39;Normalized secret length:&#39;,len(h)); print(&#39;Valid hex:&#39;,len(h)==32 and all(c in &#39;0123456789abcdef&#39; for c in h))&quot;
+Normalized secret length: 32
+Valid hex: True
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>خوب؛ تبدیل موفق بود. حالا یک نمایش استاندارد و بدون ابهام از کلید داریم:</p>
+<ul>
+<li>مقدار Decode‌شده: ۱۶ بایت</li>
+<li>نمایش Hex معادل: ۳۲ کاراکتر</li>
+<li>کلید برای تحویل به Telethon: قابل تبدیل به Hex استاندارد</li>
+</ul>
+<p>اما هنوز باید مطمئن شویم Telethon دقیقاً همین ۱۶ بایت را از نمایش جدید استخراج می‌کند.</p>
+<h3>آزمایش بعدی: تطبیق با پردازش داخلی Telethon</h3>
+<p>این دستور را اجرا کن:</p>
+<pre><code class="language-powershell">python -c &quot;from pathlib import Path; import base64; from telethon.network.connection.tcpmtproxy import TcpMTProxy; s=dict(x.split(&#39;=&#39;,1) for x in Path(&#39;telegram_proxy.env&#39;).read_text(encoding=&#39;ascii&#39;).splitlines if &#39;=&#39; in x)[&#39;TELEGRAM_PROXY_SECRET&#39;].strip; original=base64.urlsafe_b64decode(s+&#39;=&#39;*(-len(s)%4)); normalized=original.hex; result=TcpMTProxy.normalize_secret(normalized); print(&#39;Telethon key length:&#39;,len(result)); print(&#39;Same key:&#39;,result==original); print(&#39;Normalization:&#39;,&#39;PASS&#39; if result==original else &#39;FAIL&#39;)&quot;
+</code></pre>
+<p>اگر <code>Same key: True</code> شد، تفسیر کلید را تأیید کرده‌ایم.</p>
+<p><strong>فعلاً Secret داخل فایل را تغییر نمی‌دهیم.</strong> تبدیل را در Loader انجام خواهیم داد تا فایل تنظیمات همچنان با قالب فعلی خودش باقی بماند.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;from pathlib import Path; import base64; from telethon.network.connection.tcpmtproxy import TcpMTProxy; s=dict(x.split(&#39;=&#39;,1) for x in Path(&#39;telegram_proxy.env&#39;).read_text(encoding=&#39;ascii&#39;).splitlines() if &#39;=&#39; in x)[&#39;TELEGRAM_PROXY_SECRET&#39;].strip(); original=base64.urlsafe_b64decode(s+&#39;=&#39;*(-len(s)%4)); normalized=original.hex(); result=TcpMTProxy.normalize_secret(normalized); print(&#39;Telethon key length:&#39;,len(result)); print(&#39;Same key:&#39;,result==original); print(&#39;Normalization:&#39;,&#39;PASS&#39; if result==original else &#39;FAIL&#39;)&quot;
+Telethon key length: 16
+Same key: True
+Normalization: PASS
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>عالی. این بار یک تأیید واقعی از داخل کد Telethon داریم:</p>
+<p>&lt;badge color=&quot;success&quot;&gt;Normalization: PASS&lt;/badge&gt;</p>
+<p>یعنی:</p>
+<ul>
+<li>Secret فایل تنظیمات را Base64URL Decode کردیم.</li>
+<li>آن را به Hex تبدیل کردیم.</li>
+<li>تابع داخلی Telethon دوباره آن را به ۱۶ بایت تبدیل کرد.</li>
+<li>هر ۱۶ بایت دقیقاً با کلید اولیه برابر بود.</li>
+</ul>
+<p>پس ابهام رمزگشایی کلید را حل کردیم.</p>
+<h3>حالا یک تصمیم فنی مهم</h3>
+<p>سه Codec داریم، ولی لازم نیست از همین ابتدا هر سه را کورکورانه امتحان کنیم. پیشنهاد من این است که ابتدا <code>Intermediate</code> را آزمایش کنیم و در صورت شکست، سراغ دو گزینهٔ دیگر برویم.</p>
+<p>پیش از ساخت تست، یک بررسی کوچک دیگر لازم است: ببینیم نسخهٔ Telethon ما برای ساخت اتصال و قطع اتصال چه رابطی ارائه می‌دهد.</p>
+<pre><code class="language-powershell">python -c &quot;import inspect; from telethon.network.connection import ConnectionTcpMTProxyIntermediate as C; print(&#39;connect:&#39;,inspect.signature(C.connect)); print(&#39;disconnect:&#39;,inspect.signature(C.disconnect)); print(&#39;send:&#39;,inspect.signature(C.send)); print(&#39;recv:&#39;,inspect.signature(C.recv))&quot;
+</code></pre>
+<p>بعد از این بررسی، اسکریپت تست مستقل را می‌سازیم. هدف این است که ابتدا FakeTLS را کاملاً از مسیر آزمایش کنار بگذاریم و با MTProxy معمولی اتصال واقعی را بسنجیم؛ بدون دست‌زدن به رسیور اصلی.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import inspect; from telethon.network.connection import ConnectionTcpMTProxyIntermediate as C; print(&#39;connect:&#39;,inspect.signature(C.connect)); print(&#39;disconnect:&#39;,inspect.signature(C.disconnect)); print(&#39;send:&#39;,inspect.signature(C.send)); print(&#39;recv:&#39;,inspect.signature(C.recv))&quot;
+connect: (self, timeout=None, ssl=None)
+disconnect: (self)
+send: (self, data)
+recv: (self)
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>خوب، رابط اتصال مشخص شد. متدها ساده‌اند و می‌توانیم مستقیماً خود Connection را آزمایش کنیم.</p>
+<p>اما قبل از ساخت تست، یک نکته را اصلاح کنم: هنوز انتخاب <code>Intermediate</code> صرفاً یک فرض آزمایشی است، نه نتیجهٔ بررسی Secret. نوع Codec را سرور تعیین می‌کند و ممکن است لازم باشد هر سه را جداگانه امتحان کنیم.</p>
+<h3>مرحلهٔ بعد: ساخت تست مستقل</h3>
+<p>می‌خواهم یک فایل به نام <code>test_mtproxy_connection.py</code> بسازیم که:</p>
+<ol>
+<li>تنظیمات را از <code>telegram_proxy.env</code> بخواند.</li>
+<li>Secret را به‌درستی Decode کند.</li>
+<li>Connection را با مقصد MTProxy بسازد.</li>
+<li>با Timeout محدود اتصال را امتحان کند.</li>
+<li>نتیجه را بدون نمایش Secret گزارش کند.</li>
+<li>در پایان اتصال را ببندد.</li>
+</ol>
+<p>فعلاً فقط <code>Intermediate</code> را امتحان می‌کنیم. اگر جواب نداد، سراغ Codecهای دیگر می‌رویم.</p>
+<p><strong>قبل از نوشتن فایل یک سؤال مهم:</strong> پراکسی‌ای که از کانال گرفتی الان در خود تلگرام روی کامپیوترت وصل می‌شود و پیام‌ها را ردوبدل می‌کند؟</p>
+<p>این موضوع کمک می‌کند شکست احتمالی تست را از مشکل خود پراکسی جدا کنیم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain"># Selected text:
+
+## Selection 1
+قبل از نوشتن فایل یک سؤال مهم: پراکسی‌ای که از کانال گرفتی الان در خود تلگرام روی کامپیوترت وصل می‌شود و پیام‌ها را ردوبدل می‌کند؟
+
+## My request:
+بله الان بهش وصل هستم 😁👍👍</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>😂👍 عالی! این بهترین وضعیت برای ادامهٔ آزمایش است.</p>
+<p>حالا یک مرجع مقایسه داریم: <strong>همین پراکسی با همین سرور، پورت و Secret در تلگرام دسکتاپ کار می‌کند.</strong></p>
+<p>پس اگر تست ما شکست بخورد، باید بین این موارد تفکیک کنیم:</p>
+<ul>
+<li>تفسیر Secret در Telethon</li>
+<li>انتخاب Packet Codec</li>
+<li>نحوهٔ برقراری اتصال توسط کتابخانه</li>
+<li>تفاوت رفتار تلگرام دسکتاپ و Telethon</li>
+</ul>
+<h3>حالا فایل تست را می‌سازیم</h3>
+<p>فعلاً فقط یک Codec یعنی <code>Intermediate</code> را آزمایش می‌کنیم. تست هم مستقل است و به رسیور اصلی دست نمی‌زند.</p>
+<p>یک نکتهٔ مهم: قبل از نوشتن فایل، باید سازندهٔ کلاس پایه و قرارداد <code>loggers</code> را دقیقاً مطابق نسخهٔ نصب‌شده تنظیم کنیم؛ نمی‌خواهم دوباره با کدی که صرفاً روی کاغذ درست است جلو برویم.</p>
+<p>این دستور را اجرا کن:</p>
+<pre><code class="language-powershell">python -c &quot;import inspect; from telethon.network.connection.tcpmtproxy import TcpMTProxy; print(inspect.signature(TcpMTProxy.__init__)); print(&#39;--- ObfuscatedConnection ---&#39;); print(inspect.signature(TcpMTProxy.__mro__[1].__init__))&quot;
+</code></pre>
+<p>بعد فایل تست را با هم می‌سازیم. 😁</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import inspect; from telethon.network.connection.tcpmtproxy import TcpMTProxy; print(inspect.signature(TcpMTProxy.__init__)); print(&#39;--- ObfuscatedConnection ---&#39;); print(inspect.signature(TcpMTProxy.__mro__[1].__init__))&quot;
+(self, ip, port, dc_id, *, loggers, proxy=None, local_addr=None)
+--- ObfuscatedConnection ---
+(self, ip, port, dc_id, *, loggers, proxy=None, local_addr=None)
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>خوب، سازندهٔ کلاس پایه هم مشخص شد. امضای هر دو یکسان است و <code>TcpMTProxy</code> خودش اطلاعات سرور و کلید را از <code>proxy</code> دریافت می‌کند.</p>
+<p>حالا قبل از نوشتن تست، یک نکتهٔ ظریف را در نظر بگیریم: Telethon برای اتصال MTProxy، آدرس پراکسی را از <code>proxy=(host, port, secret)</code> می‌گیرد؛ بنابراین نباید Host و Port را هم‌زمان به‌عنوان مقصد مستقیم و پراکسی به آن بدهیم.</p>
+<h3>قدم بعدی: بررسی Logger</h3>
+<p>این دستور را اجرا کن:</p>
+<pre><code class="language-powershell">python -c &quot;import inspect; from telethon.network.connection.connection import Connection; print(inspect.getsource(Connection.__init__))&quot;
+</code></pre>
+<p>می‌خواهم مطمئن شویم ساختار Logger مورد انتظار کلاس چیست. بعد از آن دیگر اطلاعات لازم برای ساخت فایل تست مستقل را خواهیم داشت.</p>
+<p>تا اینجا مسیر FakeTLS را کنار گذاشته‌ایم و داریم روی اتصال استاندارد MTProxy تمرکز می‌کنیم.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import inspect; from telethon.network.connection.connection import Connection; print(inspect.getsource(Connection.__init__))&quot;
+    def __init__(self, ip, port, dc_id, *, loggers, proxy=None, local_addr=None):
+        self._ip = ip
+        self._port = port
+        self._dc_id = dc_id  # only for MTProxy, it&#39;s an abstraction leak
+        self._log = loggers[__name__]
+        self._proxy = proxy
+        self._local_addr = local_addr
+        self._reader = None
+        self._writer = None
+        self._connected = False
+        self._send_task = None
+        self._recv_task = None
+        self._codec = None
+        self._obfuscation = None  # TcpObfuscated and MTProxy
+        self._send_queue = asyncio.Queue(1)
+        self._recv_queue = asyncio.Queue(1)
+
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>خوب، ساختار Logger کاملاً روشن شد.</p>
+<p>این کلاس فقط یک Logger را با نام ماژول خودش از دیکشنری می‌گیرد:</p>
+<pre><code class="language-python">self._log = loggers[__name__]
+</code></pre>
+<p>بنابراین برای تست مستقل، می‌توانیم یک Logger معمولی و مشخص بسازیم؛ نیازی به سیستم پیچیدهٔ لاگ‌گیری نداریم.</p>
+<p>یک نکته را هم تأیید کنیم: متد <code>connect</code> در کلاس پایه دقیقاً چه کارهایی انجام می‌دهد. چون نمی‌خواهیم اتصال را باز کنیم ولی چرخهٔ دریافت و ارسال را ناقص رها کنیم.</p>
+<p>این دستور را اجرا کن:</p>
+<pre><code class="language-powershell">python -c &quot;import inspect; from telethon.network.connection.connection import Connection; print(inspect.getsource(Connection.connect)); print(&#39;--- DISCONNECT ---&#39;); print(inspect.getsource(Connection.disconnect))&quot;
+</code></pre>
+<p>بعد از دیدن این دو متد، فایل آزمایش را می‌سازیم. اطلاعات لازم تقریباً کامل شده‌اند؛ دیگر نمی‌خواهم بررسی‌های بی‌پایان انجام بدهیم. 😁</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import inspect; from telethon.network.connection.connection import Connection; print(inspect.getsource(Connection.connect)); print(&#39;--- DISCONNECT ---&#39;); print(inspect.getsource(Connection.disconnect))&quot;
+    async def connect(self, timeout=None, ssl=None):
+        &quot;&quot;&quot;
+        Establishes a connection with the server.
+        &quot;&quot;&quot;
+        await self._connect(timeout=timeout, ssl=ssl)
+        self._connected = True
+
+        loop = helpers.get_running_loop()
+        self._send_task = loop.create_task(self._send_loop())
+        self._recv_task = loop.create_task(self._recv_loop())
+
+--- DISCONNECT ---
+    async def disconnect(self):
+        &quot;&quot;&quot;
+        Disconnects from the server, and clears
+        pending outgoing and incoming messages.
+        &quot;&quot;&quot;
+        if not self._connected:
+            return
+
+        self._connected = False
+
+        await helpers._cancel(
+            self._log,
+            send_task=self._send_task,
+            recv_task=self._recv_task
+        )
+
+        if self._writer:
+            self._writer.close()
+            if sys.version_info &gt;= (3, 7):
+                try:
+                    await asyncio.wait_for(self._writer.wait_closed(), timeout=10)
+                except asyncio.TimeoutError:
+                    # See issue #3917. For some users, this line was hanging indefinitely.
+                    # The hard timeout is not ideal (connection won&#39;t be properly closed),
+                    # but the code will at least be able to procceed.
+                    self._log.warning(&#39;Graceful disconnection timed out, forcibly ignoring cleanup&#39;)
+                except Exception as e:
+                    # Disconnecting should never raise. Seen:
+                    # * OSError: No route to host and
+                    # * OSError: [Errno 32] Broken pipe
+                    # * ConnectionResetError
+                    self._log.info(&#39;%s during disconnect: %s&#39;, type(e), e)
+
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>خب! 😁👍 این واقعاً خبر خوبی است؛ چون حالا می‌دانیم خود سرور پراکسی فعال است و تلگرام دسکتاپ هم با آن ارتباط برقرار می‌کند.</p>
+<p>دیگر بررسی‌های مقدماتی کافی است. برویم سراغ آزمایش واقعی.</p>
+<h3>ساخت اولین تست مستقل</h3>
+<p>فایل <code>test_mtproxy_connection.py</code> را در پوشهٔ فعلی می‌سازیم. این تست:</p>
+<ul>
+<li>تنظیمات را از <code>telegram_proxy.env</code> می‌خواند.</li>
+<li>Secret را از Base64URL به Hex تبدیل می‌کند.</li>
+<li>کلاس <code>ConnectionTcpMTProxyIntermediate</code> را به کار می‌گیرد.</li>
+<li>با Timeout محدود متصل می‌شود.</li>
+<li>Secret را چاپ نمی‌کند.</li>
+<li>در پایان اتصال را می‌بندد.</li>
+</ul>
+<p>این دستور را یک‌جا در PowerShell اجرا کن:</p>
+<pre><code class="language-powershell">@&#39;
+import asyncio
+import base64
+import logging
+from collections import defaultdict
+from pathlib import Path
+
+from telethon.network.connection import ConnectionTcpMTProxyIntermediate
+
+def load_config:
+    path = Path(&quot;telegram_proxy.env&quot;)
+    data = dict(
+        line.split(&quot;=&quot;, 1)
+        for line in path.read_text(encoding=&quot;ascii&quot;).splitlines
+        if &quot;=&quot; in line
+    )
+
+    host = data[&quot;TELEGRAM_PROXY_HOST&quot;].strip
+    port = int(data[&quot;TELEGRAM_PROXY_PORT&quot;].strip)
+    raw = data[&quot;TELEGRAM_PROXY_SECRET&quot;].strip
+
+    secret = base64.urlsafe_b64decode(
+        raw + &quot;=&quot; * (-len(raw) % 4)
+    )
+
+    if not host or not 1 &lt;= port &lt;= 65535:
+        raise ValueError(&quot;Invalid proxy configuration&quot;)
+
+    if len(secret) != 16:
+        raise ValueError(&quot;Expected a 16-byte MTProxy secret&quot;)
+
+    return host, port, secret.hex
+
+async def main:
+    host, port, secret = load_config
+
+    logging.basicConfig(level=logging.WARNING)
+    loggers = defaultdict(
+        lambda: logging.getLogger(&quot;mtproxy-test&quot;)
+    )
+
+    connection = ConnectionTcpMTProxyIntermediate(
+        &quot;149.154.167.51&quot;,
+        443,
+        2,
+        loggers=loggers,
+        proxy=(host, port, secret),
+    )
+
+    try:
+        print(&quot;Testing MTProxy Intermediate...&quot;)
+        await asyncio.wait_for(
+            connection.connect(timeout=10),
+            timeout=15,
+        )
+        print(&quot;Connection: PASS&quot;)
+        print(&quot;Codec: Intermediate&quot;)
+    except Exception as error:
+        print(&quot;Connection: FAIL&quot;)
+        print(&quot;Error:&quot;, type(error).__name__, str(error))
+    finally:
+        await connection.disconnect
+        print(&quot;Connection closed.&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    asyncio.run(main)
+&#39;@ | Set-Content -Encoding utf8 .\test_mtproxy_connection.py
+</code></pre>
+<p>بعد از ساخت فایل، فعلاً اجرا نکن؛ فقط بگو فایل ساخته شد.</p>
+<p><strong>مرز موفقیت را هم دقیق نگه داریم:</strong> این آزمایش اتصال و مرحلهٔ اولیهٔ پروتکل MTProxy را بررسی می‌کند، نه هنوز احراز هویت ربات یا دریافت پیام از Bot API. برای آن مرحله آزمایش جداگانه خواهیم داشت.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain"># Selected text:
+
+## Selection 1
+این دستور را یک‌جا در PowerShell اجرا کن:
+powershell
+
+
+
+@&#39;
+import asyncio
+import base64
+import logging
+from collections import defaultdict
+from pathlib import Path
+
+from telethon.network.connection import ConnectionTcpMTProxyIntermediate
+
+
+def load_config():
+    path = Path(&quot;telegram_proxy.env&quot;)
+    data = dict(
+        line.split(&quot;=&quot;, 1)
+        for line in path.read_text(encoding=&quot;ascii&quot;).splitlines()
+        if &quot;=&quot; in line
+    )
+
+    host = data[&quot;TELEGRAM_PROXY_HOST&quot;].strip()
+    port = int(data[&quot;TELEGRAM_PROXY_PORT&quot;].strip())
+    raw = data[&quot;TELEGRAM_PROXY_SECRET&quot;].strip()
+
+    secret = base64.urlsafe_b64decode(
+        raw + &quot;=&quot; * (-len(raw) % 4)
+    )
+
+    if not host or not 1 &lt;= port &lt;= 65535:
+        raise ValueError(&quot;Invalid proxy configuration&quot;)
+
+    if len(secret) != 16:
+        raise ValueError(&quot;Expected a 16-byte MTProxy secret&quot;)
+
+    return host, port, secret.hex()
+
+
+async def main():
+    host, port, secret = load_config()
+
+    logging.basicConfig(level=logging.WARNING)
+    loggers = defaultdict(
+        lambda: logging.getLogger(&quot;mtproxy-test&quot;)
+    )
+
+    connection = ConnectionTcpMTProxyIntermediate(
+        &quot;149.154.167.51&quot;,
+        443,
+        2,
+        loggers=loggers,
+        proxy=(host, port, secret),
+    )
+
+    try:
+        print(&quot;Testing MTProxy Intermediate...&quot;)
+        await asyncio.wait_for(
+            connection.connect(timeout=10),
+            timeout=15,
+        )
+        print(&quot;Connection: PASS&quot;)
+        print(&quot;Codec: Intermediate&quot;)
+    except Exception as error:
+        print(&quot;Connection: FAIL&quot;)
+        print(&quot;Error:&quot;, type(error).__name__, str(error))
+    finally:
+        await connection.disconnect()
+        print(&quot;Connection closed.&quot;)
+
+
+if __name__ == &quot;__main__&quot;:
+    asyncio.run(main())
+&#39;@ | Set-Content -Encoding utf8 .\test_mtproxy_connection.py
+
+## My request:
+پاورشل یه خطی اجرا میکنه</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>درست می‌گی 😁 دستور قبلی من چندخطی بود. این بار واقعاً یک خط است؛ فایل را با یک دستور Python می‌سازد.</p>
+<p>این خط را کامل کپی و در PowerShell اجرا کن:</p>
+<pre><code class="language-powershell">python -c &quot;import base64; from pathlib import Path; Path(&#39;test_mtproxy_connection.py&#39;).write_bytes(base64.b64decode(&#39;aW1wb3J0IGFzeW5jaW8sIGJhc2U2NCwgbG9nZ2luZwpmcm9tIHBhdGhsaWIgaW1wb3J0IFBhdGgKZnJvbSBjb2xsZWN0aW9ucyBpbXBvcnQgZGVmYXVsdGRpY3QKZnJvbSB0ZWxldGhvbi5uZXR3b3JrLmNvbm5lY3Rpb24gaW1wb3J0IENvbm5lY3Rpb25UY3BNVFByb3h5SW50ZXJtZWRpYXRlIGFzIEMKCmQgPSBkaWN0KHguc3BsaXQoIj0iLCAxKSBmb3IgeCBpbiBQYXRoKCJ0ZWxlZ3JhbV9wcm94eS5lbnYiKS5yZWFkX3RleHQoZW5jb2Rpbmc9ImFzY2lpIikuc3BsaXRsaW5lcygpIGlmICI9IiBpbiB4KQpob3N0LCBwb3J0ID0gZFsiVEVMRUdSQU1fUFJPWFlfSE9TVCJdLnN0cmlwKCksIGludChkWyJURUxFR1JBTV9QUk9YWV9QT1JUIl0pCnMgPSBkWyJURUxFR1JBTV9QUk9YWV9TRUNSRVQiXS5zdHJpcCgpCmtleSA9IGJhc2U2NC51cmxzYWZlX2I2NGRlY29kZShzICsgIj0iICogKC1sZW4ocykgJSA0KSkKaWYgbm90IGhvc3Qgb3Igbm90IDEgPD0gcG9ydCA8PSA2NTUzNSBvciBsZW4oa2V5KSAhPSAxNjoKICAgIHJhaXNlIFZhbHVlRXJyb3IoIkludmFsaWQgTVRQcm94eSBjb25maWd1cmF0aW9uIikKCmFzeW5jIGRlZiBtYWluKCk6CiAgICBjID0gQygiMTQ5LjE1NC4xNjcuNTEiLCA0NDMsIDIsIGxvZ2dlcnM9ZGVmYXVsdGRpY3QobGFtYmRhOiBsb2dnaW5nLmdldExvZ2dlcigibXRwcm94eS10ZXN0IikpLCBwcm94eT0oaG9zdCwgcG9ydCwga2V5LmhleCgpKSkKICAgIHRyeToKICAgICAgICBwcmludCgiVGVzdGluZyBJbnRlcm1lZGlhdGUuLi4iKQogICAgICAgIGF3YWl0IGFzeW5jaW8ud2FpdF9mb3IoYy5jb25uZWN0KHRpbWVvdXQ9MTApLCB0aW1lb3V0PTE1KQogICAgICAgIHByaW50KCJQcm94eSB0cmFuc3BvcnQ6IFBBU1MgKGNvbm5lY3Rpb24gcmVtYWluZWQgb3BlbikiKQogICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgIHByaW50KCJQcm94eSB0cmFuc3BvcnQ6IEZBSUwiKQogICAgICAgIHByaW50KHR5cGUoZSkuX19uYW1lX18gKyAiOiIsIHN0cihlKSkKICAgIGZpbmFsbHk6CiAgICAgICAgaWYgYy5fY29ubmVjdGVkOgogICAgICAgICAgICBhd2FpdCBjLmRpc2Nvbm5lY3QoKQogICAgICAgIGVsaWYgYy5fd3JpdGVyOgogICAgICAgICAgICBjLl93cml0ZXIuY2xvc2UoKQogICAgICAgIHByaW50KCJDbGVhbnVwIGNvbXBsZXRlIikKCmFzeW5jaW8ucnVuKG1haW4oKSkK&#39;))&quot;
+</code></pre>
+<p>اگر خط فرمان بدون خطا برگشت، فقط بگو فایل ساخته شد. بعد آن را اجرا می‌کنیم:</p>
+<pre><code class="language-powershell">python .\test_mtproxy_connection.py
+</code></pre>
+<p>فعلاً نتیجهٔ <code>PASS</code> فقط یعنی اتصال پراکسی برقرار مانده و سرور بلافاصله اتصال را نبسته؛ هنوز احراز هویت یا تبادل موفق MTProto را اثبات نمی‌کند.</p>
+</div></section>
+<section class="turn user" aria-label="User"><div class="turn-label">User</div><div class="bubble"><div class="plain">(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python -c &quot;import base64; from pathlib import Path; Path(&#39;test_mtproxy_connection.py&#39;).write_bytes(base64.b64decode(&#39;aW1wb3J0IGFzeW5jaW8sIGJhc2U2NCwgbG9nZ2luZwpmcm9tIHBhdGhsaWIgaW1wb3J0IFBhdGgKZnJvbSBjb2xsZWN0aW9ucyBpbXBvcnQgZGVmYXVsdGRpY3QKZnJvbSB0ZWxldGhvbi5uZXR3b3JrLmNvbm5lY3Rpb24gaW1wb3J0IENvbm5lY3Rpb25UY3BNVFByb3h5SW50ZXJtZWRpYXRlIGFzIEMKCmQgPSBkaWN0KHguc3BsaXQoIj0iLCAxKSBmb3IgeCBpbiBQYXRoKCJ0ZWxlZ3JhbV9wcm94eS5lbnYiKS5yZWFkX3RleHQoZW5jb2Rpbmc9ImFzY2lpIikuc3BsaXRsaW5lcygpIGlmICI9IiBpbiB4KQpob3N0LCBwb3J0ID0gZFsiVEVMRUdSQU1fUFJPWFlfSE9TVCJdLnN0cmlwKCksIGludChkWyJURUxFR1JBTV9QUk9YWV9QT1JUIl0pCnMgPSBkWyJURUxFR1JBTV9QUk9YWV9TRUNSRVQiXS5zdHJpcCgpCmtleSA9IGJhc2U2NC51cmxzYWZlX2I2NGRlY29kZShzICsgIj0iICogKC1sZW4ocykgJSA0KSkKaWYgbm90IGhvc3Qgb3Igbm90IDEgPD0gcG9ydCA8PSA2NTUzNSBvciBsZW4oa2V5KSAhPSAxNjoKICAgIHJhaXNlIFZhbHVlRXJyb3IoIkludmFsaWQgTVRQcm94eSBjb25maWd1cmF0aW9uIikKCmFzeW5jIGRlZiBtYWluKCk6CiAgICBjID0gQygiMTQ5LjE1NC4xNjcuNTEiLCA0NDMsIDIsIGxvZ2dlcnM9ZGVmYXVsdGRpY3QobGFtYmRhOiBsb2dnaW5nLmdldExvZ2dlcigibXRwcm94eS10ZXN0IikpLCBwcm94eT0oaG9zdCwgcG9ydCwga2V5LmhleCgpKSkKICAgIHRyeToKICAgICAgICBwcmludCgiVGVzdGluZyBJbnRlcm1lZGlhdGUuLi4iKQogICAgICAgIGF3YWl0IGFzeW5jaW8ud2FpdF9mb3IoYy5jb25uZWN0KHRpbWVvdXQ9MTApLCB0aW1lb3V0PTE1KQogICAgICAgIHByaW50KCJQcm94eSB0cmFuc3BvcnQ6IFBBU1MgKGNvbm5lY3Rpb24gcmVtYWluZWQgb3BlbikiKQogICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgIHByaW50KCJQcm94eSB0cmFuc3BvcnQ6IEZBSUwiKQogICAgICAgIHByaW50KHR5cGUoZSkuX19uYW1lX18gKyAiOiIsIHN0cihlKSkKICAgIGZpbmFsbHk6CiAgICAgICAgaWYgYy5fY29ubmVjdGVkOgogICAgICAgICAgICBhd2FpdCBjLmRpc2Nvbm5lY3QoKQogICAgICAgIGVsaWYgYy5fd3JpdGVyOgogICAgICAgICAgICBjLl93cml0ZXIuY2xvc2UoKQogICAgICAgIHByaW50KCJDbGVhbnVwIGNvbXBsZXRlIikKCmFzeW5jaW8ucnVuKG1haW4oKSkK&#39;))&quot;
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt; python .\test_mtproxy_connection.py
+Testing Intermediate...
+Proxy transport: PASS (connection remained open)
+Cleanup complete
+(.venv) PS C:\Users\Zardakh\mtproxy-test&gt;</div></div></section>
+<section class="turn assistant" aria-label="ChatGPT"><div class="turn-label">ChatGPT</div><div class="body"><p>خوب! 😁 مرحلهٔ اول موفق شد.</p>
+<p>&lt;badge color=&quot;success&quot;&gt;PASS&lt;/badge&gt; <strong>اتصال انتقالی MTProxy با پروتکل Intermediate برقرار ماند.</strong></p>
+<p>این نتیجه چند نکته را تأیید می‌کند:</p>
+<ul>
+<li>آدرس و پورت پراکسی از نظر برقراری اتصال قابل استفاده‌اند.</li>
+<li>کلید پس از Decode و تبدیل به Hex به‌درستی به Telethon رسیده است.</li>
+<li>پراکسی پس از ارسال دادهٔ اولیه اتصال را فوراً نبسته است.</li>
+<li>پاک‌سازی اتصال هم بدون خطا انجام شده است.</li>
+</ul>
+<p>اما یک مرز مهم: هنوز تبادل واقعی پیام MTProto و احراز هویت ربات را آزمایش نکرده‌ایم. پس فعلاً نمی‌توانیم بگوییم رسیور آمادهٔ مهاجرت است.</p>
+<h3>مرحلهٔ بعد: آزمایش واقعی MTProto</h3>
+<p>پیشنهادم این است که حالا با <code>TelegramClient</code> یک اتصال واقعی برقرار کنیم و بعد با Bot Token احراز هویت را آزمایش کنیم. این مرحله مشخص می‌کند که ارتباط فقط در سطح انتقال برقرار است یا واقعاً می‌توانیم با تلگرام صحبت کنیم.</p>
+<p><strong>یک سؤال قبل از ادامه:</strong> آیا <code>api_id</code> و <code>api_hash</code> را قبلاً برای این پروژه تهیه کرده‌ای و در فایل تنظیمات محلی داری؟ لازم نیست هیچ‌کدام را اینجا بفرستی.</p>
+</div></section>
+<footer>Exported with ChatGPT Markdown Export.</footer>
+</main>
+</body>
+</html>
