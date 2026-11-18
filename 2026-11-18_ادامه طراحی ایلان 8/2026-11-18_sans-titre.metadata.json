@@ -1,0 +1,31 @@
+{
+  "schema_version": 2,
+  "conversation_id": "6afdaf2c-5aec-83eb-b51b-4423996716e6",
+  "title": "ادامه طراحی ایلان ۸",
+  "created_at": 1795010348.909155,
+  "updated_at": 1795023736.611384,
+  "exported_at": "2026-11-18T17:40:55.380Z",
+  "message_count": 160,
+  "branch": "current",
+  "branch_count": 2,
+  "project_id": null,
+  "project_title": null,
+  "archived": false,
+  "shared": false,
+  "share_id": null,
+  "workspace_id": "b1263d73-b449-435b-8fa8-6c023818f291",
+  "export_formats": {
+    "markdown": true,
+    "html": true,
+    "embedded_markdown": false,
+    "raw_json": true,
+    "thinking_summaries": false
+  },
+  "capability_snapshot": {
+    "bearer_token": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-11-18T17:40:52.110Z"
+    }
+  }
+}

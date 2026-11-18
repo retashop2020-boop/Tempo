@@ -1,0 +1,12 @@
+{
+  "bearer_token": {
+    "status": "available",
+    "detail": "",
+    "checked_at": "2026-11-18T17:40:52.110Z"
+  },
+  "conversation_api": {
+    "status": "available",
+    "detail": "",
+    "checked_at": "2026-11-18T17:40:55.381Z"
+  }
+}
