@@ -1,0 +1,31 @@
+{
+  "schema_version": 2,
+  "conversation_id": "6afbfd3e-cb48-83eb-9114-6d1db2629874",
+  "title": "فن گرافیک 马会",
+  "created_at": 1794899263.628995,
+  "updated_at": 1794924486.461377,
+  "exported_at": "2026-11-19T08:02:06.706Z",
+  "message_count": 174,
+  "branch": "current",
+  "branch_count": 1,
+  "project_id": null,
+  "project_title": null,
+  "archived": false,
+  "shared": false,
+  "share_id": null,
+  "workspace_id": "b1263d73-b449-435b-8fa8-6c023818f291",
+  "export_formats": {
+    "markdown": true,
+    "html": true,
+    "embedded_markdown": false,
+    "raw_json": true,
+    "thinking_summaries": false
+  },
+  "capability_snapshot": {
+    "bearer_token": {
+      "status": "available",
+      "detail": "",
+      "checked_at": "2026-11-19T08:02:03.984Z"
+    }
+  }
+}
