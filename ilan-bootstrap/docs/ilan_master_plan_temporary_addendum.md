@@ -1395,3 +1395,45 @@ Adapter باید قرارداد مورد انتظار AgentLoop را پیاده 
 - گام بعدی بررسی فایل/محل ساخت و اتصال `model_client`، `AgentLoop`، `ToolRegistry` و `ToolDispatcher` و همچنین محل ثبت ابزارهاست.
 - پس از مشاهدهٔ آن مسیر واقعی، قرارداد model client و نیاز یا عدم نیاز به adapter مخصوص Ollama مشخص می‌شود.
 - تا پیش از این بررسی و تست یکپارچه با ابزارهای ساختگی و بی‌خطر، ابزارهای واقعی Workspace نباید از مسیر Telegram در اختیار مدل قرار گیرند.
+
+
+## ۲۹. بررسی مسیر ساخت و اتصال اجزای Ilan در main.py
+
+### زنجیرهٔ ساخت مشاهده‌شده
+فایل `main.py` مسیر اجرایی فعلی را به این ترتیب می‌سازد:
+
+1. مسیر Workspace از متغیر محیطی `ILAN_WORKSPACE` خوانده می‌شود و در صورت نبودن، مقدار پیش‌فرض `~/ilan-lab/ilan-workspace` به کار می‌رود. سپس `WorkspaceBoundary` ساخته می‌شود.
+2. `FileTools` بر پایهٔ Workspace ساخته می‌شود.
+3. زیرساخت اجرای تست شامل test profile registry، `ExecutionLimits`، `AuthorizationManager`، `DockerTestExecutor` و `TestExecutionService` ساخته می‌شود.
+4. یک `ToolRegistry` ساخته و چهار ابزار در آن ثبت می‌شوند: `read_file`، `list_files`، `apply_patch` و `run_tests`.
+5. `ToolDispatcher(tool_registry)` ساخته می‌شود.
+6. model provider از `ILAN_MODEL_PROVIDER` خوانده می‌شود؛ مقدار پیش‌فرض `openrouter` است و فقط دو provider با نام‌های `openrouter` و `gemini` پشتیبانی می‌شوند.
+7. `OpenRouterClient()` یا `GeminiClient()` ساخته می‌شود.
+8. `AgentLoop` با model client، registry و dispatcher ساخته می‌شود.
+9. حلقهٔ CLI پیام کاربر را به `agent.run(user_message)` می‌دهد و پاسخ رشته‌ای را چاپ می‌کند.
+10. در بلوک `finally`، `workspace.close()` فراخوانی می‌شود.
+
+### یافته‌های مهم
+- مسیر فعلی `main.py` هیچ `OllamaClient` یا provider مربوط به Ollama نمی‌سازد. اتصال Ollama در این نقطه هنوز وجود ندارد؛ بنابراین نباید طراحی سرویس جدید را بر فرض اتصال حاضر Ollama بنا کرد.
+- model provider فعلی فقط OpenRouter و Gemini است و OpenRouter پیش‌فرض است.
+- چهار ابزار Workspace در زمان ساخت AgentLoop ثبت شده و از طریق `tool_registry.definitions()` برای مدل قابل معرفی‌اند.
+- برای `apply_patch`، callback مستقل `request_patch_approval` پیش‌نمایش diff را نشان می‌دهد و برای اعمال patch تأیید تعاملی می‌گیرد.
+- اجرای تست‌ها از مسیر `TestExecutionService` و `DockerTestExecutor` با `AuthorizationManager` و محدودیت‌های اجرایی انجام می‌شود.
+- callback مجوز مدیریتی از ورودی CLI پاسخ می‌گیرد. این رفتار در اجرای تعاملی قابل استفاده است، اما سازگاری آن با اجرای غیرتعاملی/Telegram هنوز بررسی نشده است.
+- حلقهٔ CLI خطاهای اختصاصی OpenRouter/Gemini را جداگانه مدیریت می‌کند و اعلام می‌کند تلاش مجدد خودکار انجام نمی‌شود. سایر خطاها در شاخهٔ عمومی ثبت و چاپ می‌شوند.
+- `workspace.close()` در `finally` قرار دارد؛ چرخهٔ عمر Workspace در همین مسیر اجرایی بسته می‌شود.
+- این فایل محل composition root فعلی است؛ اما از روی آن به‌تنهایی نمی‌توان قرارداد داخلی model clientها یا شکل payload ارسالی به providerها را تأیید کرد.
+
+### مواردی که هنوز باید بررسی شوند
+1. قرارداد دقیق `OpenRouterClient.chat(messages, tools=...)` و قالب پاسخ آن.
+2. قرارداد دقیق `GeminiClient.chat(messages, tools=...)` و اینکه آیا AgentLoop برای هر دو provider یک شکل پاسخ واحد دریافت می‌کند.
+3. نحوهٔ تبدیل `tools` در هر client و سازگاری آن با تعریف‌های تولیدشده توسط Registry.
+4. import path و محل واقعی فایل‌های model client، برای طراحی adapter بدون حدس.
+5. اینکه اجرای Telegram چگونه قرار است به AgentLoop متصل شود و callbackهای تعاملی مجوز/تأیید patch در آن محیط چگونه رفتار خواهند کرد.
+
+### تصمیم و گام بعدی
+- فعلاً `main.py`، AgentLoop، Registry، Dispatcher و clientهای موجود تغییر نکنند.
+- پیش از ساخت `ilan_model_service.py`، کد کامل فایل‌های `model/openrouter.py` و `model/gemini.py` بررسی شود.
+- پس از بررسی قرارداد clientها، مسیر افزودن Ollama یا façade مشترک تعیین شود؛ نباید فرض کرد هر سه provider قرارداد داخلی یکسانی دارند.
+- اتصال Telegram و تفاوت callbackهای CLI با محیط غیرتعاملی باید جداگانه طراحی و آزموده شود.
+- ابزارهای واقعی Workspace تا پیش از تست یکپارچه با ابزارهای ساختگی و بی‌خطر، نباید از مسیر جدید Telegram به مدل عرضه شوند.
