@@ -1967,3 +1967,82 @@ README قواعد اولیه را ثبت می‌کند: عدم دسترسی نا
 - تست‌ها در این مرحله توسط ایگور اجرا نشده‌اند.
 - هیچ کدی، تنظیمی، مجوزی، image یا داده‌ای تغییر نکرده است.
 - امنیت اجرای Docker و انتقال کامل به Workbench هنوز تأیید نهایی نشده است.
+
+
+## ۴۱. بررسی Composition Root در `main.py` و اتصال واقعی Bootstrap
+
+**منبع بررسی:** نسخهٔ کامل `main.py` که کاربر در تاریخ ۲۰۲۶-۱۱-۲۰ ارسال کرد. این بخش بررسی ایستای کد است؛ اجرای برنامه یا تست‌ها در این مرحله انجام نشده است.
+
+### ۴۱.۱. مسیر Workspace در زمان ساخت
+
+- مسیر از متغیر محیطی `ILAN_WORKSPACE` خوانده می‌شود؛ در صورت نبودن آن، مقدار پیش‌فرض `~/ilan-lab/ilan-workspace` است.
+- `expanduser()` اجرا می‌شود، سپس پوشه با `mkdir(parents=True, exist_ok=True)` ساخته می‌شود و `WorkspaceBoundary` روی همان مسیر ساخته می‌شود.
+- بنابراین در کد فعلی، مسیر پیش‌فرض `ilan-workbench/workspace` نیست. مقدار محیطی می‌تواند مسیر را override کند، اما مقدار واقعی آن در زمان اجرای برنامه از متن `main.py` معلوم نیست.
+- `WorkspaceBoundary` شیء واحدی است که به `FileTools` تزریق می‌شود و همان شیء نیز به Wrapper ابزار `run_tests` داده می‌شود. ریشهٔ نهایی و canonical به رفتار داخلی `WorkspaceBoundary` وابسته است؛ چاپ `workspace_path` در انتها لزوماً همان نمایش canonical ریشه نیست.
+
+### ۴۱.۲. اتصال ابزارهای فایل
+
+- `FileTools(workspace)` با همان `WorkspaceBoundary` ساخته می‌شود.
+- `register_read_file`، `register_list_files` و `register_apply_patch` همگی همان `file_tools` را دریافت می‌کنند.
+- در نتیجه، از نظر dependency injection این سه ابزار ریشهٔ مستقل دیگری در `main.py` دریافت نمی‌کنند و به مرز Workspace داخل `FileTools` وابسته‌اند.
+- تأیید Patch از callback مستقل `request_patch_approval` می‌آید؛ این callback پیش‌نمایش مسیر و diff را در ترمینال نشان می‌دهد و فقط پاسخ `y/yes` را تأیید می‌داند.
+
+### ۴۱.۳. اتصال واقعی اجرای تست
+
+- رجیستری پروفایل با `create_default_test_profile_registry()` ساخته می‌شود.
+- محدودیت‌های سراسری در این فایل برابر timeout برابر ۱۲۰ ثانیه، حافظهٔ ۵۱۲ MiB و CPU برابر ۱ هسته تنظیم شده‌اند.
+- `AuthorizationManager` با callback به نام `request_authorization` ساخته می‌شود.
+- همان manager به `DockerTestExecutor` تزریق می‌شود.
+- همان Executor به `TestExecutionService` تزریق می‌شود؛ بنابراین در مسیر ساختی که این `main.py` تعریف می‌کند، Executor واقعی و انتخاب‌شده `DockerTestExecutor` است، نه صرفاً یک Protocol یا Mock.
+- `register_run_tests`، همان `test_service`، همان `workspace` و همان `profile_registry` را دریافت می‌کند.
+- زنجیرهٔ اتصال در این Composition Root چنین است: `run_tests Wrapper → TestExecutionService → DockerTestExecutor`.
+- این تأیید مربوط به wiring کد است؛ اجرای واقعی Docker، صحت محیط daemon، image و مجوزهای سیستم‌عامل هنوز با این بررسی اثبات نشده‌اند.
+
+### ۴۱.۴. دو مسیر تأیید مجزا
+
+- `request_patch_approval` برای تأیید اعمال تغییر فایل است.
+- `request_authorization` برای درخواست مجوز مدیریتی است و به `AuthorizationManager` متصل شده است.
+- این دو callback از نظر هدف و محل استفاده مجزا هستند و نباید تأیید Patch را معادل مجوز اجرای Docker دانست.
+- متن callback مجوز مدیریتی فقط عملیات متنی را در ترمینال نمایش می‌دهد و پاسخ مثبت را می‌پذیرد؛ معنای دقیق و جزئیات عملیات از قرارداد `AuthorizationManager` و متن ارسالی Executor می‌آید.
+- از این فایل به‌تنهایی نمی‌توان نتیجه گرفت هر اجرای ابزار نیازمند تأیید کاربر است؛ تأیید Patch و مجوز Docker دو مسیر مشخص‌اند و سایر ابزارها callback تأیید جداگانه‌ای در این Composition Root ندارند.
+
+### ۴۱.۵. Registry، Dispatcher و AgentLoop
+
+- چهار ابزار `read_file`، `list_files`، `apply_patch` و `run_tests` در یک `ToolRegistry` ثبت می‌شوند.
+- یک `ToolDispatcher` با همان Registry ساخته می‌شود.
+- انتخاب مدل از `ILAN_MODEL_PROVIDER` انجام می‌شود و در این فایل فقط `openrouter` و `gemini` پشتیبانی شده‌اند؛ مقدار پیش‌فرض `openrouter` است.
+- هیچ انتخاب مستقیم Ollama یا مدل محلی در این Composition Root مشاهده نمی‌شود. تنظیمات مدل محلی Bridge نباید به این AgentLoop تعمیم داده شود.
+- `AgentLoop` همان model client، همان registry و همان dispatcher را دریافت می‌کند.
+- متن system prompt محدودیت‌هایی را به ایلان اعلام می‌کند، از جمله ممنوعیت ادعای موفقیت بدون نتیجهٔ ابزار و ممنوعیت اجرای arbitrary shell command؛ اما system prompt به‌تنهایی کنترل امنیتی اجرایی نیست. محدودیت واقعی از ابزارهای ثبت‌شده و کنترل‌های سمت Wrapper، Dispatcher و سرویس‌ها حاصل می‌شود.
+
+### ۴۱.۶. مدیریت خطا و چرخهٔ عمر Workspace
+
+- حلقهٔ مکالمه خطاهای `OpenRouterError` و `GeminiError` را جداگانه می‌گیرد و صریحاً اعلام می‌کند retry خودکار انجام نمی‌شود.
+- سایر خطاها در حلقه با عنوان `Runner error` چاپ می‌شوند و حلقه برای پیام بعدی ادامه می‌یابد.
+- `workspace.close()` در `finally` قرار دارد و پس از خروج از حلقه یا خطای بعدی در بلوک محافظت‌شده اجرا می‌شود.
+- ساخت مسیر و `WorkspaceBoundary` پیش از ورود به `try` انجام شده است؛ بنابراین خطاهای این مرحله تحت مدیریت خطای حلقه یا `finally` قرار نمی‌گیرند. در صورت شکست ساخت Boundary، هنوز شیء Workspace ساخته‌شده‌ای وجود ندارد که نیاز به بستن داشته باشد.
+- مسیر چاپ‌شده در پیام آماده‌بودن، متغیر `workspace_path` است؛ برای گزارش دقیق ریشهٔ canonical بهتر است مقدار `workspace.root` نیز در اجرای عملی ثبت یا مقایسه شود، اگر این property در پیاده‌سازی Workspace موجود است.
+
+### ۴۱.۷. اختلاف مهم با هدف Workbench و موارد باز
+
+1. **ریشهٔ واقعی Workbench:** مسیر پیش‌فرض هنوز `~/ilan-lab/ilan-workspace` است، در حالی که هدف انتقال پیش‌تر `~/ilan-lab/ilan-workbench/workspace` مطرح شده بود. پیش از هر تغییر باید مقدار واقعی `ILAN_WORKSPACE` در محیط اجرای ایلان بررسی شود.
+2. **اعتبارسنجی Dispatcher:** این فایل فقط نشان می‌دهد Dispatcher با Registry ساخته شده است؛ رفتار parse، schema validation، رد آرگومان‌های اضافی و مدیریت خطا باید از پیاده‌سازی فعلی `tools/dispatcher.py` بررسی شود. نباید از روی این Composition Root آن‌ها را فرض کرد.
+3. **اتصال به محیط اجرا:** کد نشان می‌دهد مجوز مدیریتی از callback تعاملی ترمینال گرفته می‌شود. اگر برنامه در محیطی بدون ورودی تعاملی اجرا شود، مسیر درخواست مجوز ممکن است متوقف یا ناموفق شود؛ این رفتار باید در محیط واقعی سنجیده شود.
+4. **اعتماد به تنظیمات محیطی:** `ILAN_WORKSPACE` و `ILAN_MODEL_PROVIDER` ورودی‌های محیطی‌اند. مقدار نهایی آن‌ها و محل تنظیمشان در اجرای واقعی هنوز مشاهده نشده است.
+5. **امنیت فراتر از wiring:** اتصال صحیح Workspace و Docker Executor به‌تنهایی امنیت کامل را اثبات نمی‌کند؛ ریسک‌های image، Docker daemon، TOCTOU، cleanup، سیاست sudo و آزمون عملی محدودیت‌ها که در بخش ۴۰ ثبت شده‌اند، باز می‌مانند.
+
+### ۴۱.۸. جمع‌بندی موقت
+
+- اتصال `FileTools` به `WorkspaceBoundary` و اتصال `TestExecutionService` به `DockerTestExecutor` در Composition Root ارسالی تأیید شد.
+- چهار ابزار مورد انتظار در یک Registry ثبت شده و همان Registry به Dispatcher و AgentLoop داده شده است.
+- مهم‌ترین اختلاف فعلی با طرح انتقال، مسیر پیش‌فرض Workspace است؛ هنوز `ilan-workbench/workspace` در `main.py` به‌عنوان پیش‌فرض تثبیت نشده است.
+- این بررسی فقط wiring و ساختار کد را تأیید می‌کند؛ هیچ تست یا اجرای Docker در این مرحله انجام نشده و امنیت کامل یا انتقال عملی به Workbench تأیید نشده است.
+- هیچ کدی یا تنظیم محیطی در این مرحله تغییر داده نشده است.
+
+### ۴۱.۹. گام بعدی پیشنهادی
+
+پیش از تغییر کد، دو مورد را از محیط واقعی مشخص کنیم:
+1. مقدار واقعی `ILAN_WORKSPACE` هنگام اجرای ایلان و مسیر canonical گزارش‌شده توسط Workspace.
+2. پیاده‌سازی `tools/dispatcher.py` برای بررسی اعتبارسنجی واقعی schema و رفتار خطا.
+
+پس از آن می‌توان دربارهٔ حداقل تغییر لازم برای پیش‌فرض Workbench و آزمون پذیرش تصمیم گرفت.
