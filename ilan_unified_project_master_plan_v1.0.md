@@ -1,6 +1,6 @@
 # نقشهٔ راه یکپارچهٔ پروژهٔ Igor–Ilan
 
-**نسخه:** 1.6  
+**نسخه:** 1.7  
 **تاریخ:** ۲۲ نوامبر ۲۰۲۶  
 **وضعیت:** مرجع یکپارچهٔ پروژه؛ ترکیب نقشهٔ اجرایی میزکار ایلان و یادداشت اکتشافی هسته و حافظهٔ Igor  
 **مالک پروژه و تصمیم‌گیر نهایی:** کاربر  
@@ -753,3 +753,75 @@ read → hash check → build patched content → write_atomic → os.replace
 - **محدودیت شواهد:** هیچ تستی اجرا نشده؛ نتایج فقط از کدهای ارائه‌شده استخراج شده‌اند.
 
 **وضعیت این گام تاریخی:** پیشنهاد بازرسی فوق با تصمیم اجرایی بعدی کاربر superseded شده است. ادامهٔ بررسی عمومی FileTools/WorkspaceBoundary پیش‌نیاز MVP نیست و نباید مسیر ساخت را متوقف کند. محدودیت Lost Update ثبت‌شده باقی می‌ماند و برای مرحلهٔ سخت‌سازی آینده پیگیری می‌شود؛ برای نسخهٔ اولیه باید دامنهٔ نوشتن ایلان محدود و تحت نظارت ایگور باشد. مرجع اقدام جاری، بخش «وضعیت اجرایی جاری ــ مرجع شروع سریع گفتگوهای بعدی» در ابتدای سند است.
+
+
+## ۱۷. تکمیل تست واحد Ollama Client و عیب‌یابی اتصال WSL به Windows ــ ۲۲ نوامبر ۲۰۲۶
+
+### ۱۷.۱. نتیجهٔ تست واحد Client ــ انجام‌شده و مشاهده‌شده
+
+کاربر تست اختصاصی `tests/test_ollama_agent_client.py` را در محیط مجازی پروژه اجرا کرد:
+
+- محیط فعال: `.venv`
+- مفسر: Python 3.10.12 در مسیر `/home/zardakh/ilan-lab/ilan-bootstrap/.venv/bin/python`
+- نسخهٔ pytest: 9.2.0
+- نتیجه: **۹ تست جمع‌آوری شد و هر ۹ تست موفق شدند؛ ۰ شکست؛ زمان اجرا ۰٫۰۳ ثانیه.**
+
+سناریوهای موفق شامل نگاشت نام ابزار از Tool Call قبلی، نگاشت چند نتیجهٔ ابزار، رد نتیجهٔ ابزار بدون شناسهٔ متناظر، حفظ content خالی به‌صورت رشته، رد آرگومان غیر-object، نرمال‌سازی Tool Call پاسخ Ollama، حذف پارامتر think در حالت auto و حفظ done_reason، ارسال think=false در حالت off و تنظیم finish_reason=tool_calls هستند.
+
+**دامنهٔ اعتبار نتیجه:** این تست‌ها رفتار واحد Adapter را با پاسخ‌های HTTP شبیه‌سازی‌شده تأیید می‌کنند؛ آن‌ها ارتباط واقعی با Ollama، سازگاری نسخهٔ نصب‌شدهٔ Ollama، در دسترس بودن مدل `gpt-oss-20b-local:latest` یا Tool Calling واقعی مدل را اثبات نمی‌کنند.
+
+### ۱۷.۲. مشاهدات شبکه از WSL ــ ۲۲ نوامبر ۲۰۲۶
+
+کاربر دستورات زیر را از WSL در مسیر `~/ilan-lab/ilan-bootstrap` اجرا کرد:
+
+- `curl http://localhost:11434/api/tags` با خطای **Connection refused** مواجه شد؛ بنابراین در آن لحظه روی loopback محیط WSL سرویس قابل‌اتصال در این پورت نبود.
+- `pgrep -a ollama` هیچ پردازش Ollama در محیط WSL نشان نداد. این مشاهده دربارهٔ پردازش‌های Windows چیزی اثبات نمی‌کند.
+- `ip route show default` مقدار `default via 172.24.32.1 dev eth0` را نشان داد.
+- `/etc/resolv.conf` نیز `nameserver 172.24.32.1` را نشان داد.
+- درخواست `curl -i --connect-timeout 3 --max-time 5 http://172.24.32.1:11434/api/tags` با **Connection timeout after 3001 ms** پایان یافت.
+
+**تفسیر محدود:** آدرس `172.24.32.1` در خروجی فعلی Gateway و DNS محیط WSL است؛ اما این به‌تنهایی ثابت نمی‌کند که آدرس Listener مناسب Ollama در Windows است. Timeout روی این آدرس نیز به‌تنهایی علت را مشخص نمی‌کند. هنوز معلوم نیست Ollama در Windows اجراست یا روی چه آدرسی گوش می‌دهد، و آیا Windows Firewall یا تنظیم شبکه در مسیر دخیل است.
+
+### ۱۷.۳. تنظیمات Client که از فایل محلی مشاهده شد
+
+خروجی grep از `model/ollama_agent_client.py` نشان داد Client از متغیرهای محیطی زیر پشتیبانی می‌کند:
+
+- `ILAN_OLLAMA_MODEL`
+- `ILAN_OLLAMA_URL`
+- `ILAN_OLLAMA_TIMEOUT` با مقدار پیش‌فرض ۲۰۰۰ ثانیه در کد مشاهده‌شده
+- `ILAN_THINKING_MODE` با مقدار پیش‌فرض `auto`
+
+این مشاهده فقط نام متغیرها و پیش‌فرض timeout را تأیید می‌کند؛ مقدار واقعی متغیرهای محیطی نشست کاربر یا تنظیمات Ollama در Windows از آن استخراج نشده است.
+
+### ۱۷.۴. گام بعدی محدود و مصوب برای عیب‌یابی
+
+گام بعدی، **بازرسی فقط‌خواندنی از PowerShell ویندوز** است؛ هنوز هیچ تنظیمی تغییر نمی‌کند. باید سه موضوع جداگانه روشن شود:
+
+1. آیا پردازش `ollama` در Windows وجود دارد؟
+2. آیا پورت TCP `11434` در Windows در وضعیت Listen است و روی کدام LocalAddress؟
+3. آیا API از خود Windows روی `127.0.0.1:11434/api/tags` پاسخ می‌دهد؟
+
+فرمان‌های پیشنهادی که هنوز اجرا نشده‌اند:
+
+```powershell
+Write-Host "===== Ollama process ====="
+Get-Process ollama -ErrorAction SilentlyContinue
+
+Write-Host "===== Port 11434 listeners ====="
+Get-NetTCPConnection -LocalPort 11434 -State Listen -ErrorAction SilentlyContinue |
+    Format-Table LocalAddress, LocalPort, State, OwningProcess
+
+Write-Host "===== Local Ollama API ====="
+curl.exe -i --connect-timeout 3 http://127.0.0.1:11434/api/tags
+```
+
+پس از دریافت خروجی، مسیر اتصال WSL↔Windows بر اساس شواهد تعیین شود. فعلاً `OLLAMA_HOST`، Firewall، Route، Relay و سایر تنظیمات شبکه تغییر نکنند. راه‌اندازی Relay نیز تا روشن‌شدن وضعیت سرویس محلی و نیاز واقعی به آن متوقف بماند.
+
+### ۱۷.۵. وضعیت اجرایی پس از این مرحله
+
+- **انجام‌شده:** اجرای تست واحد Ollama Client با نتیجهٔ ۹/۹ موفق.
+- **مشاهده‌شده:** WSL روی `localhost:11434` اتصال نداشت؛ درخواست به `172.24.32.1:11434` نیز Timeout شد.
+- **باز:** وضعیت پردازش و Listener Ollama در Windows و پاسخ API محلی Windows.
+- **باز:** مسیر قابل‌اتکای دسترسی AgentLoop در WSL به Ollama در Windows.
+- **انجام‌نشده:** تست واقعی مدل، Tool Calling واقعی، اتصال AgentLoop و اجرای Relay.
+- **محدودیت دامنه:** هیچ فایل اجرایی پروژه، تنظیم سیستم، Firewall یا شبکه در این مرحله تغییر داده نشده است.
