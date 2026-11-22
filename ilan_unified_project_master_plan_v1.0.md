@@ -1096,9 +1096,9 @@ read → hash check → build patched content → write_atomic → os.replace
 
 ### وضعیت اجرایی
 
-**انجام‌شده:** تهیهٔ دو فایل مستقل و اجرای ۱۱ تست واحد در Python 3.13.5.
+**انجام‌شده:** تهیهٔ دو فایل مستقل؛ اجرای ۱۱ تست واحد در محیط ساخت با Python 3.13.5؛ و اجرای مجدد همان ۱۱ تست در محیط محلی کاربر با Python 3.10.12 (همه موفق).
 
-**در انتظار انتقال و اعتبارسنجی محلی:** قرار دادن فایل‌ها در checkout واقعی `~/ilan-lab/ilan-bootstrap` و اجرای `python -m pytest -q tests/test_relay_session.py` با Python 3.10.12.
+**اعتبارسنجی محلی انجام‌شده:** کاربر فایل‌ها را در checkout واقعی `~/ilan-lab/ilan-bootstrap` قرار داد و فرمان `python -m pytest -v tests/test_relay_session.py` را با Python 3.10.12 و pytest 9.2.0 اجرا کرد؛ نتیجهٔ مشاهده‌شده: **۱۱ passed در ۰.۰۳ ثانیه**.
 
 **گام بعدی:** پس از موفقیت تست محلی، طراحی و پیاده‌سازی لایهٔ HTTP Relay و قرارداد مسیرهای control؛ سپس حل امن persistence/transfer اعتبارنامهٔ بازیابی و در مرحلهٔ بعد اتصال کنترل‌شده به چرخهٔ عمر `main.py`.
 
