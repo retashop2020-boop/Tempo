@@ -1103,3 +1103,32 @@ read → hash check → build patched content → write_atomic → os.replace
 
 **گام بعدی:** پس از موفقیت تست محلی، طراحی و پیاده‌سازی لایهٔ HTTP Relay و قرارداد مسیرهای control؛ سپس حل امن persistence/transfer اعتبارنامهٔ بازیابی و در مرحلهٔ بعد اتصال کنترل‌شده به چرخهٔ عمر `main.py`.
 
+## ۱۷.۱۳. تکمیل تست‌های Relay Server و Lifecycle ــ ۲۲ نوامبر ۲۰۲۶
+
+در checkout محلی کاربر، مسیر `~/ilan-lab/ilan-bootstrap` و محیط Python 3.10.12 / pytest، اصلاحات مربوط به HTTP Server و Lifecycle اجرا و با تست تأیید شدند.
+
+### تغییرات و شواهد تأییدشده
+
+- تست‌های `tests/test_relay_server.py`: **۲۰ passed**.
+- تست‌های `tests/test_relay_lifecycle.py` پس از اصلاح Startup: **۱۱ passed**.
+- تست یکپارچه با `RelayHTTPServer` واقعی، درخواست HTTP احراز هویت‌شدهٔ Shutdown، پاسخ موفق، توقف Lifecycle و بسته‌شدن Listener: موفق.
+- تست تشخیصی `test_startup_timeout_stops_entered_but_not_ready_server`: **۱ passed**. سناریو Thread واردشده به حلقهٔ سرویس‌دهی ولی فاقد Ready را شبیه‌سازی می‌کند؛ پس از درخواست توقف، Coordinator، `shutdown()` را فراخوانی می‌کند، Thread متوقف و Server بسته می‌شود.
+- اجرای کامل مجموعهٔ تست محلی پس از این اصلاحات: **۹۴ passed در ۰.۷۴ ثانیه**.
+- جست‌وجوی متنی در `core/relay_lifecycle.py` نشان داد تنها فراخوانی اجرایی `server.shutdown()` در `_coordinate_shutdown` قرار دارد؛ مورد دیگر صرفاً متن Docstring است.
+
+### نتیجهٔ معماری در محدودهٔ آزمایش
+
+- Coordinator مالک فراخوانی `server.shutdown()` است.
+- مسیر Startup timeout در سناریوی «Thread وارد حلقه شده اما Ready نشده» آزمایش و تأیید شده است.
+- تست یکپارچهٔ واقعی نشان داده است که پس از Shutdown احراز هویت‌شده، پاسخ HTTP به کلاینت بازمی‌گردد و سپس Listener بسته و state/credentials مربوط به Lifecycle پاک می‌شوند.
+
+### محدودیت شواهد و موارد باز
+
+- نتیجهٔ ۹۴ تست، فقط مجموعهٔ فعلی تست‌ها و سناریوهای مشخص‌شده را پوشش می‌دهد؛ معادل آزمون فشار، آزمون چندپردازشی، خاموشی کامل WSL/Windows یا اعتبارسنجی عملیاتی روی شبکهٔ واقعی نیست.
+- یکپارچه‌سازی Lifecycle با `main.py`، راه‌اندازی Relay ویندوزی از WSL، مدیریت process ownership در اجرای واقعی، Recovery و persistence امن Recovery Token هنوز تکمیل نشده‌اند.
+- مقادیر زمان‌بندی Lease/Heartbeat همچنان نیازمند کالیبراسیون با آزمایش محیط واقعی‌اند.
+- وضعیت فایل‌ها و کد محلی بر اساس خروجی‌هایی است که کاربر در گفتگو اجرا و ارائه کرده است؛ این checkout هنوز Git repository محلی نیست و نباید با محتوای شاخهٔ GitHub یکسان فرض شود.
+
+### گام بعدی مصوب
+
+آماده‌سازی یک مخزن مستقل و تمیز برای کل پروژهٔ `ilan-bootstrap`: ابتدا بازرسی کامل فایل‌های checkout محلی، شناسایی فایل‌های منبع و ضروری، حذف/عدم انتقال secretها، محیط مجازی، cache و فایل‌های موقت، افزودن مستندات و فایل‌های وابستگی و `.gitignore`، سپس ساخت clone مستقل، اجرای تست‌ها از خود clone و بازبینی نهایی. مقصد GitHub باید پیش از ساخت/Push با کاربر مشخص شود؛ انتقال به مخزن `Tempo` مفروض نیست. تا تعیین مقصد، هیچ مخزن جدیدی ساخته یا Push انجام نمی‌شود.
