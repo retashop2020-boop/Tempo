@@ -1250,7 +1250,7 @@ read → hash check → build patched content → write_atomic → os.replace
 
 در بررسی Ruleهای فعال Inbound در `ActiveStore` دو Rule با نام نمایشی `Windows PowerShell` و پروفایل `Public` پیدا شدند. هر دو Rule برنامهٔ زیر را هدف می‌گرفتند:
 
-- `C:\\windows\\system32\\windowspowershell\\v1.0\\powershell.exe`
+- `C:\windows\system32\windowspowershell\v1.0\powershell.exe`
 
 فیلترهای پورت نشان دادند یکی برای UDP و دیگری برای TCP است و هر دو `LocalPort=Any` و `RemotePort=Any` دارند. شناسهٔ Rule مربوط به TCP:
 
