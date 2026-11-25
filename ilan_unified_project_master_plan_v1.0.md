@@ -1506,3 +1506,40 @@ curl --connect-timeout 5 http://172.24.32.1:11434/api/tags
 
 این مرحله فقط از مسیر Relay احراز هویت‌شده استفاده کرد و هیچ Rule یا تنظیم Firewall را تغییر نداد. وضعیت Ruleهای TCP/UDP و تصمیم نهایی سیاست Firewall که در بخش ۱۷.۱۷ ثبت شده، همچنان مستقل و باز است؛ برای ادامهٔ کار AgentLoop نباید بدون مانع مشخص دوباره به آن پرونده برگشت.
 
+## ۱۷.۲۰. تکمیل و آزمون چرخهٔ عمر Windows Relay Runner و Startup Core ــ ۲۵ نوامبر ۲۰۲۶
+
+### دامنهٔ این ثبت
+
+این بخش فقط نتایج آزمون‌های انجام‌شده روی ماژول Windows Startup Core و فرایند مستقل `core.windows_relay_runner` را ثبت می‌کند. این ثبت، جایگزین شواهد اتصال واقعی WSL → Relay → Ollama در بخش ۱۷.۱۹ نیست و ادعای تکمیل Launcher یکپارچه یا قابلیت‌های پیشرفتهٔ Relay را مطرح نمی‌کند.
+
+### اصلاح احراز هویت در Windows PowerShell
+
+- در تابع `Test-IlanRelayAuthentication` از ماژول `%LOCALAPPDATA%\\Ilan\\core\\IlanStartup.psm1` مشخص شد که Windows PowerShell/.NET هدر `Expect: 100-continue` را ارسال می‌کند؛ سرور Relay این رفتار را پشتیبانی نمی‌کند و پاسخ `HTTP 417` می‌دهد.
+- تنظیم `[System.Net.ServicePointManager]::FindServicePoint([uri]$uri).Expect100Continue = $false` بلافاصله پس از تعیین URI و پیش از ارسال درخواست به تابع افزوده شد.
+- فایل پیش از جایگزینی با نسخهٔ پشتیبان `IlanStartup.psm1.pre-expect100-continue.bak` حفظ شد؛ فایل موقت Parse شد و پس از اصلاح نیز Parse فایل اصلی بدون خطا انجام شد.
+- پس از بارگذاری مجدد ماژول، آزمون احراز هویت موفق بود. همین آزمون در یک پنجرهٔ تازهٔ PowerShell نیز بدون تنظیم دستی نشست قبلی نتیجهٔ `Reachable=True`، `Authenticated=True` و `TOKEN_VALID` داد. بنابراین اصلاح به خود ماژول وابسته است، نه وضعیت موقت نشست.
+
+### آزمون چرخهٔ عمر Runner
+
+- Runner موجود با PID `10128` شناسایی شد؛ `Start-IlanRelay` به‌جای ساخت فرایند دوم، نتیجهٔ `Started=False`، `Available=True`، `Authenticated=True` و `ALREADY_RUNNING` برگرداند.
+- `Stop-IlanRelay` همان Runner را با سازوکار توقف اختصاصی Event متوقف کرد: `Stopped=True`، `Status=STOPPED` و بدون فرایند Listener باقی‌مانده روی پورت `18765`. در این آزمون از خاتمهٔ اجباری فرایند استفاده نشد.
+- اجرای مجدد `Start-IlanRelay` موفق بود و Runner جدید با PID `23256` بالا آمد: `Started=True`، `Available=True`، `Authenticated=True` و `Status=STARTED`.
+- در پایان آزمون، Runner با PID `23256` فعال باقی ماند. این PID وضعیت مشاهده‌شده در زمان ثبت است، نه شناسه‌ای پایدار برای اجراهای بعدی.
+
+### آزمون Ollama و پیکربندی
+
+- `Test-IlanOllama` نتیجهٔ `Available=True` و `ModelCount=5` داد؛ سرویس موجود Ollama در این آزمون متوقف یا راه‌اندازی مجدد نشد.
+- `Get-IlanConfiguration` مقادیر جاری را تأیید کرد: Relay برابر `172.24.32.1:18765`، Ollama برابر پورت `11434`، توزیع WSL برابر `Ubuntu`، مسیر پروژه برابر `\\wsl.localhost\\Ubuntu\\home\\zardakh\\ilan-lab\\ilan-bootstrap`، Workspace برابر `/home/zardakh/ilan-lab/ilan-workbench/workspace`، Python برابر Windows Python 3.14 و SecretPath برابر فایل DPAPI در `%LOCALAPPDATA%\\Ilan\\secrets\\relay-token.dpapi`.
+- Token در خروجی‌ها یا فرمان‌ها افشا نشد و در این مرحله هیچ تغییر جدیدی در Ruleهای Firewall انجام نشد.
+
+### نتیجه و مرز ادعا
+
+**انجام‌شده و با خروجی واقعی تأییدشده:** اصلاح دائمی رفتار `Expect100Continue` در Startup Core، احراز هویت از PowerShell تازه، شناسایی Runner موجود، توقف کنترل‌شده، آزادشدن Listener، راه‌اندازی مجدد Runner و دسترسی به Ollama با پنج مدل.
+
+**هنوز انجام‌نشده یا خارج از دامنهٔ این آزمون:**
+1. آزمون یکپارچهٔ Launcher نهایی و راه‌اندازی تعاملی `main.py`؛
+2. تکمیل پایش Heartbeat/Lease، بازیابی پس از Crash، Recovery Token و آزمون‌های فشار؛
+3. ممیزی امنیتی جامع Firewall و کل مسیر ارتباطی.
+
+**اثر بر صف اجرا:** بخش Windows Startup Core و چرخهٔ پایهٔ Start/Stop/Restart برای Runner مستقل، در محدودهٔ آزمون‌های بالا تأیید شده است. این نتیجه، شواهد End-to-End قبلی بخش ۱۷.۱۹ را تکمیل می‌کند؛ اما به‌تنهایی به معنی تکمیل همهٔ قابلیت‌های Relay یا Launcher نیست.
+
